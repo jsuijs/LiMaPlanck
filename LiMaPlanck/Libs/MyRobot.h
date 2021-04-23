@@ -8,6 +8,18 @@
 #include "Arduino.h"
 
 #include "Libs/LppMaster.h"   // contains code...
+extern int LidarArray_L100;
+extern int LidarArray_L80 ;
+extern int LidarArray_L60 ;
+extern int LidarArray_L40 ;
+extern int LidarArray_L20 ;
+extern int LidarArray_V   ;
+extern int LidarArray_R20 ;
+extern int LidarArray_R40 ;
+extern int LidarArray_R60 ;
+extern int LidarArray_R80 ;
+extern int LidarArray_R100;
+
 #include "Libs/Commands.h"    // contains code...
 
 #define TICKS_360_GRADEN   (360L * 256 * 256 / ODO_HEADING)

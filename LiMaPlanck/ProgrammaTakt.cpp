@@ -12,8 +12,6 @@ bool MissieHeenEnWeer(TState &S);
 bool MissieRandomRijden(TState &S);
 bool MissieDetectBlik(TState &S);
 
-int SharpLinks, SharpRechts;    // sharp meting - afstand in mm
-
 TState GlobS;  // Statemachine voor missie
 
 //-----------------------------------------------------------------------------
@@ -37,7 +35,7 @@ void ProgrammaTakt()
       }
    }
 
-   Program.Update("Programma", Flags.IsSet(1));
+   Program.Update("Programma", Flags.IsSet(10));
    if (Program.NewState) GlobS.Reset();   // reset statemachine van missie zelf.
 
    // Roep actieve programma 1 t/m 12  aan.
@@ -90,7 +88,7 @@ void ProgrammaTakt()
       break;
 
       case 9 : { // Programma: Heen en Weer
-         GlobS.Param1 = 500;  // speed
+         GlobS.Param1 = 200;  // speed
          if (MissieHeenEnWeer(GlobS)) Program.State = 0;
       }
       break;
@@ -177,7 +175,7 @@ bool Rijden1Takt(bool Init)
 //-----------------------------------------------------------------------------
 bool MissieUmbMark1(TState &S)
 {
-   S.Update("UmbMark1", Flags.IsSet(2));
+   S.Update("UmbMark1", Flags.IsSet(11));
 
    switch (S.State) {
       case 0 :    // Rij naar X, 0
@@ -279,40 +277,39 @@ bool MissieUmbMark1(TState &S)
 bool MissieHeenEnWeer(TState &S)
 {  int x;
 
-   S.Update("HW", Flags.IsSet(2));
-
-   CSerial.printf("hw %d %d %d %d\n", S.State, Driver.SollSpeedL, Driver.SollSpeedR, SharpRechts);
+   S.Update("HW", Flags.IsSet(11));
 
    switch (S.State) {
 
-      case 0 : {  // Volg wand naar vak B
+      case 0 : { // LIDAR-STARTEN
          if (S.NewState) {
-            Position.Reset();
+            Driver.Pwm(0, 0);
+            Lpp.Start();
          }
-         x = (250 - SharpRechts)/10;  // wand volgen
-         Driver.SpeedHeading(S.Param1, x);  // Speed, Heading
 
-//            if (UsDistance < 500) { // Als we de wand voor ons zien
-//               State++; // naar volgende state
-//            }
+         if (S.StateTime() > 2000) {   //Wacht op start lidar
+            S.State++;
+         }
       }
       break;
 
-      case 1 : {  // Stop
+      case 1 : {  // Volg wand naar vak B
          if (S.NewState) {
-            // voor het eerst in deze state
-            Driver.Stop();
+            Position.Reset();
          }
-         if (Driver.IsDone()) { // Als de beweging klaar is
+         x = (400 - LidarArray_R40) / 50;  // wand volgen
+         Driver.SpeedHeading(S.Param1, x);  // Speed, Heading
+
+         if (LidarArray_V < 350) { // Als we de wand voor ons zien
             S.State++; // naar volgende state
          }
       }
       break;
 
-      case 2 : {  // Draai
+      case 2 : {  // Stop
          if (S.NewState) {
             // voor het eerst in deze state
-            Driver.Rotate(90); // Heading (in graden)
+            Driver.Stop();
          }
          if (Driver.IsDone()) { // Als de beweging klaar is
             S.State++; // naar volgende state
@@ -323,7 +320,7 @@ bool MissieHeenEnWeer(TState &S)
       case 3 : {  // Draai
          if (S.NewState) {
             // voor het eerst in deze state
-            Driver.Rotate(180); // Heading (in graden)
+            Driver.RotateRel(180); // Heading (in graden)
          }
          if (Driver.IsDone()) { // Als de beweging klaar is
             S.State++; // naar volgende state
@@ -332,12 +329,12 @@ bool MissieHeenEnWeer(TState &S)
       break;
 
       case 4 : {  // Terug naar startpunt
-         x = 180 + (SharpLinks - 250)/10;  // wand volgen
+         x = 180 + (LidarArray_L40 - 400) / 50;  // wand volgen
          Driver.SpeedHeading(S.Param1, x);  // Speed, Heading
 
-//            if (UsDistance < 500) { // Als we de wand voor ons zien
-//               State++; // naar volgende state
-//            }
+         if (LidarArray_V < 350) { // Als we de wand voor ons zien
+            S.State++; // naar volgende state
+         }
       }
       break;
 
@@ -348,6 +345,17 @@ bool MissieHeenEnWeer(TState &S)
          }
          if (Driver.IsDone()) { // Als de beweging klaar is
             S.State++; // naar volgende state
+         }
+      }
+      break;
+
+      case 6 : {  // Draai
+         if (S.NewState) {
+            // voor het eerst in deze state
+            Driver.RotateRel(180); // Heading (in graden)
+         }
+         if (Driver.IsDone()) { // Als de beweging klaar is
+            return true;   // mission end
          }
       }
       break;
@@ -364,14 +372,14 @@ bool MissieHeenEnWeer(TState &S)
 bool MissieTTijd(TState &S)
 {  int x;
 
-   S.Update("TTijd", Flags.IsSet(2));
+   S.Update("TTijd", Flags.IsSet(11));
 
    switch (S.State) {
       case 0 :    // Volg wand naar vak B
-            x = (200 - SharpRechts)/10;  // wand volgen
+            x = (200 - LidarArray_R40)/10;  // wand volgen
             Driver.SpeedHeading(S.Param1, x);  // Speed, Heading
 
-            if (SharpLinks < 300) { // Als we de wand voor ons zien
+            if (LidarArray_L40 < 300) { // Als we de wand voor ons zien
                S.State++; // naar volgende state
             }
          break;
@@ -397,11 +405,11 @@ bool MissieTTijd(TState &S)
          break;
 
       case 3 :    // Volg wand in vak B
-            x = (200 - SharpRechts)/10;  // wand volgen
+            x = (200 - LidarArray_R40)/10;  // wand volgen
             Driver.SpeedHeading(S.Param1, x + 90);  // Speed, Heading
-            CSerial.printf("SharpRechts: %d\n", SharpRechts);
+            CSerial.printf("LidarArray_R40: %d\n", LidarArray_R40);
 
-            if (SharpLinks < 300) { // Als we de wand voor ons zien
+            if (LidarArray_L40 < 300) { // Als we de wand voor ons zien
                S.State++; // naar volgende state
             }
          break;
@@ -427,10 +435,10 @@ bool MissieTTijd(TState &S)
          break;
 
       case 6 :    // Volg wand uit vak B
-            x = (200 - SharpRechts)/10;  // wand volgen
+            x = (200 - LidarArray_R40)/10;  // wand volgen
             Driver.SpeedHeading(S.Param1, x + 180);  // Speed, Heading
 
-            if (SharpRechts > 400) { // Als we rechts geen wand meer zien
+            if (LidarArray_R40 > 400) { // Als we rechts geen wand meer zien
                S.State++; // naar volgende state
             }
          break;
@@ -457,12 +465,12 @@ bool MissieTTijd(TState &S)
          break;
 
       case 9 :    // Volg wand naar vak C
-            x = (200 - SharpRechts)/10;  // wand volgen
+            x = (200 - LidarArray_R40)/10;  // wand volgen
             x = Clip(x, -5, 5);
             Driver.SpeedHeading(S.Param1, x + 90);  // Speed, Heading
-            CSerial.printf("Sharp: %d, x: %d\n", SharpRechts, x);
+            CSerial.printf("Sharp: %d, x: %d\n", LidarArray_R40, x);
 
-            if (SharpLinks < 300) { // Als we de wand voor ons zien
+            if (LidarArray_L40 < 300) { // Als we de wand voor ons zien
                S.State++; // naar volgende state
             }
          break;
@@ -488,10 +496,10 @@ bool MissieTTijd(TState &S)
          break;
 
       case 12 :    // Volg wand in vak C
-            x = (200 - SharpRechts)/10;  // wand volgen
+            x = (200 - LidarArray_R40)/10;  // wand volgen
             Driver.SpeedHeading(S.Param1, x + 180);  // Speed, Heading
 
-            if (SharpLinks < 300) { // Als we de wand voor ons zien
+            if (LidarArray_L40 < 300) { // Als we de wand voor ons zien
                S.State++; // naar volgende state
             }
          break;
@@ -518,10 +526,10 @@ bool MissieTTijd(TState &S)
          break;
 
       case 15 :    // Volg wand uit vak C
-            x = (200 - SharpRechts)/10;  // wand volgen
+            x = (200 - LidarArray_R40)/10;  // wand volgen
             Driver.SpeedHeading(S.Param1, x + 270);  // Speed, Heading
 
-            if (SharpRechts > 400) { // Als we rechts geen wand meer zien
+            if (LidarArray_R40 > 400) { // Als we rechts geen wand meer zien
                S.State++; // naar volgende state
             }
          break;
@@ -548,10 +556,10 @@ bool MissieTTijd(TState &S)
          break;
 
       case 18 :    // Volg wand naar vak A
-            x = (200 - SharpRechts)/10;  // wand volgen
+            x = (200 - LidarArray_R40)/10;  // wand volgen
             Driver.SpeedHeading(S.Param1, x + 180);  // Speed, Heading
 
-            if (SharpLinks < 300) { // Als we de wand voor ons zien
+            if (LidarArray_L40 < 300) { // Als we de wand voor ons zien
                return true; // done
             }
          break;
@@ -583,7 +591,7 @@ bool MissieDetectBlik(TState &S)
    static int StartRobotHoek;
 
 
-   S.Update("DetectBlik", Flags.IsSet(2));
+   S.Update("DetectBlik", Flags.IsSet(11));
 
    switch (S.State) {
       case 0 : {    // draai naar rechts
@@ -591,10 +599,10 @@ bool MissieDetectBlik(TState &S)
             StartRobotHoek = Position.Hoek;
             Driver.SpeedLR(100, -100);
          }
-//         CSerial.printf("aaHoek: %d, Sonar: %d\n", Position.Hoek, UsDistance);
-//         if (Driver.IsDone()) { // Als de beweging klaar is
-//            State++; // naar volgende state
-//         }
+         CSerial.printf("aaHoek: %d, Sonar: %d\n", Position.Hoek, LidarArray_V);
+         if (Driver.IsDone()) { // Als de beweging klaar is
+            S.State++; // naar volgende state
+         }
          if (Position.Hoek - StartRobotHoek < -45 ) S.State ++;
       }
       break;
@@ -606,9 +614,9 @@ bool MissieDetectBlik(TState &S)
          }
          int Ix = Position.Hoek + 45 - StartRobotHoek;
          if ((Ix >= 0) && (Ix < 90)) {
-//             Afstanden[Ix] = UsDistance;
+             Afstanden[Ix] = LidarArray_V;
          }
-//         CSerial.printf("aaHoek: %d, Sonar: %d\n", Position.Hoek, UsDistance);
+         CSerial.printf("aaHoek: %d, Sonar: %d\n", Position.Hoek, LidarArray_V);
          if (Position.Hoek - StartRobotHoek > 45 ) S.State ++;
       }
       break;
@@ -643,11 +651,11 @@ bool MissieDetectBlik(TState &S)
             Driver.SpeedHeading(200, Target + StartRobotHoek);
 //            GrijperMagneetVast(true);
          }
-//         CSerial.printf("aaHoek: %d, Sonar: %d\n", Position.Hoek, UsDistance);
-//         if (Driver.IsDone()) { // Als de beweging klaar is
-//            State++; // naar volgende state
-//         }
-//         if (UsDistance < 40) State ++;
+         CSerial.printf("aaHoek: %d, Sonar: %d\n", Position.Hoek, LidarArray_V);
+         if (Driver.IsDone()) { // Als de beweging klaar is
+            S.State++; // naar volgende state
+         }
+         if (LidarArray_V < 100) S.State ++;
       }
          break;
 
@@ -683,7 +691,7 @@ int AfstBediening;
 //-----------------------------------------------------------------------------
 bool MissieRandomRijden(TState &S)
 {
-   S.Update("RandomRijden", Flags.IsSet(2));
+   S.Update("RandomRijden", Flags.IsSet(11));
 
 //   int Lidar_A = Lpp.Sensor[0].Distance;         // Afstand achterzijde
 //   int Lidar_grV = Lpp.Sensor[1].Degrees32 / 32; // Scannen(1) Hoek van 90 graden + 180 gr tot 270 graden

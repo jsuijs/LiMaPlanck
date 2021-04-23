@@ -22,6 +22,18 @@ TFlags         Flags(32);
 
 int Lijn;  // 0..7, 3 bits. 0 = wit, 7 = zwart, 1 = links, 2 = midden, 4 = rechts
 
+int LidarArray_L100;
+int LidarArray_L80 ;
+int LidarArray_L60 ;
+int LidarArray_L40 ;
+int LidarArray_L20 ;
+int LidarArray_V   ;
+int LidarArray_R20 ;
+int LidarArray_R40 ;
+int LidarArray_R60 ;
+int LidarArray_R80 ;
+int LidarArray_R100;
+
 //---------------------------------------------------------------------------------------
 // RC5 stuff start
 #include "Libs/RC5.h"
@@ -66,7 +78,7 @@ void setup() {
       Lpp.SetOffsetDegrees(180);       //180 Align lidar with robotlib coordinate system
       Lpp.SetReverse(0);            // 1
 
-      Lpp.ArraySetup(70, 20, 11);      // Setup array with 11 segments of 20 degrees
+      Lpp.ArraySetup(70, 20, 11);     // Setup array with 11 segments of 20 degrees
       Lpp.SensorSetup(0, -15, 30);    // Setup Sensor 0 to detect achterwaards objects (-15 + 30 = +15 graden)
       Lpp.SensorSetup(1, 90, 180);    // Sensor 1, vanaf 90 graden, (+90 + 180 = 270 graden)
       Lpp.SensorSetup(2, 135, 90);    // Sensor 2, vanaf 135 graden, segment van 90 graden
@@ -83,8 +95,14 @@ void setup() {
       CSerial.printf("LPP I2C error.\n");
    }
 
-   Flags.Set(10, true);
-   Flags.Set(11, true);
+   Flags.Set(1, true);  // 1 - Drive new movement (sub takt)
+   //Flags.Set(2, true);  // 2 - Drive sub takt (each call)
+   //Flags.Set(3, true);  // 3 - Drive new movement (main takt)
+   //Flags.Set(4, true);  // 4 - Drive update speedsp
+
+   //Flags.Set(9, true);  // 9 - Lpp array dump
+   Flags.Set(10, true); // 10 - ProgrammaTakt programma-keuze
+   Flags.Set(11, true); // 11 - ProgrammaTakt Missie-takt
 
    CSerial.printf("Opstarten gereed.\n");
 }
@@ -109,7 +127,7 @@ void loop() {
       NextMainTakt = ms + MAIN_TAKT_INTERVAL;  // zet tijd voor volgende interval
       // hier de periodieke acties voor deze interval
 
-      Lpp.ReadSensors();// lees lidar data
+      ReadLpp();
       Position.Takt();  // Lees & verwerk encoder data
       ProgrammaTakt();  // Voer (stapje van) geselecteerde programma uit
       Driver.Takt();    // stuur motoren aan
@@ -133,6 +151,35 @@ void loop() {
 
    Command.Takt(CSerial);  // Console command interpreter
 }
+
+// All Lpp stuff
+void ReadLpp()
+{
+   Lpp.ReadArray();  // lees lidar array data
+   Lpp.ReadSensors();// lees lidar sensor data
+
+   if (Flags.IsSet(9)) {
+      for (int i=0; i<11; i++) {
+         CSerial.printf("%d ", Lpp.Array[i]);
+      }
+      CSerial.printf("\n");
+   }
+   LidarArray_L100   = Lpp.Array[ 0].Distance;
+   LidarArray_L80    = Lpp.Array[ 1].Distance;
+   LidarArray_L60    = Lpp.Array[ 2].Distance;
+   LidarArray_L40    = Lpp.Array[ 3].Distance;
+   LidarArray_L20    = Lpp.Array[ 4].Distance;
+   LidarArray_V      = Lpp.Array[ 5].Distance;
+   LidarArray_R20    = Lpp.Array[ 6].Distance;
+   LidarArray_R40    = Lpp.Array[ 7].Distance;
+   LidarArray_R60    = Lpp.Array[ 8].Distance;
+   LidarArray_R80    = Lpp.Array[ 9].Distance;
+   LidarArray_R100   = Lpp.Array[10].Distance;
+
+//int Lidar_RB;          //Lpp.Array[9]
+//int Lidar_RBB;          //Lpp.Array[10]av LD4 270<>290 gr
+}
+
 
 //-----------------------------------------------------------------------------
 // BlinkTakt -
