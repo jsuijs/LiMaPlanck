@@ -100,11 +100,11 @@ void TDrive::Takt()
             break;
          }
          case M_ROTATE : {
-            IsDoneFlag = RotateTakt(FirstCall, Param1);
+            IsDoneFlag = RotateRelTakt(FirstCall, Param1);
             break;
          }
          case M_ARC : {
-            IsDoneFlag = ArcTakt(FirstCall, Param1, Param2, Param3, Param4);
+            IsDoneFlag = ArcRelTakt(FirstCall, Param1, Param2, Param3, Param4);
             break;
          }
          case M_STOP : {
@@ -264,7 +264,7 @@ void TDrive::Arc(int Heading, int Radius, int Speed, int EndSpeed)
       if (Flags.IsSet(1)) CSerial.printf("Drive.Arc\n");
 
       DriveMode = M_ARC;
-      Param1 = Heading;
+      Param1 = NormHoek(Heading - Position.Hoek, 360);   // DeltaDegrees
       Param2 = Radius;
       Param3 = Speed;
       Param4 = EndSpeed;
@@ -272,6 +272,28 @@ void TDrive::Arc(int Heading, int Radius, int Speed, int EndSpeed)
       NewMovement = true;
       IsDoneFlag = false;
    }
+
+//-----------------------------------------------------------------------------
+// ArcRel - Rij boog van Degrees (graden).
+//-----------------------------------------------------------------------------
+// Rij een boog tot de opgegeven richting.
+// - 'Heading' is de absolute hoek, in graden.
+// - Radius is straal van de draaicircel in mm
+//-----------------------------------------------------------------------------
+void TDrive::ArcRel(int Degrees, int Radius, int Speed, int EndSpeed)
+   {
+      if (Flags.IsSet(1)) CSerial.printf("Drive.ArcRel\n");
+
+      DriveMode = M_ARC;
+      Param1 = Degrees;
+      Param2 = Radius;
+      Param3 = Speed;
+      Param4 = EndSpeed;
+
+      NewMovement = true;
+      IsDoneFlag = false;
+   }
+
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -303,18 +325,18 @@ void TDrive::UpdateSpeedSP(int InSpeedL, int InSpeedR, int MaxSlopeP)
    }
 
 //-----------------------------------------------------------------------------
-// RotateTakt -
+// RotateRelTakt -
 //-----------------------------------------------------------------------------
-// Parameter: InDegrees - gewenste aantal graden draaien
+// Parameter: DeltaDegrees - gewenste aantal graden draaien
 // return: true when done
 //-----------------------------------------------------------------------------
-bool TDrive::RotateTakt(bool FirstCall, int InDegrees)
+bool TDrive::RotateRelTakt(bool FirstCall, int DeltaDegrees)
    {  static int RestHoek_q8, PrevRestHoek_q8;
       static int VorigeHoek_q8;
       static char StilStand;
 
       if (FirstCall) {
-         RestHoek_q8    = InDegrees * 256;      // doel
+         RestHoek_q8    = DeltaDegrees * 256;      // doel
          VorigeHoek_q8  = Position.HoekHires(); // start
          StilStand      = 0;                    // tbv eind-detectie
       }
@@ -329,7 +351,7 @@ bool TDrive::RotateTakt(bool FirstCall, int InDegrees)
       int SpeedL = -SpeedR;
 
       if (Flags.IsSet(1)) CSerial.printf("RotateTakt FirstCall: %d InDegrees: %d DezeHoek: %d, RestHoek: %d, SpeedL: %d, Clipped: %d, Delta: %d\n",
-            FirstCall, InDegrees, DezeHoek_q8/256, RestHoek_q8/256, SpeedL, Clipped_q8/256, Delta_q8/256);
+            FirstCall, DeltaDegrees, DezeHoek_q8/256, RestHoek_q8/256, SpeedL, Clipped_q8/256, Delta_q8/256);
 
       if (ABS(RestHoek_q8) > ABS(Clipped_q8)) {
          // clipped
@@ -493,12 +515,12 @@ bool TDrive::XYTakt(bool FirstCall, int TargetX, int TargetY, int Speed, int End
    }
 
 //-----------------------------------------------------------------------------
-// ArcTakt - Rij boog naar heading
+// ArcRelTakt - Rij boog van DeltaDegrees graden
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool TDrive::ArcTakt(bool FirstCall, int Heading, int Radius, int Speed, int EndSpeed)
-   {  static int   DoelOdoT;
+bool TDrive::ArcRelTakt(bool FirstCall, int DeltaDegrees, int Radius, int Speed, int EndSpeed)
+   {  static int   DoelOdoT, DegreesOffset_q8;
       static float TurnRate;
 
       int OdoL, OdoR, OdoT;  // afgelegde weg in mm
@@ -508,13 +530,13 @@ bool TDrive::ArcTakt(bool FirstCall, int Heading, int Radius, int Speed, int End
          // bepaal
          // - hoeveel we moeten rijden tot het eindpunt van de boog (DoelOdoT)
          // - hoeveel graden we moeten draaien per afgelegde mm (Turnrate)
-         int DeltaHoek = NormHoek(Heading - Position.Hoek, 360);
-         DoelOdoT = OdoT + 2 * 3.14159 * Radius  * ABS(DeltaHoek) / 360;
+         DoelOdoT = OdoT + 2 * 3.14159 * Radius  * ABS(DeltaDegrees) / 360;
          TurnRate = 360 / 2 / 3.14159 / Radius; // TurnRate in graden / mm
-         if (DeltaHoek < 0) {
+         DegreesOffset_q8 = Position.HoekHires();
+         if (DeltaDegrees < 0) {
             TurnRate = -TurnRate;
          }
-         if (Flags.IsSet(1)) CSerial.printf("ArcTakt First DoelOdoT: %d, TurnRate x 100: %d (%d %d %d %d)\n", DoelOdoT, (int)(TurnRate * 100), Heading, Radius, OdoT, Position.Hoek);
+         if (Flags.IsSet(1)) CSerial.printf("ArcTakt First DoelOdoT: %d, TurnRate x 100: %d (%d %d %d %d)\n", DoelOdoT, (int)(TurnRate * 100), DeltaDegrees, Radius, OdoT, Position.Hoek);
       }
 
       int RestantWeg = DoelOdoT - OdoT;
@@ -522,22 +544,20 @@ bool TDrive::ArcTakt(bool FirstCall, int Heading, int Radius, int Speed, int End
          return true;   // done
       }
 
-      long CurrentHoek = Position.HoekHires(); // (graden *256)
-      int  TargetHoek  = Heading - TurnRate * RestantWeg;  // deze hoek willen we nu hebben (graden).
-      long HoekError   = NormHoek(CurrentHoek - TargetHoek * 256L, (360L * 256));
+      long CurrentHoek_q8 = Position.HoekHires(); //
+      int  TargetHoek  = DeltaDegrees - TurnRate * RestantWeg;  // deze hoek willen we nu hebben (graden).
+      long HoekError_q8   = NormHoek(CurrentHoek_q8 - DegreesOffset_q8 - TargetHoek * 256L, (360L * 256));
 
       // bepaal maximale snelheid op gegeven afstand van doel, en verschil tussen L en R o.b.v. radius
       int SpeedL = EenparigVertragen(RestantWeg, Speed, EndSpeed, MAX_SLOPE * MAIN_TAKT_RATE); // max speed
       int SpeedR = SpeedL;
-      {  // limit scope Delta
-         int Delta = SpeedL * (WIEL_BASIS / 2) / Radius;
-         SpeedL += Delta;
-         SpeedR -= Delta;
-      }
+      int _Delta = SpeedL * (WIEL_BASIS / 2) / Radius;
+      SpeedL += _Delta;
+      SpeedR -= _Delta;
 
-      // simpele P regelaar voor richting (zie ook UmSpeedHeadingTakt)
+      // simpele P regelaar voor richting
       {  // limit scope Correctie
-         int Correctie = (HoekError * PID_Kp) / 4096;
+         int Correctie = (HoekError_q8 * PID_Kp) / 4096;
          int ClippedCorrectie = Clip(Correctie, PID_OUT_CLIP * 256, PID_OUT_CLIP * -256);
          SpeedL = SpeedL + (ClippedCorrectie * WIEL_BASIS) / (1024);
          SpeedR = SpeedR - (ClippedCorrectie * WIEL_BASIS) / (1024);
@@ -546,8 +566,8 @@ bool TDrive::ArcTakt(bool FirstCall, int Heading, int Radius, int Speed, int End
       // stuur de motoren
       SpeedLRTakt(FirstCall, SpeedL, SpeedR, MAX_SLOPE);
 
-      if (Flags.IsSet(2)) CSerial.printf("ArcTakt FirstCall: %d Heading: %d Radius: %d, RestantWeg: %d, TargetHoek: %d, CurHoek: %d, HoekError: %d, SpeedL: %d, SpeedR: %d\n",
-            FirstCall, Heading, Radius, RestantWeg, TargetHoek, (int)(CurrentHoek/256), (int)(HoekError/256), SpeedL, SpeedR);
+      if (Flags.IsSet(2)) CSerial.printf("ArcTakt FirstCall: %d DeltaDegrees: %d Radius: %d, RestantWeg: %d, TargetHoek: %d, CurHoek: %d, HoekError: %d, SpeedL: %d, SpeedR: %d\n",
+            FirstCall, DeltaDegrees, Radius, RestantWeg, TargetHoek, (int)(CurrentHoek_q8/256), (int)(HoekError_q8/256), SpeedL, SpeedR);
 
       return false; // not done yet
    }

@@ -96,6 +96,7 @@ class TDrive
       void Rotate(int Heading);
       void RotateRel(int Degrees);
       void Arc(int Heading, int Radius, int Speed, int EndSpeed);
+      void ArcRel(int Degrees, int Radius, int Speed, int EndSpeed);
       void Stop();
 
       int SollSpeedL, SollSpeedR; // Snelheid (in mm/sec) die we nastreven, verandering begrensd door MaxSlope
@@ -118,8 +119,8 @@ class TDrive
       void SpeedLRTakt(bool FirstCall, int SpeedL, int SpeedR, int MaxSlopeP);
       bool SpeedHeadingTakt(bool FirstCall, int InSpeed, int InHeading);
       bool XYTakt(bool FirstCall, int TargetX, int TargetY, int Speed, int EndSpeed);
-      bool RotateTakt(bool FirstCall, int InHeading);
-      bool ArcTakt(bool FirstCall, int Heading, int Radius, int Speed, int EndSpeed);
+      bool RotateRelTakt(bool FirstCall, int DeltaDegrees);
+      bool ArcRelTakt(bool FirstCall, int DeltaDegrees, int Radius, int Speed, int EndSpeed);
       bool StopTakt(bool FirstCall);
 };
 

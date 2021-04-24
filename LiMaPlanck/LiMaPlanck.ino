@@ -99,6 +99,7 @@ void setup() {
    //Flags.Set(2, true);  // 2 - Drive sub takt (each call)
    //Flags.Set(3, true);  // 3 - Drive new movement (main takt)
    //Flags.Set(4, true);  // 4 - Drive update speedsp
+   //Flags.Set(5, true);  // 5 - Position print (1/sec)
 
    //Flags.Set(9, true);  // 9 - Lpp array dump
    Flags.Set(10, true); // 10 - ProgrammaTakt programma-keuze
@@ -139,7 +140,7 @@ void loop() {
       NextSecTakt = ms + 1000;  // zet tijd voor volgende interval
       // hier de periodieke acties voor deze interval
 
-      if (Flags.IsSet(1)) {
+      if (Flags.IsSet(5)) {
          Position.Print();
       }
 
@@ -213,6 +214,7 @@ void Execute(int Param[])
    if (Command.Match("DriveRotate",    1)) Driver.Rotate(Param[0]);
    if (Command.Match("DriveRotateRel", 1)) Driver.RotateRel(Param[0]);
    if (Command.Match("DriveArc",       4)) Driver.Arc(Param[0], Param[1], Param[2], Param[3]);
+   if (Command.Match("DriveArcRel",    4)) Driver.ArcRel(Param[0], Param[1], Param[2], Param[3]);
    if (Command.Match("DriveStop",      0)) Driver.Stop();
 
    if (Command.Match("LppStatus",      0)) { Lpp.ReadStatus(); Lpp.PrintStatus(); }
