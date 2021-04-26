@@ -200,14 +200,14 @@ void TDrive::XY(int X, int Y, int Speed, int EndSpeed)
    }
 
 //-----------------------------------------------------------------------------
-// Rotate - draai naar absolute heading (graden).
+// RotateHeading - draai naar absolute heading (graden).
 //-----------------------------------------------------------------------------
 // Draai de stilstaande robot naar opgegeven richting.
 // - 'Heading' is de absolute hoek, in graden.
 //
 // Gebruikte constantes: ROTATE_P_GAIN, ROTATE_D_GAIN, ROTATE_CLIP
 //-----------------------------------------------------------------------------
-void TDrive::Rotate(int Heading)
+void TDrive::RotateHeading(int Heading)
    {
       if (Flags.IsSet(1)) CSerial.printf("Drive.Rotate\n");
 
@@ -227,7 +227,7 @@ void TDrive::Rotate(int Heading)
 //
 // Gebruikte constantes: ROTATE_P_GAIN, ROTATE_D_GAIN, ROTATE_CLIP
 //-----------------------------------------------------------------------------
-void TDrive::RotateRel(int Degrees)
+void TDrive::Rotate(int Degrees)
    {
       if (Flags.IsSet(1)) CSerial.printf("Drive.RotateRel\n");
 
@@ -253,13 +253,13 @@ void TDrive::Stop()
    }
 
 //-----------------------------------------------------------------------------
-// Arc - Rij boog naar heading (graden).
+// ArcHeading - Rij boog naar heading (graden).
 //-----------------------------------------------------------------------------
 // Rij een boog tot de opgegeven richting.
 // - 'Heading' is de absolute hoek, in graden.
 // - Radius is straal van de draaicircel in mm
 //-----------------------------------------------------------------------------
-void TDrive::Arc(int Heading, int Radius, int Speed, int EndSpeed)
+void TDrive::ArcHeading(int Heading, int Radius, int Speed, int EndSpeed)
    {
       if (Flags.IsSet(1)) CSerial.printf("Drive.Arc\n");
 
@@ -274,13 +274,13 @@ void TDrive::Arc(int Heading, int Radius, int Speed, int EndSpeed)
    }
 
 //-----------------------------------------------------------------------------
-// ArcRel - Rij boog van Degrees (graden).
+// Arc - Rij boog van Degrees (graden).
 //-----------------------------------------------------------------------------
 // Rij een boog tot de opgegeven richting.
 // - 'Heading' is de absolute hoek, in graden.
 // - Radius is straal van de draaicircel in mm
 //-----------------------------------------------------------------------------
-void TDrive::ArcRel(int Degrees, int Radius, int Speed, int EndSpeed)
+void TDrive::Arc(int Degrees, int Radius, int Speed, int EndSpeed)
    {
       if (Flags.IsSet(1)) CSerial.printf("Drive.ArcRel\n");
 

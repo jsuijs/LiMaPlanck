@@ -191,7 +191,7 @@ bool MissieUmbMark1(TState &S)
       case 1 :    // Draai naar +90 of -90, afhankelijk van MissionHandler.ParamGet(0)
             if (S.NewState) {
                // voor het eerst in deze state
-               Driver.Rotate(90 * S.Param1); // Heading (in graden)
+               Driver.RotateHeading(90 * S.Param1); // Heading (in graden)
             }
             if (Driver.IsDone()) { // Als de beweging klaar is
                S.State++; // naar volgende state
@@ -214,7 +214,7 @@ bool MissieUmbMark1(TState &S)
       case 3 :    // Draai naar 180 graden
             if (S.NewState) {
                // voor het eerst in deze state
-               Driver.Rotate(180); // Heading (in graden)
+               Driver.RotateHeading(180); // Heading (in graden)
             }
             if (Driver.IsDone()) { // Als de beweging klaar is
                S.State++; // naar volgende state
@@ -237,7 +237,7 @@ bool MissieUmbMark1(TState &S)
       case 5 :    // Draai naar -90 of +90, afhankelijk van MissionHandler.ParamGet(0)
             if (S.NewState) {
                // voor het eerst in deze state
-               Driver.Rotate(-90 * S.Param1); // Heading (in graden)
+               Driver.RotateHeading(-90 * S.Param1); // Heading (in graden)
             }
             if (Driver.IsDone()) { // Als de beweging klaar is
                S.State++; // naar volgende state
@@ -257,7 +257,7 @@ bool MissieUmbMark1(TState &S)
       case 7 :    // Draai naar 0 graden
             if (S.NewState) {
                // voor het eerst in deze state
-               Driver.Rotate(0); // Heading (in graden)
+               Driver.RotateHeading(0); // Heading (in graden)
             }
             if (Driver.IsDone()) { // Als de beweging klaar is
                return true;   // Geef aan dat de missie klaar is.
@@ -323,7 +323,7 @@ bool MissieHeenEnWeer(TState &S)
       case 3 : {  // Draai
          if (S.NewState) {
             // voor het eerst in deze state
-            Driver.RotateRel(180); // Heading (in graden)
+            Driver.Rotate(180); // Heading (in graden)
          }
          if (Driver.IsDone()) { // Als de beweging klaar is
             S.State++; // naar volgende state
@@ -355,7 +355,7 @@ bool MissieHeenEnWeer(TState &S)
       case 6 : {  // Draai
          if (S.NewState) {
             // voor het eerst in deze state
-            Driver.RotateRel(180); // Heading (in graden)
+            Driver.Rotate(180); // Heading (in graden)
          }
          if (Driver.IsDone()) { // Als de beweging klaar is
             return true;   // mission end
@@ -415,7 +415,7 @@ bool MissieTTijd(TState &S)
 
       case 30 : { // Draai
          if (S.NewState) {
-            Driver.Rotate(90); // Heading (in graden)
+            Driver.RotateHeading(90); // Heading (in graden)
          }
 
          if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
@@ -440,7 +440,7 @@ bool MissieTTijd(TState &S)
 
       case 60 : { // Draai
          if (S.NewState) {
-            Driver.Rotate(180); // Heading (in graden)
+            Driver.RotateHeading(180); // Heading (in graden)
          }
 
          if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
@@ -465,7 +465,7 @@ bool MissieTTijd(TState &S)
 
       case 90 : { // draai richting C
          if (S.NewState) {
-            Driver.Rotate(90); // Heading (in graden)
+            Driver.RotateHeading(90); // Heading (in graden)
          }
 
          if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
@@ -493,7 +493,7 @@ bool MissieTTijd(TState &S)
 
       case 120 : { // Draai
          if (S.NewState) {
-            Driver.Rotate(180); // Heading (in graden)
+            Driver.RotateHeading(180); // Heading (in graden)
          }
 
          if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
@@ -518,7 +518,7 @@ bool MissieTTijd(TState &S)
 
       case 150 : { // Draai
          if (S.NewState) {
-            Driver.Rotate(270); // Heading (in graden)
+            Driver.RotateHeading(270); // Heading (in graden)
          }
 
          if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
@@ -543,7 +543,7 @@ bool MissieTTijd(TState &S)
 
       case 180 : { // Draai
          if (S.NewState) {
-            Driver.Rotate(180); // Heading (in graden)
+            Driver.RotateHeading(180); // Heading (in graden)
          }
 
          if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
@@ -755,7 +755,7 @@ bool MissieRandomRijden(TState &S)
       case 602 : { // 180 gr RECHTSOM draaien - Random rijden
 
          if (S.NewState) {
-            Driver.RotateRel(-180);
+            Driver.Rotate(-180);
          }
          if (Driver.IsDone()) S.State = 601;
       }
@@ -765,7 +765,7 @@ bool MissieRandomRijden(TState &S)
       case 603 : { // 90 gr RECHTSOM draaien - Random rijden
 
          if (S.NewState) {
-            Driver.RotateRel(-90);
+            Driver.Rotate(-90);
          }
          if (Driver.IsDone()) S.State = 601;
       }
@@ -775,7 +775,7 @@ bool MissieRandomRijden(TState &S)
       case 604 : { // 90 gr LINKSOM draaien - Random rijden
 
          if (S.NewState) {
-            Driver.RotateRel(90);
+            Driver.Rotate(90);
          }
          if (Driver.IsDone()) S.State = 601;
       }

@@ -93,10 +93,10 @@ class TDrive
       void SpeedLR(int SpeedL, int SpeedR);
       void SpeedHeading(int Speed, int Heading);
       void XY(int X, int Y, int Speed, int EndSpeed);
-      void Rotate(int Heading);
-      void RotateRel(int Degrees);
-      void Arc(int Heading, int Radius, int Speed, int EndSpeed);
-      void ArcRel(int Degrees, int Radius, int Speed, int EndSpeed);
+      void RotateHeading(int Heading);
+      void Rotate(int Degrees);
+      void ArcHeading(int Heading, int Radius, int Speed, int EndSpeed);
+      void Arc(int Degrees, int Radius, int Speed, int EndSpeed);
       void Stop();
 
       int SollSpeedL, SollSpeedR; // Snelheid (in mm/sec) die we nastreven, verandering begrensd door MaxSlope
