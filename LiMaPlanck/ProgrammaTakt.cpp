@@ -380,6 +380,7 @@ static int VolgRechts()
 // MissieTTijd - state machine
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+#define TT_FRONT_DETECT 400
 bool MissieTTijd(TState &S)
 {  int x;
 
@@ -400,7 +401,7 @@ bool MissieTTijd(TState &S)
       case 10 : { // Volg wand naar vak B
          Driver.SpeedHeading(S.Param1, VolgRechts());  // Volg rechtse wand
 
-         if (LidarArray_L40 < 300)  S.State += 10; // Naar de volgende state als we de wand voor ons zien
+         if (LidarArray_L40 < TT_FRONT_DETECT) S.State += 10; // Naar de volgende state als we de wand voor ons zien
       }
       break;
 
@@ -413,9 +414,9 @@ bool MissieTTijd(TState &S)
       }
       break;
 
-      case 30 : { // Draai
+      case 30 : { // 1e draai in vak B
          if (S.NewState) {
-            Driver.RotateHeading(90); // Heading (in graden)
+            Driver.Rotate(90); // 90 graden linksom
          }
 
          if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
@@ -425,7 +426,7 @@ bool MissieTTijd(TState &S)
       case 40 : { // Volg wand in vak B
          Driver.SpeedHeading(S.Param1, VolgRechts() + 90);  // Volg rechtse wand
 
-         if (LidarArray_L40 < 300)  S.State += 10; // Naar de volgende state als we de wand voor ons zien
+         if (LidarArray_L40 < TT_FRONT_DETECT) S.State += 10; // Naar de volgende state als we de wand voor ons zien
       }
       break;
 
@@ -438,9 +439,9 @@ bool MissieTTijd(TState &S)
       }
       break;
 
-      case 60 : { // Draai
+      case 60 : { // 2e draai in vak B
          if (S.NewState) {
-            Driver.RotateHeading(180); // Heading (in graden)
+            Driver.Rotate(90);
          }
 
          if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
@@ -450,13 +451,13 @@ bool MissieTTijd(TState &S)
       case 70 : { // Volg wand uit vak B
          Driver.SpeedHeading(S.Param1, VolgRechts() + 180);  // Volg rechtse wand
 
-         if (LidarArray_R40 > 400)  S.State += 10; // Naar de volgende state als we rechts geen wand meer zien
+         if (LidarArray_R40 > 400) S.State += 10; // Naar de volgende state als we rechts geen wand meer zien
       }
       break;
 
       case 80 : { // Nog klein stukje rechtdoor
          if (S.NewState) {
-            Driver.XY(Position.XPos-280, Position.YPos, S.Param1, 0);
+            Driver.XY(Position.XPos-450, Position.YPos, S.Param1, 0);
          }
 
          if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
@@ -465,7 +466,7 @@ bool MissieTTijd(TState &S)
 
       case 90 : { // draai richting C
          if (S.NewState) {
-            Driver.RotateHeading(90); // Heading (in graden)
+            Driver.Rotate(-90); // 90 graden rechtsom
          }
 
          if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
@@ -478,7 +479,7 @@ bool MissieTTijd(TState &S)
          Driver.SpeedHeading(S.Param1, x + 90);  // Volg rechtse wand
          CSerial.printf("LidarArray_R40: %d, x: %d\n", LidarArray_R40, x);
 
-         if (LidarArray_L40 < 300) S.State += 10; // Naar volgende state als we de wand voor ons zien
+         if (LidarArray_L40 < TT_FRONT_DETECT) S.State += 10; // Naar volgende state als we de wand voor ons zien
       }
       break;
 
@@ -491,9 +492,9 @@ bool MissieTTijd(TState &S)
       }
       break;
 
-      case 120 : { // Draai
+      case 120 : { // 1e draai in vak C
          if (S.NewState) {
-            Driver.RotateHeading(180); // Heading (in graden)
+            Driver.Rotate(90); // 90 graden naar links
          }
 
          if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
@@ -503,7 +504,7 @@ bool MissieTTijd(TState &S)
       case 130 : { // Volg wand in vak C
          Driver.SpeedHeading(S.Param1, VolgRechts() + 180);  // Volg rechtse wand
 
-         if (LidarArray_L40 < 300) S.State += 10; // Naar volgende state als we de wand voor ons zien
+         if (LidarArray_L40 < TT_FRONT_DETECT) S.State += 10; // Naar volgende state als we de wand voor ons zien
       }
       break;
 
@@ -516,9 +517,9 @@ bool MissieTTijd(TState &S)
       }
       break;
 
-      case 150 : { // Draai
+      case 150 : { // 2e draai in vak C
          if (S.NewState) {
-            Driver.RotateHeading(270); // Heading (in graden)
+            Driver.Rotate(90); // 90 graden naar links
          }
 
          if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
@@ -534,16 +535,16 @@ bool MissieTTijd(TState &S)
 
       case 170 : { // Nog een klein stukje rechtdoor
          if (S.NewState) {
-            Driver.XY(Position.XPos, Position.YPos-280, S.Param1, 0); // Heading (in graden)
+            Driver.XY(Position.XPos, Position.YPos-450, S.Param1, 0); // Heading (in graden)
          }
 
          if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
       }
       break;
 
-      case 180 : { // Draai
+      case 180 : { // Draai richting vak A
          if (S.NewState) {
-            Driver.RotateHeading(180); // Heading (in graden)
+            Driver.Rotate(-90); // 90 graden naar links
          }
 
          if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
@@ -553,7 +554,22 @@ bool MissieTTijd(TState &S)
       case 190 : { // Volg wand naar vak A
          Driver.SpeedHeading(S.Param1, VolgRechts() + 180);  // Volg rechtse wand
 
-         if (LidarArray_L40 < 300) return true; // Als we de wand voor ons zien zijn we klaar met de missie
+         if (LidarArray_L40 < TT_FRONT_DETECT) S.State += 10;  // als we de wand voor ons zien
+      }
+      break;
+
+
+      case 140 : { // Stop (via curve)
+         // Deze state zorgt dat we netjes afremmen voordat we de melden dat de missie klaar is.
+         //
+         // Het hoofd-programma zet pwm op 0 als de missie is afgerond
+         // en dat geeft een 'noodstop' als we nog rijden.
+         //
+         if (S.NewState) {
+            Driver.Stop();
+         }
+
+         if (Driver.IsDone()) return true; // Missie klaar als we netjes gestopt zijn.
       }
       break;
 
@@ -575,7 +591,6 @@ bool MissieDetectBlik(TState &S)
    static int Target;
 
    static int StartRobotHoek;
-
 
    S.Update("DetectBlik", Flags.IsSet(11));
 
