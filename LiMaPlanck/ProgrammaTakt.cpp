@@ -558,8 +558,7 @@ bool MissieTTijd(TState &S)
       }
       break;
 
-
-      case 140 : { // Stop (via curve)
+      case 200 : { // Stop (via curve)
          // Deze state zorgt dat we netjes afremmen voordat we de melden dat de missie klaar is.
          //
          // Het hoofd-programma zet pwm op 0 als de missie is afgerond
