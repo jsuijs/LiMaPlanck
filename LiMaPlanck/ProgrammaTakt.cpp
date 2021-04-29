@@ -178,93 +178,86 @@ bool MissieUmbMark1(TState &S)
    S.Update("UmbMark1", Flags.IsSet(11));
 
    switch (S.State) {
-      case 0 :    // Rij naar X, 0
-            if (S.NewState) {
-               Position.Reset();
-               Driver.XY(UMB_MARK_AFSTAND, 0, UMB_MARK_SPEED, 0);  // X, Y, Speed, EndSpeed - alles in mm(/sec)
-            }
+      case 0 : { // Rij naar X, 0
+         if (S.NewState) {
+            Position.Reset();
+            Driver.XY(UMB_MARK_AFSTAND, 0, UMB_MARK_SPEED, 0);  // X, Y, Speed, EndSpeed - alles in mm(/sec)
+         }
 
-            if (Driver.IsDone()) { // Als de beweging klaar is
-               S.State++; // naar volgende state
-            }
-         break;
+         if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
+      }
+      break;
 
-      case 1 :    // Draai naar +90 of -90, afhankelijk van MissionHandler.ParamGet(0)
-            if (S.NewState) {
-               // voor het eerst in deze state
-               Driver.RotateHeading(90 * S.Param1); // Heading (in graden)
-            }
-            if (Driver.IsDone()) { // Als de beweging klaar is
-               S.State++; // naar volgende state
-            }
-         break;
+      case 10 : { // Draai naar +90 of -90, afhankelijk van MissionHandler.ParamGet(0)
+         if (S.NewState) {
+            Driver.Rotate(90 * S.Param1); // 90 graden links of rechts
+         }
+         if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
+      }
+      break;
 
-      case 2 :    // Rij naar X, Y of X, -Y, afhankelijk van MissionHandler.ParamGet(0)
-            if (S.NewState) {
-               // voor het eerst in deze state
-               Driver.XY( UMB_MARK_AFSTAND,
-                        UMB_MARK_AFSTAND * S.Param1,
-                        UMB_MARK_SPEED,
-                        0); // X, Y, Speed, EndSpeed - alles in mm(/sec)
-            }
-            if (Driver.IsDone()) { // Als de beweging klaar is
-               S.State++; // naar volgende state
-            }
-         break;
+      case 20 : {
+         // Rij naar X, Y of X, -Y, afhankelijk van MissionHandler.ParamGet(0)
+         if (S.NewState) {
+            // voor het eerst in deze state
+            Driver.XY( UMB_MARK_AFSTAND,
+                     UMB_MARK_AFSTAND * S.Param1,
+                     UMB_MARK_SPEED,
+                     0); // X, Y, Speed, EndSpeed - alles in mm(/sec)
+         }
+         if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
+      }
+      break;
 
-      case 3 :    // Draai naar 180 graden
-            if (S.NewState) {
-               // voor het eerst in deze state
-               Driver.RotateHeading(180); // Heading (in graden)
-            }
-            if (Driver.IsDone()) { // Als de beweging klaar is
-               S.State++; // naar volgende state
-            }
-         break;
+      case 30 : { // Draai naar 180 graden
+         if (S.NewState) {
+            Driver.Rotate(90 * S.Param1); // 90 graden links of rechts
+         }
+         if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
+      }
+      break;
 
-      case 4 :    // Rij naar 0, Y of 0, -Y, afhankelijk van MissionHandler.ParamGet(0)
-            if (S.NewState) {
-               // voor het eerst in deze state
-               Driver.XY( 0,
-                        UMB_MARK_AFSTAND * S.Param1,
-                        UMB_MARK_SPEED,
-                        0); // X, Y, Speed, EndSpeed - alles in mm(/sec)
-            }
-            if (Driver.IsDone()) { // Als de beweging klaar is
-               S.State++; // naar volgende state
-            }
-         break;
+      case 40 : { // Rij naar 0, Y of 0, -Y, afhankelijk van MissionHandler.ParamGet(0)
+         if (S.NewState) {
+            // voor het eerst in deze state
+            Driver.XY( 0,
+                     UMB_MARK_AFSTAND * S.Param1,
+                     UMB_MARK_SPEED,
+                     0); // X, Y, Speed, EndSpeed - alles in mm(/sec)
+         }
+         if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
+      }
+      break;
 
-      case 5 :    // Draai naar -90 of +90, afhankelijk van MissionHandler.ParamGet(0)
-            if (S.NewState) {
-               // voor het eerst in deze state
-               Driver.RotateHeading(-90 * S.Param1); // Heading (in graden)
-            }
-            if (Driver.IsDone()) { // Als de beweging klaar is
-               S.State++; // naar volgende state
-            }
-         break;
+      case 50 : { // Draai naar -90 of +90, afhankelijk van MissionHandler.ParamGet(0)
+         if (S.NewState) {
+            Driver.Rotate(90 * S.Param1); // 90 graden links of rechts
+         }
+         if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
+      }
+      break;
 
-      case 6 :    // Rij naar 0, 0
-            if (S.NewState) {
-               // voor het eerst in deze state
-               Driver.XY(0, 0, UMB_MARK_SPEED, 0); // X, Y, Speed, EndSpeed - alles in mm(/sec)
-            }
-            if (Driver.IsDone()) { // Als de beweging klaar is
-               S.State++; // naar volgende state
-            }
-         break;
+      case 60 : { // Rij naar 0, 0
+         if (S.NewState) {
+            // voor het eerst in deze state
+            Driver.XY(0, 0, UMB_MARK_SPEED, 0); // X, Y, Speed, EndSpeed - alles in mm(/sec)
+         }
+         if (Driver.IsDone()) { // Als de beweging klaar is
+            S.State += 10; // naar volgende state
+         }
+      }
+      break;
 
-      case 7 :    // Draai naar 0 graden
-            if (S.NewState) {
-               // voor het eerst in deze state
-               Driver.RotateHeading(0); // Heading (in graden)
-            }
-            if (Driver.IsDone()) { // Als de beweging klaar is
-               return true;   // Geef aan dat de missie klaar is.
-                              // De Msm zal nu niet meer aangeroepen worden.
-            }
-         break;
+      case 70 : { // Draai naar 0 graden
+         if (S.NewState) {
+            Driver.Rotate(90 * S.Param1); // 90 graden links of rechts
+         }
+         if (Driver.IsDone()) { // Als de beweging klaar is
+            return true;   // Geef aan dat de missie klaar is.
+                           // De Msm zal nu niet meer aangeroepen worden.
+         }
+      }
+      break;
 
       default : {
          CSerial.printf("Error: ongeldige state in MissieUmbMark1 (%d)\n", S.State);
