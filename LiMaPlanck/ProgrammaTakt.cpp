@@ -180,6 +180,7 @@ bool MissieUmbMark1(TState &S)
    switch (S.State) {
       case 0 :    // Rij naar X, 0
             if (S.NewState) {
+               Position.Reset();
                Driver.XY(UMB_MARK_AFSTAND, 0, UMB_MARK_SPEED, 0);  // X, Y, Speed, EndSpeed - alles in mm(/sec)
             }
 
@@ -287,6 +288,7 @@ bool MissieHeenEnWeer(TState &S)
       case 0 : {  // LIDAR-STARTEN
          if (S.NewState) {
             Driver.Pwm(0, 0);
+            Position.Reset();
             Lpp.Start();
          }
 
@@ -391,6 +393,7 @@ bool MissieTTijd(TState &S)
       case 0 : {  // LIDAR-STARTEN
          if (S.NewState) {
             Driver.Pwm(0, 0);
+            Position.Reset();
             Lpp.Start();
          }
 
