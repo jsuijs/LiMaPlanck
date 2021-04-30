@@ -735,7 +735,7 @@ bool MissieRandomRijden(TState &S)
          if (Lidar_Blik_RV > Lid_Max)  Lidar_Blik_RV = Lid_Max;   // 210><250 gr valse meting
          if (Lidar_Blik_R  > Lid_Max)  Lidar_Blik_R  = Lid_Max;   // 250><290 gr valse meting
 
-         if (Lidar_Blik_V < 200) {
+         if (Lidar_Blik_V < 240) {
             // print a random number from 0 to 6
             int randNumber = random(2);
             CSerial.println(randNumber);
@@ -750,14 +750,14 @@ bool MissieRandomRijden(TState &S)
             S.State = 602;      // 180 gr R/Om draaien
          }
          if ((Lidar_Blik_LV < 200) || (Lidar_Blik_RV > Lidar_Blik_LV)) {
-            Driver.SpeedLR(110, 60);   // Rechts afdraaien
+            Driver.SpeedLR(150, 90);   // Rechts afdraaien
             break;
          }
          if ((Lidar_Blik_RV < 200) || (Lidar_Blik_LV > Lidar_Blik_RV)) {
-            Driver.SpeedLR(60, 110);   //Links afdraaien
+            Driver.SpeedLR(90, 150);   //Links afdraaien
             break;
          }
-         Driver.SpeedLR(110, 110);   // default rechtuit
+         Driver.SpeedLR(150, 150);   // default rechtuit
       }
       break;
 
