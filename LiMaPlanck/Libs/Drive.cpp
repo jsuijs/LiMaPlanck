@@ -91,6 +91,10 @@ void TDrive::Takt()
             SpeedLRTakt(FirstCall, Param1, Param2, MaxSlope);
             break;
          }
+         case M_SPEED_ROTATION : {
+            SpeedRotationTakt(FirstCall, Param1, Param2);
+            break;
+         }
          case M_SPEED_HEADING : {
             SpeedHeadingTakt(FirstCall, Param1, Param2);
             break;
@@ -161,6 +165,21 @@ void TDrive::SpeedLR(int SpeedL, int SpeedR)
       DriveMode = M_SPEED_LR;
       Param1 = SpeedL;
       Param2 = SpeedR;
+
+      IsDoneFlag = false;
+   }
+
+//-----------------------------------------------------------------------------
+// SpeedRotation - rij met gegeven snelheid - voorwaards & rotatie
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void TDrive::SpeedRotation(int Speed, int Rotation)
+   {
+      if (Flags.IsSet(1)) CSerial.printf("Drive.SpeedRotation\n");
+
+      DriveMode = M_SPEED_ROTATION;
+      Param1 = Speed;
+      Param2 = Rotation;
 
       IsDoneFlag = false;
    }
@@ -376,6 +395,30 @@ bool TDrive::RotateRelTakt(bool FirstCall, int DeltaDegrees)
    }
 
 //-----------------------------------------------------------------------------
+// SpeedRotationTakt -
+//-----------------------------------------------------------------------------
+// InSpeed in mm/sec
+// InRotation in graden/sec
+//
+// De snelheidswijziging verloopt via een slope
+//-----------------------------------------------------------------------------
+bool TDrive::SpeedRotationTakt(bool FirstCall, int InSpeed, int InRotation)
+   {  static int HeadingSp_q8 = 0;
+
+      // slope input speed
+      if (FirstCall) {
+         HeadingSp_q8 = Position.HoekHires();
+         if (Flags.IsSet(1)) CSerial.printf("SpeedRotationTakt FirstCall HeadingSp: %d, InSpeedSp: %d, InRotation: %d\n", HeadingSp_q8/256, InSpeed, InRotation);
+      } else {
+         if (Flags.IsSet(2)) CSerial.printf("SpeedRotationTakt HeadingSp: %d, InSpeedSp: %d, InRotation: %d\n", HeadingSp_q8/256, InSpeed, InRotation);
+      }
+
+      SpeedHeadingTakt(FirstCall, InSpeed, HeadingSp_q8 / 256);
+
+      return false; // never done
+   }
+
+//-----------------------------------------------------------------------------
 // SpeedHeadingTakt -
 //-----------------------------------------------------------------------------
 // InSpeed in mm/sec
@@ -389,11 +432,8 @@ bool TDrive::SpeedHeadingTakt(bool FirstCall, int InSpeed, int InHeading)
 
       // slope input speed
       if (FirstCall) {
-         int l, r;
-         //      l = ((ActSpeedL * ODO_TICK_TO_METRIC) ) / (ODO_TICK_HIRES_FACTOR * 4 * MAIN_TAKT_INTERVAL);
-         //      r = ((ActSpeedR * ODO_TICK_TO_METRIC) ) / (ODO_TICK_HIRES_FACTOR * 4 * MAIN_TAKT_INTERVAL);
-         l = ACT_SPEED_MM_SEC(Position.ActSpeedL);
-         r = ACT_SPEED_MM_SEC(Position.ActSpeedR);
+         int l = ACT_SPEED_MM_SEC(Position.ActSpeedL);
+         int r = ACT_SPEED_MM_SEC(Position.ActSpeedR);
          SpeedSp = (l+r)/2;
          if (Flags.IsSet(1)) CSerial.printf("SpeedHeadingTakt FirstCall SpeedL: %d/%d SpeedR: %d/%d (mm/sec / raw), SpeedSp: %d, InHeading: %d\n", l, Position.ActSpeedL, r, Position.ActSpeedR, SpeedSp, InHeading);
       } else {

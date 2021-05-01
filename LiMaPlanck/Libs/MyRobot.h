@@ -50,21 +50,21 @@ class TPosition
       int  YPos;
       int  Hoek;  // in graden
 
-      long HoekHires() { return VarRobotHoek; }
+      long HoekHires() { return VarRobotDegrees_q8; }
 
    private:
 
       // de robot positie.
-      long int VarRobotXPos;    // in 1/1024 mm (ca 1 um)
-      long int VarRobotYPos;    // in 1/1024 mm (ca 1 um)
-      long int VarRobotHoek;    // in 360*256 /circel (graden*256)
+      long int VarRobotXPos_q10;    // in 1/1024 mm (ca 1 um)
+      long int VarRobotYPos_q10;    // in 1/1024 mm (ca 1 um)
+      long int VarRobotDegrees_q8;  // in 360*256 /circel (graden*256)
 
-      long int OdoL_ticks;      // afstand in odo_ticks  - LET OP - alleen voor hoek; var maakt sprong van '360 graden' ticks.
-      long int OdoR_ticks;      // afstand in odo_ticks  - LET OP - alleen voor hoek;
+      long int OdoL_ticks;          // afstand in odo_ticks  - LET OP - alleen voor hoek; var maakt sprong van '360 graden' ticks.
+      long int OdoR_ticks;          // afstand in odo_ticks  - LET OP - alleen voor hoek;
 
-      long int OdoL;            // afstand in mm * 1024 (ongeveer um)
-      long int OdoR;            // afstand in mm * 1024 (ongeveer um)
-      long int OdoT;            // afstand in mm * 1024 (ongeveer um) (gemiddelde van L+R, absolute waarde!)
+      long int OdoL_q10;            // afstand in mm * 1024 (ongeveer um)
+      long int OdoR_q10;            // afstand in mm * 1024 (ongeveer um)
+      long int OdoT_q10;            // afstand in mm * 1024 (ongeveer um) (gemiddelde van L+R, absolute waarde!)
 
       // private methods
       void Update();
@@ -77,7 +77,7 @@ extern TPosition Position;
 //-----------------------------------------------------------------------------
 
 // Constante per bewegingstype (DriveMode) die we ondersteunen.
-enum TDiveMode { UNDEFINED, M_PWM, M_SPEED_LR, M_SPEED_HEADING, M_XY, M_ROTATE, M_ARC, M_STOP };
+enum TDiveMode { UNDEFINED, M_PWM, M_SPEED_LR, M_SPEED_ROTATION, M_SPEED_HEADING, M_XY, M_ROTATE, M_ARC, M_STOP };
 
 class TDrive
 {
@@ -91,6 +91,7 @@ class TDrive
       // bewegingen
       void Pwm(int PwmL, int PwmR);
       void SpeedLR(int SpeedL, int SpeedR);
+      void SpeedRotation(int Speed, int Rotation);
       void SpeedHeading(int Speed, int Heading);
       void XY(int X, int Y, int Speed, int EndSpeed);
       void RotateHeading(int Heading);
@@ -117,6 +118,7 @@ class TDrive
       void UpdateSpeedSP(int InSpeedL, int InSpeedR, int MaxSlopeP);
 
       void SpeedLRTakt(bool FirstCall, int SpeedL, int SpeedR, int MaxSlopeP);
+      bool SpeedRotationTakt(bool FirstCall, int InSpeed, int InRotation);
       bool SpeedHeadingTakt(bool FirstCall, int InSpeed, int InHeading);
       bool XYTakt(bool FirstCall, int TargetX, int TargetY, int Speed, int EndSpeed);
       bool RotateRelTakt(bool FirstCall, int DeltaDegrees);
