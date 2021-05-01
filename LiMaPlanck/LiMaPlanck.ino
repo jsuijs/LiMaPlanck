@@ -209,13 +209,15 @@ void Execute(int Param[])
    // Drive commands
    if (Command.Match("DrivePwm",       2)) Driver.Pwm(Param[0], Param[1]);
    if (Command.Match("DriveLR",        2)) Driver.SpeedLR(Param[0], Param[1]);
+   if (Command.Match("DriveSR",        2)) Driver.SpeedRotation(Param[0], Param[1]);
    if (Command.Match("DriveSH",        2)) Driver.SpeedHeading(Param[0], Param[1]);
    if (Command.Match("DriveXY",        4)) Driver.XY(Param[0], Param[1], Param[2], Param[3]);
    if (Command.Match("DriveRotateH",   1)) Driver.RotateHeading(Param[0]);
    if (Command.Match("DriveRotate",    1)) Driver.Rotate(Param[0]);
    if (Command.Match("DriveArcH",      4)) Driver.ArcHeading(Param[0], Param[1], Param[2], Param[3]);
    if (Command.Match("DriveArc",       4)) Driver.Arc(Param[0], Param[1], Param[2], Param[3]);
-   if (Command.Match("DriveStop",      0)) Driver.Stop();
+
+   if (Command.Match("Stop",           0)) Driver.Stop();
 
    if (Command.Match("LppStatus",      0)) { Lpp.ReadStatus(); Lpp.PrintStatus(); }
    if (Command.Match("LppStart",       0)) Lpp.Start();

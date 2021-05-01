@@ -177,6 +177,19 @@ void TDrive::SpeedRotation(int Speed, int Rotation)
    {
       if (Flags.IsSet(1)) CSerial.printf("Drive.SpeedRotation\n");
 
+      // Limit Rotation value to 50% of max rotation allowed by heading control loop
+      const int RotLimit = ROTATE_CLIP_Q8 * MAIN_TAKT_RATE / 256 / 2;
+      bool Limit = false;
+      if (Rotation > RotLimit) {
+         Rotation = RotLimit;
+         Limit = true;
+      }
+      if (Rotation < -RotLimit) {
+         Rotation = -RotLimit;
+         Limit = true;
+      }
+      if (Limit) CSerial.printf("Drive.SpeedRotation warning: Rotation limited to %d\n", Rotation);
+
       DriveMode = M_SPEED_ROTATION;
       Param1 = Speed;
       Param2 = Rotation;
@@ -313,13 +326,6 @@ void TDrive::Arc(int Degrees, int Radius, int Speed, int EndSpeed)
       IsDoneFlag = false;
    }
 
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-// Hieronder de PRIVATE procedures
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-
 //-----------------------------------------------------------------------------
 // SpeedLRTakt -
 //-----------------------------------------------------------------------------
@@ -413,6 +419,8 @@ bool TDrive::SpeedRotationTakt(bool FirstCall, int InSpeed, int InRotation)
          if (Flags.IsSet(2)) CSerial.printf("SpeedRotationTakt HeadingSp: %d, InSpeedSp: %d, InRotation: %d\n", HeadingSp_q8/256, InSpeed, InRotation);
       }
 
+      HeadingSp_q8 += (InRotation * 256) / MAIN_TAKT_RATE;
+      HeadingSp_q8 = NormHoek(HeadingSp_q8, NORM_Q8);
       SpeedHeadingTakt(FirstCall, InSpeed, HeadingSp_q8 / 256);
 
       return false; // never done
@@ -586,7 +594,7 @@ bool TDrive::ArcRelTakt(bool FirstCall, int DeltaDegrees, int Radius, int Speed,
 
       long CurrentHoek_q8 = Position.HoekHires(); //
       int  TargetHoek  = DeltaDegrees - TurnRate * RestantWeg;  // deze hoek willen we nu hebben (graden).
-      long HoekError_q8   = NormHoek(CurrentHoek_q8 - DegreesOffset_q8 - TargetHoek * 256L, (360L * 256));
+      long HoekError_q8   = NormHoek(CurrentHoek_q8 - DegreesOffset_q8 - TargetHoek * 256L, NORM_Q8);
 
       // bepaal maximale snelheid op gegeven afstand van doel, en verschil tussen L en R o.b.v. radius
       int SpeedL = EenparigVertragen(RestantWeg, Speed, EndSpeed, MAX_SLOPE * MAIN_TAKT_RATE); // max speed

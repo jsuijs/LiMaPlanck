@@ -29,6 +29,7 @@ extern int LidarArray_R100;
 #define RAD2GRAD(x)        ((float)(x) * 57.2957795)   // uitkomst is float, deze kan evt zonder verlies geschaald worden naar hogere resulotie
 #define ACT_SPEED_MM_SEC(ActSpeed) ((ActSpeed * (long)ODO_TICK_TO_METRIC)) / (4 * MAIN_TAKT_INTERVAL);
 #define ABS(x)             ( (x>=0) ? x : -x )
+#define NORM_Q8            (360L * 256)
 
 template <typename T> inline
 T ABSOLUTE(const T& v) { return v < 0 ? -v : v; }
