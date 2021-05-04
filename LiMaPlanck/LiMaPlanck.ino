@@ -95,15 +95,20 @@ void setup() {
       CSerial.printf("LPP I2C error.\n");
    }
 
-   Flags.Set(1, true);  // 1 - Drive new movement (sub takt)
-   //Flags.Set(2, true);  // 2 - Drive sub takt (each call)
-   //Flags.Set(3, true);  // 3 - Drive new movement (main takt)
-   //Flags.Set(4, true);  // 4 - Drive update speedsp
-   //Flags.Set(5, true);  // 5 - Position print (1/sec)
+   Flags.Set(1, true);     // Drive FirstCall - all movements (sub takt)
+   //Flags.Set(2, true);     // 2 Driver.SpeedLRTakt
+   //Flags.Set(3, true);     // 3 Driver.RotateRelTakt
+   //Flags.Set(4, true);     // 4 Driver.SpeedHeadingTakt
+   //Flags.Set(5, true);     // 5 Driver.ArcRelTakt
+   //Flags.Set(6, true);     // 6 Driver.XYTakt
+   Flags.Set(7, true);     // 7 Driver.SpeedRotationTakt
 
-   //Flags.Set(9, true);  // 9 - Lpp array dump
-   Flags.Set(10, true); // 10 - ProgrammaTakt programma-keuze
-   Flags.Set(11, true); // 11 - ProgrammaTakt Missie-takt
+
+   Flags.Set(20, true);     // Position print (each update)
+
+   //Flags.Set(9, true);   // Lpp array dump
+   Flags.Set(10, true);    // ProgrammaTakt programma-keuze
+   Flags.Set(11, true);    // ProgrammaTakt Missie-takt
 
    CSerial.printf("Opstarten gereed.\n");
 }

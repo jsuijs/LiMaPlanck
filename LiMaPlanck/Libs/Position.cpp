@@ -149,6 +149,12 @@ void TPosition::Update()
       XPos  = VarRobotXPos_q10   / 1024;  // RobotXPos in mm
       YPos  = VarRobotYPos_q10   / 1024;  // RobotYPos in mm
       Hoek  = VarRobotDegrees_q8 / 256;   // RobotHoekPos in graden
+
+      if (Flags.IsSet(20)) {
+         CSerial.printf("%cPOSITION %d %d ", FRAME_START, XPos, YPos);
+         CSerial.print(VarRobotDegrees_q8 / 14667.7);
+         CSerial.printf("%c\n", FRAME_END);
+      }
    }
 
 //------------------------------------------------------------------------------

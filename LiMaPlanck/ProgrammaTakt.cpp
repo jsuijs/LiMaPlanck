@@ -295,8 +295,8 @@ bool MissieHeenEnWeer(TState &S)
          if (S.NewState) {
             Position.Reset();
          }
-         x = (400 - LidarArray_R40) / 50;    // wand volgen
-         Driver.SpeedHeading(S.Param1, x);   // Speed, Heading
+         x = (400 - LidarArray_R40) * 20;    // wand volgen
+         Driver.SpeedRotation(S.Param1, x);   // Speed, Heading
 
          if (LidarArray_V < 350) { // Als we de wand voor ons zien
             S.State++; // naar volgende state
@@ -327,8 +327,8 @@ bool MissieHeenEnWeer(TState &S)
       break;
 
       case 4 : {  // Terug naar startpunt
-         x = 180 + (LidarArray_L40 - 400) / 50;  // wand volgen
-         Driver.SpeedHeading(S.Param1, x);  // Speed, Heading
+         x = (LidarArray_L40 - 400) * 20;  // wand volgen
+         Driver.SpeedRotation(S.Param1, x);  // Speed, Heading
 
          if (LidarArray_V < 350) { // Als we de wand voor ons zien
             S.State++; // naar volgende state

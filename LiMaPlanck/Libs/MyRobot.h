@@ -31,6 +31,9 @@ extern int LidarArray_R100;
 #define ABS(x)             ( (x>=0) ? x : -x )
 #define NORM_Q8            (360L * 256)
 
+#define FRAME_END             0xC0    /* indicates end of packet */
+#define FRAME_START           0xC1    /* indicates start of packet */
+
 template <typename T> inline
 T ABSOLUTE(const T& v) { return v < 0 ? -v : v; }
 
@@ -92,7 +95,7 @@ class TDrive
       // bewegingen
       void Pwm(int PwmL, int PwmR);
       void SpeedLR(int SpeedL, int SpeedR);
-      void SpeedRotation(int Speed, int Rotation);
+      void SpeedRotation(int Speed, int Rotation_q8);
       void SpeedHeading(int Speed, int Heading);
       void XY(int X, int Y, int Speed, int EndSpeed);
       void RotateHeading(int Heading);
@@ -116,10 +119,8 @@ class TDrive
 
       int MaxSlope;
 
-      void UpdateSpeedSP(int InSpeedL, int InSpeedR, int MaxSlopeP);
-
       void SpeedLRTakt(bool FirstCall, int SpeedL, int SpeedR, int MaxSlopeP);
-      bool SpeedRotationTakt(bool FirstCall, int InSpeed, int InRotation);
+      bool SpeedRotationTakt(bool FirstCall, int InSpeed, int InRotation_q8);
       bool SpeedHeadingTakt(bool FirstCall, int InSpeed, int InHeading);
       bool XYTakt(bool FirstCall, int TargetX, int TargetY, int Speed, int EndSpeed);
       bool RotateRelTakt(bool FirstCall, int DeltaDegrees);

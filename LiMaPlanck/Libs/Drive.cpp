@@ -64,7 +64,7 @@ void TDrive::Takt()
 
       if (NewMovement) {
          // gewijzigde drive mode => diverse init's
-         if (Flags.IsSet(3)) CSerial.printf("Drive - new movement\n");
+         if (Flags.IsSet(1)) CSerial.printf("Drive - new movement\n");
          FirstCall = true;
 
          SollSpeedL = ACT_SPEED_MM_SEC(Position.ActSpeedL);
@@ -136,99 +136,112 @@ bool TDrive::IsDone()
 // TDrive::Pwm - rij met gegeven pwm waarden (L, R)
 //-----------------------------------------------------------------------------
 // Pwm* is pwm waarde + rijrichting, range 255...-255
+//
+// Updatable:  Yes
+// Indefinite: Yes
 //-----------------------------------------------------------------------------
 void TDrive::Pwm(int PwmL, int PwmR)
    {
-      if (DriveMode != M_PWM) {
-         if (Flags.IsSet(1)) CSerial.printf("Drive.Pwm\n");
+      if (DriveMode != M_PWM) { // Updatable
          NewMovement = true;
+         IsDoneFlag = false;
       }
 
       DriveMode = M_PWM;
       Param1 = PwmL;
       Param2 = PwmR;
-
-      IsDoneFlag = false;
    }
 
 //-----------------------------------------------------------------------------
 // SpeedLR - rij met gegeven snelheid (L, R)
 //-----------------------------------------------------------------------------
+//
+// Updatable:  Yes
+// Indefinite: Yes
 //-----------------------------------------------------------------------------
 void TDrive::SpeedLR(int SpeedL, int SpeedR)
    {
-      if (DriveMode != M_SPEED_LR) {
-        if (Flags.IsSet(1)) CSerial.printf("Drive.SpeedLR\n");
-        NewMovement = true;
+      if (DriveMode != M_SPEED_LR) { // Updatable
+         NewMovement = true;
+         IsDoneFlag = false;
       }
 
       DriveMode = M_SPEED_LR;
       Param1 = SpeedL;
       Param2 = SpeedR;
-
-      IsDoneFlag = false;
    }
 
 //-----------------------------------------------------------------------------
 // SpeedRotation - rij met gegeven snelheid - voorwaards & rotatie
 //-----------------------------------------------------------------------------
+//
+// Updatable:  Yes
+// Indefinite: Yes
 //-----------------------------------------------------------------------------
-void TDrive::SpeedRotation(int Speed, int Rotation)
+void TDrive::SpeedRotation(int Speed, int Rotation_q8)
    {
-      if (Flags.IsSet(1)) CSerial.printf("Drive.SpeedRotation\n");
+      if (DriveMode != M_SPEED_ROTATION) { // Updatable
+         NewMovement = true;
+         IsDoneFlag = false;
+      }
 
       // Limit Rotation value to 50% of max rotation allowed by heading control loop
-      const int RotLimit = ROTATE_CLIP_Q8 * MAIN_TAKT_RATE / 256 / 2;
+      const int RotLimit_q8 = ROTATE_CLIP_Q8 * MAIN_TAKT_RATE / 2;
       bool Limit = false;
-      if (Rotation > RotLimit) {
-         Rotation = RotLimit;
+      if (Rotation_q8 > RotLimit_q8) {
+         Rotation_q8 = RotLimit_q8;
          Limit = true;
       }
-      if (Rotation < -RotLimit) {
-         Rotation = -RotLimit;
+      if (Rotation_q8 < -RotLimit_q8) {
+         Rotation_q8 = -RotLimit_q8;
          Limit = true;
       }
-      if (Limit) CSerial.printf("Drive.SpeedRotation warning: Rotation limited to %d\n", Rotation);
+      if (Limit) CSerial.printf("Drive.SpeedRotation warning: Rotation limited to %d\n", Rotation_q8);
 
       DriveMode = M_SPEED_ROTATION;
       Param1 = Speed;
-      Param2 = Rotation;
-
-      IsDoneFlag = false;
+      Param2 = Rotation_q8;
    }
 
 //-----------------------------------------------------------------------------
 // SpeedHeading - rij met gegeven snelheid in gegeven richting
 //-----------------------------------------------------------------------------
+//
+// Updatable:  Yes
+// Indefinite: Yes
 //-----------------------------------------------------------------------------
 void TDrive::SpeedHeading(int Speed, int Heading)
    {
-      if (Flags.IsSet(1)) CSerial.printf("Drive.SpeedHeading\n");
+      if (DriveMode != M_SPEED_HEADING) { // Updatable
+         NewMovement = true;
+         IsDoneFlag = false;
+      }
 
       DriveMode = M_SPEED_HEADING;
       Param1 = Speed;
       Param2 = Heading;
-
-      IsDoneFlag = false;
    }
 
 //-----------------------------------------------------------------------------
 // XY - Rij naar gegeven punt
 //-----------------------------------------------------------------------------
+//
+// Updatable:  No
+// Indefinite: No
 //-----------------------------------------------------------------------------
 void TDrive::XY(int X, int Y, int Speed, int EndSpeed)
    {
       if (Flags.IsSet(1)) CSerial.printf("Drive.XY  x: %d, y: %d, Speed: %d, EndSpeed: %d\n",
             X, Y, Speed, EndSpeed);
 
+      NewMovement = true;
+      IsDoneFlag = false;
+
       DriveMode = M_XY;
       Param1 = X;
       Param2 = Y;
       Param3 = Speed;
       Param4 = EndSpeed;
-
-      NewMovement = true;
-      IsDoneFlag = false;
    }
 
 //-----------------------------------------------------------------------------
@@ -238,16 +251,19 @@ void TDrive::XY(int X, int Y, int Speed, int EndSpeed)
 // - 'Heading' is de absolute hoek, in graden.
 //
 // Gebruikte constantes: ROTATE_P_GAIN, ROTATE_D_GAIN, ROTATE_CLIP
+//
+// Updatable:  No
+// Indefinite: No
 //-----------------------------------------------------------------------------
 void TDrive::RotateHeading(int Heading)
    {
       if (Flags.IsSet(1)) CSerial.printf("Drive.Rotate\n");
 
-      DriveMode = M_ROTATE;
-      Param1 = NormHoek(Position.Hoek + Heading, 360); // Aantal te draaien graden (relatief).
-
       NewMovement = true;
       IsDoneFlag = false;
+
+      DriveMode = M_ROTATE;
+      Param1 = NormHoek(Position.Hoek + Heading, 360); // Aantal te draaien graden (relatief).
    }
 
 //-----------------------------------------------------------------------------
@@ -258,30 +274,35 @@ void TDrive::RotateHeading(int Heading)
 //    groter zijn dan +/- 360 graden, de robot draait dan meer dan een hele ronde.
 //
 // Gebruikte constantes: ROTATE_P_GAIN, ROTATE_D_GAIN, ROTATE_CLIP
+//
+// Updatable:  No
+// Indefinite: No
 //-----------------------------------------------------------------------------
 void TDrive::Rotate(int Degrees)
    {
       if (Flags.IsSet(1)) CSerial.printf("Drive.RotateRel\n");
 
-      DriveMode = M_ROTATE;
-      Param1 = Degrees; // Aantal te draaien graden (relatief).
-
       NewMovement = true;
       IsDoneFlag = false;
+
+      DriveMode = M_ROTATE;
+      Param1 = Degrees; // Aantal te draaien graden (relatief).
    }
 
 //-----------------------------------------------------------------------------
-// Stop - breng de robot tot stilstand.
+// Stop - Slow down & stop using speed curve.
 //-----------------------------------------------------------------------------
+// Updatable:  No
+// Indefinite: No
 //-----------------------------------------------------------------------------
 void TDrive::Stop()
    {
       if (Flags.IsSet(1)) CSerial.printf("Drive.Stop\n");
 
-      DriveMode = M_STOP;
-
       NewMovement = true;
       IsDoneFlag = false;
+
+      DriveMode = M_STOP;
    }
 
 //-----------------------------------------------------------------------------
@@ -290,19 +311,22 @@ void TDrive::Stop()
 // Rij een boog tot de opgegeven richting.
 // - 'Heading' is de absolute hoek, in graden.
 // - Radius is straal van de draaicircel in mm
+//
+// Updatable:  No
+// Indefinite: No
 //-----------------------------------------------------------------------------
 void TDrive::ArcHeading(int Heading, int Radius, int Speed, int EndSpeed)
    {
       if (Flags.IsSet(1)) CSerial.printf("Drive.Arc\n");
+
+      NewMovement = true;
+      IsDoneFlag = false;
 
       DriveMode = M_ARC;
       Param1 = NormHoek(Heading - Position.Hoek, 360);   // DeltaDegrees
       Param2 = Radius;
       Param3 = Speed;
       Param4 = EndSpeed;
-
-      NewMovement = true;
-      IsDoneFlag = false;
    }
 
 //-----------------------------------------------------------------------------
@@ -311,20 +335,29 @@ void TDrive::ArcHeading(int Heading, int Radius, int Speed, int EndSpeed)
 // Rij een boog tot de opgegeven richting.
 // - 'Heading' is de absolute hoek, in graden.
 // - Radius is straal van de draaicircel in mm
+//
+// Updatable:  No
+// Indefinite: No
 //-----------------------------------------------------------------------------
 void TDrive::Arc(int Degrees, int Radius, int Speed, int EndSpeed)
    {
       if (Flags.IsSet(1)) CSerial.printf("Drive.ArcRel\n");
+
+      NewMovement = true;
+      IsDoneFlag = false;
 
       DriveMode = M_ARC;
       Param1 = Degrees;
       Param2 = Radius;
       Param3 = Speed;
       Param4 = EndSpeed;
-
-      NewMovement = true;
-      IsDoneFlag = false;
    }
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Private functions
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 // SpeedLRTakt -
@@ -332,21 +365,17 @@ void TDrive::Arc(int Degrees, int Radius, int Speed, int EndSpeed)
 //-----------------------------------------------------------------------------
 void TDrive::SpeedLRTakt(bool FirstCall, int SpeedL, int SpeedR, int MaxSlopeP)
    {
-      if (Flags.IsSet(1)) CSerial.printf("SpeedLRTakt %d %d %d %d\n", FirstCall, SpeedL, SpeedR, MaxSlopeP);
-      UpdateSpeedSP(SpeedL, SpeedR, MaxSlopeP);
-      MotorController(SollSpeedL, SollSpeedR);
-   }
+      if (FirstCall) {
+         if (Flags.IsSet(1)) CSerial.printf("SpeedLRTakt FirstCall %d %d %d\n", SpeedL, SpeedR, MaxSlopeP);
+      } else {
+         if (Flags.IsSet(2)) CSerial.printf("SpeedLRTakt %d %d %d\n", SpeedL, SpeedR, MaxSlopeP);
+      }
 
-//-----------------------------------------------------------------------------
-// UpdateSpeedSP - werk Speed Setpoint (SollSpeed) bij
-//-----------------------------------------------------------------------------
-// Setpoint wordt gelijk aan parameters. Slope bepaalt hoe snel dit gebeurt.
-//-----------------------------------------------------------------------------
-void TDrive::UpdateSpeedSP(int InSpeedL, int InSpeedR, int MaxSlopeP)
-   {
-      Slope(SollSpeedL, InSpeedL, MaxSlopeP);
-      Slope(SollSpeedR, InSpeedR, MaxSlopeP);
-      if (Flags.IsSet(3)) CSerial.printf("@@ %d %d %d\n", SollSpeedL, InSpeedL, MaxSlopeP);
+      // Update SpeedSetpoints (SollSpeed*)
+      Slope(SollSpeedL, SpeedL, MaxSlopeP);
+      Slope(SollSpeedR, SpeedR, MaxSlopeP);
+
+      MotorController(SollSpeedL, SollSpeedR);
    }
 
 //-----------------------------------------------------------------------------
@@ -375,8 +404,17 @@ bool TDrive::RotateRelTakt(bool FirstCall, int DeltaDegrees)
       int SpeedR = Clipped_q8 * (float) ROTATE_P_GAIN + (RestHoek_q8 - PrevRestHoek_q8) * (float) ROTATE_D_GAIN;
       int SpeedL = -SpeedR;
 
-      if (Flags.IsSet(1)) CSerial.printf("RotateTakt FirstCall: %d InDegrees: %d DezeHoek: %d, RestHoek: %d, SpeedL: %d, Clipped: %d, Delta: %d\n",
-            FirstCall, DeltaDegrees, DezeHoek_q8/256, RestHoek_q8/256, SpeedL, Clipped_q8/256, Delta_q8/256);
+      if (FirstCall) {
+         if (Flags.IsSet(1)) {
+            CSerial.printf("RotateTakt FirstCall InDegrees: %d DezeHoek: %d, RestHoek: %d, SpeedL: %d, Clipped: %d, Delta: %d\n",
+                  DeltaDegrees, DezeHoek_q8/256, RestHoek_q8/256, SpeedL, Clipped_q8/256, Delta_q8/256);
+         }
+      } else {
+         if (Flags.IsSet(3)) {
+            CSerial.printf("RotateTakt InDegrees: %d DezeHoek: %d, RestHoek: %d, SpeedL: %d, Clipped: %d, Delta: %d\n",
+                  DeltaDegrees, DezeHoek_q8/256, RestHoek_q8/256, SpeedL, Clipped_q8/256, Delta_q8/256);
+         }
+      }
 
       if (ABS(RestHoek_q8) > ABS(Clipped_q8)) {
          // clipped
@@ -404,22 +442,22 @@ bool TDrive::RotateRelTakt(bool FirstCall, int DeltaDegrees)
 // SpeedRotationTakt -
 //-----------------------------------------------------------------------------
 // InSpeed in mm/sec
-// InRotation in graden/sec
+// InRotation in 256*graden/sec
 //
 // De snelheidswijziging verloopt via een slope
 //-----------------------------------------------------------------------------
-bool TDrive::SpeedRotationTakt(bool FirstCall, int InSpeed, int InRotation)
+bool TDrive::SpeedRotationTakt(bool FirstCall, int InSpeed, int InRotation_q8)
    {  static int HeadingSp_q8 = 0;
 
       // slope input speed
       if (FirstCall) {
          HeadingSp_q8 = Position.HoekHires();
-         if (Flags.IsSet(1)) CSerial.printf("SpeedRotationTakt FirstCall HeadingSp: %d, InSpeedSp: %d, InRotation: %d\n", HeadingSp_q8/256, InSpeed, InRotation);
+         if (Flags.IsSet(1)) CSerial.printf("SpeedRotationTakt FirstCall HeadingSp: %d, InSpeedSp: %d, InRotation: %d\n", HeadingSp_q8/256, InSpeed, InRotation_q8);
       } else {
-         if (Flags.IsSet(2)) CSerial.printf("SpeedRotationTakt HeadingSp: %d, InSpeedSp: %d, InRotation: %d\n", HeadingSp_q8/256, InSpeed, InRotation);
+         if (Flags.IsSet(7)) CSerial.printf("SpeedRotationTakt HeadingSp: %d, InSpeedSp: %d, InRotation: %d\n", HeadingSp_q8/256, InSpeed, InRotation_q8);
       }
 
-      HeadingSp_q8 += (InRotation * 256) / MAIN_TAKT_RATE;
+      HeadingSp_q8 += InRotation_q8 / MAIN_TAKT_RATE;
       HeadingSp_q8 = NormHoek(HeadingSp_q8, NORM_Q8);
       SpeedHeadingTakt(FirstCall, InSpeed, HeadingSp_q8 / 256);
 
@@ -446,7 +484,7 @@ bool TDrive::SpeedHeadingTakt(bool FirstCall, int InSpeed, int InHeading)
          if (Flags.IsSet(1)) CSerial.printf("SpeedHeadingTakt FirstCall SpeedL: %d/%d SpeedR: %d/%d (mm/sec / raw), SpeedSp: %d, InHeading: %d\n", l, Position.ActSpeedL, r, Position.ActSpeedR, SpeedSp, InHeading);
       } else {
          Slope(SpeedSp, InSpeed, MAX_SLOPE);
-         if (Flags.IsSet(2)) CSerial.printf("SpeedHeadingTakt InSpeed: %d, SpeedSp: %d, InHeading: %d\n", InSpeed, SpeedSp, InHeading);
+         if (Flags.IsSet(4)) CSerial.printf("SpeedHeadingTakt InSpeed: %d, SpeedSp: %d, InHeading: %d\n", InSpeed, SpeedSp, InHeading);
       }
 
       // Hoekfout bepalen (i.c.m. richting)
@@ -497,7 +535,7 @@ bool TDrive::XYTakt(bool FirstCall, int TargetX, int TargetY, int Speed, int End
       // doel bepalen (steeds opnieuw).
       // hoek & afstand bepalen, resultaat in graden*256 (360/circel) en mm
       Cartesian2Polar(TargetHeading, TargetDistance, TargetX - Position.XPos, TargetY - Position.YPos);
-      if (Flags.IsSet(2)) CSerial.printf ("XYTakt TargetVector %d mm, %d graden (%d %d %d %d))\n", TargetDistance, (int)(TargetHeading/256),
+      if (Flags.IsSet(6)) CSerial.printf ("XYTakt TargetVector %d mm, %d graden (%d %d %d %d))\n", TargetDistance, (int)(TargetHeading/256),
             TargetX, Position.XPos, TargetY, Position.YPos);
 
       //   CSerial.printf("run plaats: ( %d, %d ), doel: ( %d, %d ), TargetDistance: %d\n", RobotXPos()/10, RobotYPos()/10, TargetX, TargetY, TargetDistance);
@@ -614,7 +652,7 @@ bool TDrive::ArcRelTakt(bool FirstCall, int DeltaDegrees, int Radius, int Speed,
       // stuur de motoren
       SpeedLRTakt(FirstCall, SpeedL, SpeedR, MAX_SLOPE);
 
-      if (Flags.IsSet(2)) CSerial.printf("ArcTakt FirstCall: %d DeltaDegrees: %d Radius: %d, RestantWeg: %d, TargetHoek: %d, CurHoek: %d, HoekError: %d, SpeedL: %d, SpeedR: %d\n",
+      if (Flags.IsSet(5)) CSerial.printf("ArcTakt FirstCall: %d DeltaDegrees: %d Radius: %d, RestantWeg: %d, TargetHoek: %d, CurHoek: %d, HoekError: %d, SpeedL: %d, SpeedR: %d\n",
             FirstCall, DeltaDegrees, Radius, RestantWeg, TargetHoek, (int)(CurrentHoek_q8/256), (int)(HoekError_q8/256), SpeedL, SpeedR);
 
       return false; // not done yet
