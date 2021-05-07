@@ -28,7 +28,8 @@ void LppSensorDucklingSetup()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 bool MissieDuckling(TState &S)
-{
+{  static int MDistance = 9999, MDegrees32 = 0;
+
    S.Update("Duckling");
 
    switch (S.State) {
@@ -48,20 +49,22 @@ bool MissieDuckling(TState &S)
       case 1 : {  // Follow mother
          if (S.NewState) {
             // find mother
-            int Distance = 9999;
-            int Degrees32 = 0;
+            MDistance = 9999;
+            MDegrees32 = 0;
             for (int i=0; i< 7; i++) {
                if (Distance > Lpp.Sensor[i].Distance) {
-                  Distance   = Lpp.Sensor[i].Distance;
-                  Degrees32  = Lpp.Sensor[i].Degrees32;
+                  MDistance   = Lpp.Sensor[i].Distance;
+                  MDegrees32  = Lpp.Sensor[i].Degrees32;
                }
             }
-            CSerial.printf("Mother at %d mm, %d degrees, sensor: %d \n", Distance, Degrees32, (Degrees32 - 120) / 15 / 32);
+            CSerial.printf("Mother initial at %d mm, %d degrees, sensor: %d \n", MDistance, MDegrees32, (MDegrees32 - 120) / 15 / 32);
          }
 
-         if (S.StateTime() > 2000) {      // Wacht op start lidar
-            S.State++;
-         }
+         // ** follow mother **
+         // Use law of cosines to find point closest to previous mother location.
+         // Wee use robot-relative location and both the robot (duckling) and mother could be moving.
+         // The algorithm assumes the relative movement of mother is less than the distance
+         // to any other obstacle.
       }
       break;
 
