@@ -52,7 +52,7 @@ bool MissieDuckling(TState &S)
             MDistance = 9999;
             MDegrees32 = 0;
             for (int i=0; i< 7; i++) {
-               if (Distance > Lpp.Sensor[i].Distance) {
+               if (MDistance > Lpp.Sensor[i].Distance) {
                   MDistance   = Lpp.Sensor[i].Distance;
                   MDegrees32  = Lpp.Sensor[i].Degrees32;
                }

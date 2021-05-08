@@ -56,6 +56,14 @@ void Rc5Isr()
 // Rc5 stuff done (but do not forget to attach Rc5Isr() to IrPin).
 //---------------------------------------------------------------------------------------
 
+// Create buzzer instance & call it each ms from SYSTICK
+TBuzzer Buzzer(BUZZER_PIN);
+void HAL_SYSTICK_Callback(void) { Buzzer.Takt(); }
+
+//---------------------------------------------------------------------------------------
+// setup -
+//---------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
 void setup() {
    // start serial
    CSerial.begin(115200);
@@ -96,6 +104,7 @@ void setup() {
       Lpp.PrintStatus();
    } else {
       CSerial.printf("LPP I2C error.\n");
+      Buzzer.Beep(200, 3);
    }
 
    Flags.Set(1, true);     // Drive FirstCall - all movements (sub takt)
@@ -114,8 +123,13 @@ void setup() {
    Flags.Set(11, true);    // ProgrammaTakt Missie-takt
 
    CSerial.printf("Opstarten gereed.\n");
+   Buzzer.Beep(30, 2);
 }
 
+//---------------------------------------------------------------------------------------
+// loop -
+//---------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
 void loop() {
    static int NextMainTakt;
    static int NextSecTakt;
@@ -161,7 +175,6 @@ void loop() {
    Command.Takt(CSerial);  // Console command interpreter
 }
 
-
 //---------------------------------------------------------------------------------------
 // LppSensorDefaultSetup -
 //---------------------------------------------------------------------------------------
@@ -178,7 +191,10 @@ void LppSensorDefaultSetup()
    Lpp.SensorSetup(7, 250, 40);  // Sensor 7, vanaf 250 graden, segment van 40 graden
 }
 
-// All Lpp stuff
+//---------------------------------------------------------------------------------------
+// ReadLpp - get state & put it in specific vars
+//---------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
 void ReadLpp()
 {
    Lpp.ReadArray();  // lees lidar array data
@@ -203,7 +219,6 @@ void ReadLpp()
    LidarArray_R100   = Lpp.Array[10].Distance;
 }
 
-
 //-----------------------------------------------------------------------------
 // BlinkTakt -
 //-----------------------------------------------------------------------------
@@ -219,10 +234,9 @@ void BlinkTakt()
 }
 
 //-----------------------------------------------------------------------------
-// Execute - voer commando uit
+// Execute - execute commando
 //-----------------------------------------------------------------------------
-// wordt via CmdTakt() aangeroepen als een commando is ontvangen
-// via de serial port.
+// Called via CmdTakt() when a command is received from the serial port.
 //-----------------------------------------------------------------------------
 void Execute(int Param[])
 {
@@ -253,3 +267,4 @@ void Execute(int Param[])
    if (Command.Match("Flag",           2)) Flags.Set(Param[0], Param[1]);
    if (Command.Match("FlagDump",       0)) Flags.Dump();
 }
+

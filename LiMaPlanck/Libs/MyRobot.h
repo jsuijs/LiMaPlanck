@@ -167,6 +167,64 @@ class TState
       int StateStartTime;
 };
 
+
+//-----------------------------------------------------------------------------
+class TBuzzer
+{
+   public:
+
+      //-----------------------------------------------------------------------
+      // Construct - store pin & set pin to output
+      //-----------------------------------------------------------------------
+      //-----------------------------------------------------------------------
+      TBuzzer(int Pin)
+      {
+         BeepState      = 0;
+         BeepDuration   = 0;
+         BuzzerPin      = Pin;
+         pinMode(BuzzerPin, OUTPUT);
+      }
+
+      //-----------------------------------------------------------------------
+      // Beep - sound nr of beeps.
+      //-----------------------------------------------------------------------
+      // duration = time length for sound and silence (in ms)
+      //-----------------------------------------------------------------------
+      void Beep(int duration, int number_of_beeps = 1)
+      {
+         BeepState      = 2 * number_of_beeps - 1;
+         BeepDuration   = duration;
+         BeepCountDown  = BeepDuration;
+      }
+
+      //-----------------------------------------------------------------------
+      // Call this at 1 kHz rate
+      //-----------------------------------------------------------------------
+      //-----------------------------------------------------------------------
+      void Takt()
+      {
+         if (BeepState) {
+            // buzzy beeping
+            BeepCountDown --;
+            if (BeepCountDown<=0) {
+               BeepState --;
+               BeepCountDown = BeepDuration;
+            }
+         }
+         if (BeepState & 1) {
+            Toggle = !Toggle;    // create 500 Hz square wave
+         } else {
+            Toggle = false;
+         }
+         digitalWrite(BuzzerPin, Toggle);  // drive buzzer
+      }
+
+   private :
+      int BuzzerPin;
+      int BeepState, BeepDuration;
+      int BeepCountDown, Toggle;
+};
+
 //-----------------------------------------------------------------------------
 class TFlags
 {

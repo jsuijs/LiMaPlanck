@@ -18,7 +18,7 @@ extern  TwoWire Wire2;
 #define LppWire Wire2
 
 // IO mapping
-#define BUZZER_PIN      PB5
+#define BUZZER_PIN      PC13
 
 //-----------------------------------------------------------------------------
 // TB6612 Motor configuration
