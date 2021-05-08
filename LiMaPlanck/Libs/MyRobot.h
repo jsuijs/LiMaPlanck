@@ -192,9 +192,15 @@ class TBuzzer
       //-----------------------------------------------------------------------
       void Beep(int duration, int number_of_beeps = 1)
       {
-         BeepState      = 2 * number_of_beeps - 1;
+         BeepState      = 2 * number_of_beeps-1;
          BeepDuration   = duration;
          BeepCountDown  = BeepDuration;
+      }
+
+      void BeepWait(int duration, int number_of_beeps = 1)
+      {
+         Beep(duration, number_of_beeps);
+         Wait();
       }
 
       //-----------------------------------------------------------------------
@@ -203,15 +209,20 @@ class TBuzzer
       //-----------------------------------------------------------------------
       void Takt()
       {
-         if (BeepState) {
+         if (BeepCountDown > 0) {
             // buzzy beeping
             BeepCountDown --;
             if (BeepCountDown<=0) {
-               BeepState --;
-               BeepCountDown = BeepDuration;
+               // this pulse done
+               if (BeepState) {
+                  // more pulses to go
+                  BeepState --;
+                  BeepCountDown = BeepDuration;
+               }
             }
          }
          if (BeepState & 1) {
+            // odd BeepState generate sound
             Toggle = !Toggle;    // create 500 Hz square wave
          } else {
             Toggle = false;
@@ -219,9 +230,14 @@ class TBuzzer
          digitalWrite(BuzzerPin, Toggle);  // drive buzzer
       }
 
+      void Wait()
+      {
+         for(;BeepState;) { /* wait for BeepState to become 0*/ }
+      }
+
    private :
       int BuzzerPin;
-      int BeepState, BeepDuration;
+      volatile int BeepState, BeepDuration;
       int BeepCountDown, Toggle;
 };
 

@@ -104,7 +104,7 @@ void setup() {
       Lpp.PrintStatus();
    } else {
       CSerial.printf("LPP I2C error.\n");
-      Buzzer.Beep(200, 3);
+      Buzzer.BeepWait(200, 3);
    }
 
    Flags.Set(1, true);     // Drive FirstCall - all movements (sub takt)
@@ -122,8 +122,8 @@ void setup() {
    Flags.Set(10, true);    // ProgrammaTakt programma-keuze
    Flags.Set(11, true);    // ProgrammaTakt Missie-takt
 
-   CSerial.printf("Opstarten gereed.\n");
    Buzzer.Beep(30, 2);
+   CSerial.printf("Opstarten gereed.\n");
 }
 
 //---------------------------------------------------------------------------------------

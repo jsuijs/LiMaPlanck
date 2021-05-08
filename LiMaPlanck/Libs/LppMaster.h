@@ -242,7 +242,7 @@ TLpp::TLpp()
 // return true on succes.
 //-----------------------------------------------------------------------------
 bool TLpp::begin()
-   {  bool r;
+   {  bool r = false;
 
       if (EnableMode != 0) return true;
       // some tries to communicate, allows Lpp bootloader timeout.
@@ -252,6 +252,7 @@ bool TLpp::begin()
             // check here for version, sometimes we get the wrong one on startup
             if (Status.SwRevision != INTERFACE_VERSION) {
                CSerial.printf("Lpp.begin() failed (interface version error - %d, expected %d\n", (int) Status.SwRevision, INTERFACE_VERSION);
+               r = false;  // report as error when we run out of retries
                delay(250);
                continue;
             }
@@ -278,7 +279,7 @@ bool TLpp::Start()
    {
       if (EnableMode == 0) {
          CSerial.printf("Lpp.Start() error: EnableMode 0\n");
-         return false;  // begin not called, of failure
+         return false;  // begin not called, or failure
       }
       EnableMode = 2;   // active
 
