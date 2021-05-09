@@ -3,6 +3,7 @@
 //-----------------------------------------------------------------------------
 #include "RobotSettings.h"
 #include "Libs/MyRobot.h"
+#include "Project.h"
 
 //---------------------------------------------------------------------------------------
 // LppSensorDucklingSetup -
@@ -24,16 +25,16 @@ void LppSensorDucklingSetup()
 }
 
 //-----------------------------------------------------------------------------
-// MissieDuckling -
+// MissionDuckling -
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool MissieDuckling(TState &S)
-{  static int MDistance = 9999, MDegrees32 = 0;
+bool MissionDuckling(TState &S)
+{  static int MDistance = 9999, MDegrees_q5 = 0;
 
    S.Update("Duckling");
 
    switch (S.State) {
-      case 0 : {  // LIDAR-STARTEN
+      case 0 : {  // LIDAR-START
          if (S.NewState) {
             LppSensorDucklingSetup();     // reconfigure Lpp
             Lpp.Start();
@@ -50,14 +51,14 @@ bool MissieDuckling(TState &S)
          if (S.NewState) {
             // find mother
             MDistance = 9999;
-            MDegrees32 = 0;
+            MDegrees_q5 = 0;
             for (int i=0; i< 7; i++) {
                if (MDistance > Lpp.Sensor[i].Distance) {
                   MDistance   = Lpp.Sensor[i].Distance;
-                  MDegrees32  = Lpp.Sensor[i].Degrees32;
+                  MDegrees_q5  = Lpp.Sensor[i].Degrees32;
                }
             }
-            CSerial.printf("Mother initial at %d mm, %d degrees, sensor: %d \n", MDistance, MDegrees32, (MDegrees32 - 120) / 15 / 32);
+            CSerial.printf("Mother initial at %d mm, %d degrees, sensor: %d \n", MDistance, MDegrees_q5/32, (MDegrees_q5/32 - 120) / 15);
          }
 
          // ** follow mother **
@@ -65,6 +66,30 @@ bool MissieDuckling(TState &S)
          // Wee use robot-relative location and both the robot (duckling) and mother could be moving.
          // The algorithm assumes the relative movement of mother is less than the distance
          // to any other obstacle.
+
+         int NewDelta  = 99999;
+         int NewDistance   = -1;
+         int NewDegrees_q5 = -1;
+         for (int i=0; i<8; i++) {
+            // law of cosine:  c^2 = a^2 + b^2 - 2ab * cos(gamma)
+            double C2 =    Lpp.Sensor[i].Distance * Lpp.Sensor[i].Distance +
+                           MDistance * MDistance -
+                           2 * Lpp.Sensor[i].Distance * MDistance *
+                           cos( (Lpp.Sensor[i].Degrees32 - MDegrees_q5) / (32 * 57.3) );
+            int C = sqrt(C2);
+            CSerial.printf("Sensor: %d, Distance: %d, Degrees: %d, Delta: %d\n",
+                  i, Lpp.Sensor[i].Distance, Lpp.Sensor[i].Degrees32/32, C);
+
+            // Store smallest distance
+            if (NewDelta > C2) {
+               NewDelta       = C2;
+               NewDistance    = Lpp.Sensor[i].Distance;
+               NewDegrees_q5  = Lpp.Sensor[i].Degrees32;
+            }
+         }
+         MDistance   = NewDistance;
+         MDegrees_q5 = NewDegrees_q5;
+         CSerial.printf("Mother at %d mm, %d degrees, sensor: %d \n", MDistance, MDegrees_q5/32, (MDegrees_q5/32 - 120) / 15);
       }
       break;
 

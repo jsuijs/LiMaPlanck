@@ -6,6 +6,7 @@
 #include "RobotSettings.h"          // project-instellingen
 #include "Libs/MyRobot.h"           // super-include
 #include "Libs/Motors_TB6612.cpp"   // Kies je motor-sturing
+#include "Project.h"
 
 // include code
 
@@ -114,7 +115,6 @@ void setup() {
    //Flags.Set(5, true);     // 5 Driver.ArcRelTakt
    //Flags.Set(6, true);     // 6 Driver.XYTakt
    Flags.Set(7, true);     // 7 Driver.SpeedRotationTakt
-
 
    Flags.Set(20, true);     // Position print (each update)
 

@@ -44,3 +44,6 @@ Relative to Project File=1
 11=Libs+AFw-MyRobot.h
 12=+AF8-Framework.cpp
 13=LiMaPlanck.ino
+14=Duckling.cpp
+15=Libs+AFw-MyRobot.cpp
+16=Project.h

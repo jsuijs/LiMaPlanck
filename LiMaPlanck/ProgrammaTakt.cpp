@@ -3,6 +3,7 @@
 //-----------------------------------------------------------------------------
 #include "RobotSettings.h"
 #include "Libs/MyRobot.h"
+#include "Project.h"
 
 // prototypes
 bool Rijden1Takt(bool Init);
@@ -11,11 +12,14 @@ bool MissieTTijd(TState &S);
 bool MissieHeenEnWeer(TState &S);
 bool MissieRandomRijden(TState &S);
 bool MissieDetectBlik(TState &S);
+bool MissionDuckling(TState &S);
 
-TState GlobS;  // Statemachine voor missie
+void LppSensorDefaultSetup();
+
+TState MissonS;  // Mission statemachine
 
 //-----------------------------------------------------------------------------
-// ProgrammaTakt - programma-keuze & aanroep van het programma
+// ProgrammaTakt - program-selection & call the program (mission)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void ProgrammaTakt()
@@ -27,21 +31,24 @@ void ProgrammaTakt()
 
       CSerial.printf("Key: %d\n", ch);
       if (ch == -1) {
-         Program.Reset();     // reset, stop lopend programma / programma 'stilstaan'.
+         Program.Reset();           // reset, stop lopend programma / programma 'stilstaan'.
       } else {
-         if (Program.State == 0) {    // andere pfkeys werken alleen als we stil staan
+         if (Program.State == 0) {  // andere pfkeys werken alleen als we stil staan
             Program.State = ch;
          }
       }
    }
 
-   Program.Update("Programma", Flags.IsSet(10));
-   if (Program.NewState) GlobS.Reset();   // reset statemachine van missie zelf.
+   Program.Update("Program", Flags.IsSet(10));
+   if (Program.NewState) {
+      LppSensorDefaultSetup();      // re-load Lidar default configuration
+      MissonS.Reset();              // reset mission statemachine
+   }
 
-   // Roep actieve programma 1 t/m 12  aan.
+   // Call active program 1 trough 12
    switch(Program.State) {
 
-      case 0 : { // Programma: stil staan
+      case 0 : { // Program: stand-still
          if (Program.NewState) {
             Driver.Pwm(0, 0); // only on entry, so CLI-commands can be used in this state.
             Lpp.Stop();
@@ -59,6 +66,7 @@ void ProgrammaTakt()
       break;
 
       case 3 : {  // Programma:
+         if (MissionDuckling(MissonS)) Program.State = 0;
       }
       break;
 
@@ -67,14 +75,14 @@ void ProgrammaTakt()
       break;
 
       case 5 : { // Programma: UmbMark CCW
-         GlobS.Param1 = 1;                // set CCW
-         if (MissieUmbMark1(GlobS)) Program.State = 0;
+         MissonS.Param1 = 1;                // set CCW
+         if (MissieUmbMark1(MissonS)) Program.State = 0;
       }
       break;
 
       case 6 : { // Programma: UmbMark CW
-         GlobS.Param1 = -1;               // set CW
-         if (MissieUmbMark1(GlobS)) Program.State = 0;
+         MissonS.Param1 = -1;               // set CW
+         if (MissieUmbMark1(MissonS)) Program.State = 0;
       }
       break;
 
@@ -83,24 +91,24 @@ void ProgrammaTakt()
       break;
 
       case 8 : { // Programma: UmbMark CW
-         if (MissieDetectBlik(GlobS)) Program.State = 0;
+         if (MissieDetectBlik(MissonS)) Program.State = 0;
       }
       break;
 
       case 9 : { // Programma: Heen en Weer
-         GlobS.Param1 = 200;  // speed
-         if (MissieHeenEnWeer(GlobS)) Program.State = 0;
+         MissonS.Param1 = 200;  // speed
+         if (MissieHeenEnWeer(MissonS)) Program.State = 0;
       }
       break;
 
       case 10 : { // Programma: ttijd
-         GlobS.Param1 = 300;  // speed
-         if (MissieTTijd(GlobS)) Program.State = 0;
+         MissonS.Param1 = 300;  // speed
+         if (MissieTTijd(MissonS)) Program.State = 0;
       }
       break;
 
       case 11 : { // Programma:
-         if (MissieRandomRijden(GlobS)) Program.State = 0;
+         if (MissieRandomRijden(MissonS)) Program.State = 0;
       }
       break;
 

@@ -1,27 +1,18 @@
-// file: MyRobot.h - include voor diverse .cpp files.
+//-----------------------------------------------------------------------------
+// MyRobot.h - include voor diverse .cpp files.
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 #ifndef MYROBOT_H
 #define MYROBOT_H
 
-//-----------------------------------------------------------------------------
-// Position.cpp
-//-----------------------------------------------------------------------------
 #include "Arduino.h"
 
 #include "Libs/LppMaster.h"   // contains code...
-extern int LidarArray_L100;
-extern int LidarArray_L80 ;
-extern int LidarArray_L60 ;
-extern int LidarArray_L40 ;
-extern int LidarArray_L20 ;
-extern int LidarArray_V   ;
-extern int LidarArray_R20 ;
-extern int LidarArray_R40 ;
-extern int LidarArray_R60 ;
-extern int LidarArray_R80 ;
-extern int LidarArray_R100;
 
 #include "Libs/Commands.h"    // contains code...
 
+//-----------------------------------------------------------------------------
+// Position.cpp
 #define TICKS_360_GRADEN   (360L * 256 * 256 / ODO_HEADING)
 #define GRAD2RAD(x)        ((float)(x) / 57.2957795)
 #define MAIN_TAKT_RATE     (1000 / MAIN_TAKT_INTERVAL)   // Hz
@@ -37,10 +28,10 @@ extern int LidarArray_R100;
 template <typename T> inline
 T ABSOLUTE(const T& v) { return v < 0 ? -v : v; }
 
+//-----------------------------------------------------------------------------
 class TPosition
 {
    public:
-
       TPosition();
       void init() { Reset(); }
       void Takt();
@@ -57,7 +48,6 @@ class TPosition
       long HoekHires() { return VarRobotDegrees_q8; }
 
    private:
-
       // de robot positie.
       long int VarRobotXPos_q10;    // in 1/1024 mm (ca 1 um)
       long int VarRobotYPos_q10;    // in 1/1024 mm (ca 1 um)
@@ -73,20 +63,14 @@ class TPosition
       // private methods
       void Update();
 };
-
 extern TPosition Position;
 
 //-----------------------------------------------------------------------------
-// Drive.cpp
-//-----------------------------------------------------------------------------
-
-// Constante per bewegingstype (DriveMode) die we ondersteunen.
-enum TDiveMode { UNDEFINED, M_PWM, M_SPEED_LR, M_SPEED_ROTATION, M_SPEED_HEADING, M_XY, M_ROTATE, M_ARC, M_STOP };
-
 class TDrive
 {
-   public:
+   enum TDiveMode { UNDEFINED, M_PWM, M_SPEED_LR, M_SPEED_ROTATION, M_SPEED_HEADING, M_XY, M_ROTATE, M_ARC, M_STOP };
 
+   public:
       TDrive();
       void init();
       void Takt();
@@ -104,10 +88,7 @@ class TDrive
       void Arc(int Degrees, int Radius, int Speed, int EndSpeed);
       void Stop();
 
-      int SollSpeedL, SollSpeedR; // Snelheid (in mm/sec) die we nastreven, verandering begrensd door MaxSlope
-
    private:
-
       TDiveMode DriveMode;    // actief type aansturing
       int Param1;             // Paramers van actieve aansturing type
       int Param2;
@@ -116,6 +97,8 @@ class TDrive
 
       bool IsDoneFlag;        // Movement is gereed
       bool NewMovement;
+
+      int SollSpeedL, SollSpeedR; // Snelheid (in mm/sec) die we nastreven, verandering begrensd door MaxSlope
 
       int MaxSlope;
 
@@ -127,35 +110,18 @@ class TDrive
       bool ArcRelTakt(bool FirstCall, int DeltaDegrees, int Radius, int Speed, int EndSpeed);
       bool StopTakt(bool FirstCall);
 };
-
 extern TDrive Driver;
 
 //-----------------------------------------------------------------------------
 class TState
 {
    public:
+      TState();
+      void Reset();
 
-      TState() { Reset(); }
+      void Update(const char *InName, bool Verbose=true);
 
-      void Update(const char *InName, bool Verbose=true) {
-         NewState = false;
-         if (PrevState != State) {
-            if (Verbose) CSerial.printf("%s state %d -> %d\n", InName, PrevState, State);
-
-            PrevState      = State;
-            NewState       = true;
-            StateStartTime = millis();
-         }
-      }
-
-      void Reset() {
-         State  = 0;
-         PrevState = -1;
-      }
-
-      int StateTime() {
-         return millis() - StateStartTime;
-      }
+      int StateTime();
 
       int  State;
       bool NewState;
@@ -167,138 +133,48 @@ class TState
       int StateStartTime;
 };
 
-
 //-----------------------------------------------------------------------------
 class TBuzzer
 {
    public:
+      TBuzzer(int Pin);
+      void Takt();
 
-      //-----------------------------------------------------------------------
-      // Construct - store pin & set pin to output
-      //-----------------------------------------------------------------------
-      //-----------------------------------------------------------------------
-      TBuzzer(int Pin)
-      {
-         BeepState      = 0;
-         BeepDuration   = 0;
-         BuzzerPin      = Pin;
-         pinMode(BuzzerPin, OUTPUT);
-      }
-
-      //-----------------------------------------------------------------------
-      // Beep - sound nr of beeps.
-      //-----------------------------------------------------------------------
-      // duration = time length for sound and silence (in ms)
-      //-----------------------------------------------------------------------
-      void Beep(int duration, int number_of_beeps = 1)
-      {
-         BeepState      = 2 * number_of_beeps-1;
-         BeepDuration   = duration;
-         BeepCountDown  = BeepDuration;
-      }
-
-      void BeepWait(int duration, int number_of_beeps = 1)
-      {
-         Beep(duration, number_of_beeps);
-         Wait();
-      }
-
-      //-----------------------------------------------------------------------
-      // Call this at 1 kHz rate
-      //-----------------------------------------------------------------------
-      //-----------------------------------------------------------------------
-      void Takt()
-      {
-         if (BeepCountDown > 0) {
-            // buzzy beeping
-            BeepCountDown --;
-            if (BeepCountDown<=0) {
-               // this pulse done
-               if (BeepState) {
-                  // more pulses to go
-                  BeepState --;
-                  BeepCountDown = BeepDuration;
-               }
-            }
-         }
-         if (BeepState & 1) {
-            // odd BeepState generate sound
-            Toggle = !Toggle;    // create 500 Hz square wave
-         } else {
-            Toggle = false;
-         }
-         digitalWrite(BuzzerPin, Toggle);  // drive buzzer
-      }
-
-      void Wait()
-      {
-         for(;BeepState;) { /* wait for BeepState to become 0*/ }
-      }
+      void Beep(int duration, int number_of_beeps = 1);
+      void BeepWait(int duration, int number_of_beeps = 1);
+      void Wait();
 
    private :
       int BuzzerPin;
       volatile int BeepState, BeepDuration;
       int BeepCountDown, Toggle;
 };
+extern TBuzzer Buzzer;
 
 //-----------------------------------------------------------------------------
 class TFlags
 {
    public:
+      TFlags(int NrFlags); // NrFlags 32 means 0..31
 
-      TFlags(int NrFlags) {
-         SetIx(NrFlags-1); // 32 means 0..31
-         NrFlagWords = WordIx + 1;
-         FlagWords   = (int *)malloc(NrFlagWords * sizeof(int));
-         for (int i=0; i<NrFlagWords; i++) FlagWords[i] = 0;;
-      }
+      bool IsSet(int Nr);
+      void Set(int Nr, bool Value);
 
-      bool IsSet(int Nr) {
-         if (!SetIx(Nr)) return false;
-         return ((FlagWords[WordIx] & (1<<BitIx)) != 0);
-      }
-
-      void Set(int Nr, bool Value) {
-         if (!SetIx(Nr)) {
-            CSerial.printf("ERROR setting flag %d\n", Nr);
-            return;
-         }
-         if (Value) {
-            FlagWords[WordIx] |= (1<<BitIx);
-         } else {
-            FlagWords[WordIx] &= 0xFFFFFFFF ^ (1<<BitIx);
-         }
-         CSerial.printf("Flag %d set to %d (%d %d %d)\n", Nr, Value, WordIx, BitIx, NrFlagWords);
-      }
-
-      void Dump() {
-         CSerial.printf("NrFlagWords: %d\n", NrFlagWords);
-         for (int i=0; i<NrFlagWords; i++) CSerial.printf("%08x ", FlagWords[i]);
-         CSerial.printf("\n");
-      }
+      void Dump();
 
    private:
       int *FlagWords;
       int NrFlagWords;  // WordIx + 1
       int WordIx, BitIx;
 
-      bool SetIx(int Nr) {  // return true if Nr is valid
-         WordIx = Nr / 32;
-         BitIx  = Nr - 32 * WordIx;
-         if (WordIx >= NrFlagWords) return false;  // out of range
-         if (!FlagWords)            return false;  // no vars malloc'd
-         return true;
-      }
+      bool SetIx(int Nr);
 };
-
 extern TFlags Flags;
 
 //-----------------------------------------------------------------------------
 // Encoders
 void InitStmEncoders();
 void ReadStmEncodersDelta(int &Left, int &Right);
-
-extern volatile int EncoderLTeller, EncoderRTeller;  // aantal flanken
 
 //-----------------------------------------------------------------------------
 // Motors.cpp

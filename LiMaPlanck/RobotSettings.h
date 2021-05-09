@@ -1,7 +1,8 @@
 //-----------------------------------------------------------------------------
-// RobotSettings.h voor Planck
+// RobotSettings.h - project-specific settings
 //-----------------------------------------------------------------------------
 // Zet in deze file alle instellingen voor je eigen project.
+// De 'gewone' includes zet je in Project.h
 
 #ifndef ROBOTSETTINGS_H
 #define ROBOTSETTINGS_H
@@ -12,7 +13,7 @@
 
 #define CSerial Serial2 // definieer Console-serial.
 
-// Setup i2c for Lidar Preprocessor
+// Choose i2c for Lidar Preprocessor
 #include <Wire.h>
 extern  TwoWire Wire2;
 #define LppWire Wire2
@@ -63,6 +64,7 @@ const int TB6612_DIRR_B2   = PA9;   // pin 26  jumper pin 31 PB12
 // Instellingen per gebruiker - Activeer bovenaan deze file.
 // ---------------------------------------------------------
 
+//=============js===============================
 #ifdef ROBOT_JOEP
    //
    // Definitie van functie-toets RC5-codes
