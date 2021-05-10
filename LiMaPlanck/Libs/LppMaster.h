@@ -24,9 +24,9 @@
       //14
       //15
       #define R_CAN_SAMPLES         (       16)   // min # of samples for CAN detection
-      #define R_CAN_EDGE            (       17)   // min edge size (delta between two samples, in mm) for CAN start/end
-      #define R_CAN_MIN             (       18)   // min angle of can (units tbd)
-      #define R_CAN_MAX             (       19)   // max angle of can (units tbd)
+      #define R_CAN_EDGE            (       17)   // minimal edge size (delta between two samples, in mm) for CAN-start and CAN-end.
+      #define R_CAN_MIN             (       18)   // minimal size (width) of can in mm
+      #define R_CAN_MAX             (       19)   // maximal size (width) of can in mm, 0 disables width-check
       // free up to SensorDataOffset
       #define SDO (32) // sensor data offset
       // SensorArray
@@ -181,9 +181,18 @@ class TLpp {
       bool SetOffsetDegrees(int Degrees)  { return I2cWrite_Byte_Word(LPP_I2C_ADDRESS, R_OFFSET_DEGREES_H,  Degrees     ); };
       bool SetOffsetX(int Mm)             { return I2cWrite_Byte_Byte(LPP_I2C_ADDRESS, R_OFFSET_X,          Mm / 2      ); };
       bool SetOffsetY(int Mm)             { return I2cWrite_Byte_Byte(LPP_I2C_ADDRESS, R_OFFSET_Y,          Mm / 2      ); };
+
+      // min # of samples for CAN detection
       bool SetCanSamples(int Count)       { return I2cWrite_Byte_Byte(LPP_I2C_ADDRESS, R_CAN_SAMPLES,       Count       ); };
-      bool SetCanEdge(int Mm)             { return I2cWrite_Byte_Byte(LPP_I2C_ADDRESS, R_CAN_MIN,           Mm          ); };
-      bool SetCanMin(int Min)             { return I2cWrite_Byte_Byte(LPP_I2C_ADDRESS, R_CAN_MAX,           Min         ); };
+
+      // minimal edge size (delta between two samples, in mm) for CAN-start and CAN-end, default 60..
+      bool SetCanEdge(int Mm)             { return I2cWrite_Byte_Byte(LPP_I2C_ADDRESS, R_CAN_EDGE,          Mm          ); };
+
+      // minimal size (width) of can in mm
+      bool SetCanMin(int Mm)              { return I2cWrite_Byte_Byte(LPP_I2C_ADDRESS, R_CAN_MIN,           Mm          ); };
+
+      // maximal size (width) of can in mm, 0 disables width-check
+      bool SetCanMax(int Mm)              { return I2cWrite_Byte_Byte(LPP_I2C_ADDRESS, R_CAN_MAX,           Mm          ); };
 
       bool ArraySetup(int StartAngle, int StepAngle, int StepCount);
       bool SensorSetup(int Nr, int StartAngle, int StepAngle);
