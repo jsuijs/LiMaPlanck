@@ -13,6 +13,7 @@ bool MissieHeenEnWeer(TState &S);
 bool MissieRandomRijden(TState &S);
 bool MissieDetectBlik(TState &S);
 bool MissionDuckling(TState &S);
+bool MissionTest(TState &S);
 
 void LppSensorDefaultSetup();
 
@@ -87,6 +88,7 @@ void ProgrammaTakt()
       break;
 
       case 7 : { // Programma:
+         if (MissionTest(MissonS)) Program.State = 0;
       }
       break;
 
@@ -269,6 +271,42 @@ bool MissieUmbMark1(TState &S)
 
       default : {
          CSerial.printf("Error: ongeldige state in MissieUmbMark1 (%d)\n", S.State);
+         return true;  // error => mission end
+      }
+   }
+   return false;  // mission nog niet gereed
+}
+
+//-----------------------------------------------------------------------------
+// MissionTest - state machine
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool MissionTest(TState &S)
+{  int x;
+
+   S.Update("Test", Flags.IsSet(11));
+
+   switch (S.State) {
+
+      case 0 : {  // LIDAR-STARTEN
+         if (S.NewState) {
+            Lpp.Start();
+         }
+
+         if (S.StateTime() > 2000) {      // Wacht op start lidar
+            S.State++;
+         }
+      }
+      break;
+
+      case 1 : {
+         // blijf hier tot op stop wordt gedrukt.
+      }
+      break;
+
+
+      default : {
+         CSerial.printf("Error: ongeldige state in MissionTest (%d)\n", S.State);
          return true;  // error => mission end
       }
    }
