@@ -282,7 +282,7 @@ bool MissieUmbMark1(TState &S)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 bool MissionTest(TState &S)
-{  int x;
+{  static int x = 0;
 
    S.Update("Test", Flags.IsSet(11));
 
@@ -301,6 +301,12 @@ bool MissionTest(TState &S)
 
       case 1 : {
          // blijf hier tot op stop wordt gedrukt.
+         if (x !=  Lpp.Sensor[3].Distance) {
+            x =  Lpp.Sensor[3].Distance;
+            printf("Lidar S2 Distance %d, Degrees: %d\n",
+               Lpp.Sensor[2].Distance, Lpp.Sensor[2].Degrees32/32);
+         }
+
       }
       break;
 
