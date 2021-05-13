@@ -18,6 +18,7 @@ TDrive         Driver;
 TCommand       Command(Execute);
 TLpp           Lpp;
 HardwareSerial Serial2 (PA3, PA2);
+//                   SDA   SCL
 TwoWire        Wire2(PB11, PB10);
 TFlags         Flags(32);
 
@@ -81,6 +82,7 @@ void setup() {
    // Link PinChange interrupt to RC5 reader.
    attachInterrupt(IR_PIN, Rc5Isr, CHANGE);
 
+   I2cClearBus(PB11, PB10); // SDA, SCL
    LppWire.begin();
    if (Lpp.begin()) {
 

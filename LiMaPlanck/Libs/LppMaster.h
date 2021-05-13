@@ -302,7 +302,7 @@ bool TLpp::Start()
 //-----------------------------------------------------------------------------
 bool TLpp::Stop()
    {
-      if (EnableMode == 0) return false;  // begin not called, of failure
+      if (EnableMode == 0) return false;  // begin not called, or failure
       EnableMode = 1;   // inactive
 
       return I2cWrite_Byte_Byte(LPP_I2C_ADDRESS, R_CMD, 2);
@@ -373,6 +373,7 @@ bool TLpp::SensorSetupCan(int Nr, int StartAngle, int StepAngle)
 bool TLpp::ReadStatus()
    { char TxBuffer[1];
 
+      // allowed regardless of EnableMode.
       TxBuffer[0] = R_ID;
       bool r = I2cSendReceive(LPP_I2C_ADDRESS, 1, sizeof(Status), (lpp_tx_buffer *)TxBuffer, (lpp_rx_buffer *)&Status);
 
@@ -395,6 +396,8 @@ bool TLpp::ReadStatus()
 //-----------------------------------------------------------------------------
 bool TLpp::ReadArray()
    {
+      if (EnableMode == 0) return false;  // begin not called, or failure
+
       return _ReadShorts(R_A0_DISTANCE_H, ArrayCount, (lpp_int *) Array);
    }
 
@@ -406,6 +409,8 @@ bool TLpp::ReadArray()
 //-----------------------------------------------------------------------------
 bool TLpp::ReadSensors(int Count)
    {
+      if (EnableMode == 0) return false;  // begin not called, or failure
+
       SensorCount = Count;
       if (SensorCount > 8) SensorCount = 8;
       return _ReadShorts(R_V0_DISTANCE_H, SensorCount * 2, (lpp_int *) Sensor);
@@ -483,6 +488,8 @@ void TLpp::ReadPrintSensorCfg(int Nr)
 //-----------------------------------------------------------------------------
 bool TLpp::_SA_Setup(char StartIx, char Mode, int StartAngle, int StepAngle, int StepCount)
    { char TxBuffer[7];
+
+      if (EnableMode == 0) return false;  // begin not called, or failure
 
       TxBuffer[0] = StartIx;
       TxBuffer[1] = Mode;

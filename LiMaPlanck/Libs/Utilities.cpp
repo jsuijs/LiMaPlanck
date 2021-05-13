@@ -119,3 +119,49 @@ void Cartesian2Polar(long &hoek, int &afstand, int x, int y)
 
 //   CSerial.printf("Cartesian2Polar %d %d %d %d\n", (int)(hoek>>8), afstand, x, y);
 }
+
+
+//-----------------------------------------------------------------------------
+// HalI2cClearBus -
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void I2cClearBus(int PinSda, int PinScl)
+{
+   pinMode(PinSda, INPUT);
+   pinMode(PinScl, OUTPUT);
+//   InitGPIO(GPIOB, I2C_PIN_SCL, GPIO_Mode_OUT, GPIO_OType_OD);
+//-    InitGPIO(GPIOB, I2C_PIN_SDA, GPIO_Mode_OUT, GPIO_OType_OD);
+
+//   GPIO_SetBits(GPIOB, I2C_PIN_SDA);  // SDA high
+//-   GPIO_SetBits(GPIOB, I2C_PIN_SCL);  // SCL high
+   digitalWrite(PinScl, 1);
+   delay(5);
+
+   //toggle SCL 9+ times
+   for (int i = 0; i< 10; i++) {
+      digitalWrite(PinScl, 0);
+      delay(1);
+      digitalWrite(PinScl, 1);
+      delay(1);
+   }
+
+//   GPIO_ResetBits(GPIOB, I2C_PIN_SCL);  // SCL low allows setup of SDA
+   digitalWrite(PinScl, 0);
+   delay(1);
+
+//   GPIO_ResetBits(GPIOB, I2C_PIN_SDA);  // SDA setup (low)
+   pinMode(PinSda, OUTPUT);
+   digitalWrite(PinSda, 0);
+   delay(1);
+
+//   GPIO_SetBits(GPIOB, I2C_PIN_SCL);  // SCL high, prepare for STOP
+   digitalWrite(PinScl, 1);
+   delay(1);
+
+//   GPIO_SetBits(GPIOB, I2C_PIN_SDA);  // SDA low->high while CLK high => STOP
+   digitalWrite(PinSda, true);
+   delay(1);
+
+   pinMode(PinSda, INPUT);
+   pinMode(PinScl, INPUT);
+}

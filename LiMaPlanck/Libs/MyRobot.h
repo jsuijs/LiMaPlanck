@@ -191,6 +191,7 @@ long Clip(long input, long min, long max);
 void Slope(int &SlopeInOut, int Setpoint, int Step);
 long NormHoek(long hoek, long Norm);
 void Cartesian2Polar(long &hoek, int &afstand, int x, int y);
+void I2cClearBus(int PinSda, int PinScl);
 
 // ProgrammaTakt.cpp
 void ProgrammaTakt();
