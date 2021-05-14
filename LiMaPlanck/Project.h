@@ -6,6 +6,11 @@
 #ifndef PROJECT_H
 #define PROJECT_H
 
+#include <Servo.h>
+extern Servo myservo;
+
+void LppSensorDefaultSetup();
+
 extern int LidarArray_L100;
 extern int LidarArray_L80 ;
 extern int LidarArray_L60 ;

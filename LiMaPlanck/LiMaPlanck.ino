@@ -22,7 +22,7 @@ HardwareSerial Serial2 (PA3, PA2);
 TwoWire        Wire2(PB11, PB10);
 TFlags         Flags(32);
 
-int Lijn;  // 0..7, 3 bits. 0 = wit, 7 = zwart, 1 = links, 2 = midden, 4 = rechts
+Servo myservo;  // create servo object to control a servo
 
 int LidarArray_L100;
 int LidarArray_L80 ;
@@ -117,6 +117,8 @@ void setup() {
 
    Buzzer.Beep(30, 2);
    CSerial.printf("Opstarten gereed.\n");
+
+   myservo.attach(PB5);  // attaches the servo on pin 9 to the servo object
 }
 
 //---------------------------------------------------------------------------------------
@@ -135,14 +137,12 @@ void loop() {
    if (ms != PrevMs) {  // miliseconde takt
       PrevMs = ms;  // bewaar huidige tijd
       BlinkTakt();
-      Lijn = 7 - (digitalRead(5) * 1 + digitalRead(6) * 2 + digitalRead(7) * 4);
    }
    // Main takt interval
    ms = millis();
    if ((ms - NextMainTakt) > 0) {
       NextMainTakt = ms + MAIN_TAKT_INTERVAL;  // zet tijd voor volgende interval
       // hier de periodieke acties voor deze interval
-
       ReadLpp();
       Position.Takt();  // Lees & verwerk encoder data
       ProgrammaTakt();  // Voer (stapje van) geselecteerde programma uit
@@ -259,5 +259,7 @@ void Execute(int Param[])
    if (Command.Match("Flag",           1)) CSerial.printf("Flag %d is %d\n", Param[0], Flags.IsSet(Param[0]));
    if (Command.Match("Flag",           2)) Flags.Set(Param[0], Param[1]);
    if (Command.Match("FlagDump",       0)) Flags.Dump();
+
+   if (Command.Match("Servo",          1)) myservo.write(Param[0]);
 }
 

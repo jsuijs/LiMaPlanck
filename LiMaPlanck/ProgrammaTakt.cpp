@@ -15,8 +15,6 @@ bool MissieDetectBlik(TState &S);
 bool MissionDuckling(TState &S);
 bool MissionTest(TState &S);
 
-void LppSensorDefaultSetup();
-
 TState MissonS;  // Mission statemachine
 
 //-----------------------------------------------------------------------------
