@@ -23,4 +23,6 @@ extern int LidarArray_R60 ;
 extern int LidarArray_R80 ;
 extern int LidarArray_R100;
 
+bool MissionAloys1(TState &S);
+
 #endif

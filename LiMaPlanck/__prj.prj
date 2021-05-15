@@ -4,6 +4,12 @@ Unicode=2
 [Project Information]
 Use Relative Directory=1
 Relative to Project File=1
+Include Sub Directories=1
+Project TagfileU=
+Project WordfileU=
+Project TpFileU=
+FilterU=
+Create Tagfile=0
 [Files]
 	0=Planck.ino
 	1=HeenEnWeer.ino
@@ -47,3 +53,4 @@ Relative to Project File=1
 14=Duckling.cpp
 15=Libs+AFw-MyRobot.cpp
 16=Project.h
+17=AloysTakt.cpp
