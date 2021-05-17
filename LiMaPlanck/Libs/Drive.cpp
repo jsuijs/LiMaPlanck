@@ -257,13 +257,13 @@ void TDrive::XY(int X, int Y, int Speed, int EndSpeed)
 //-----------------------------------------------------------------------------
 void TDrive::RotateHeading(int Heading)
    {
-      if (Flags.IsSet(1)) CSerial.printf("Drive.Rotate\n");
+      if (Flags.IsSet(1)) CSerial.printf("Drive.RotateHeading\n");
 
       NewMovement = true;
       IsDoneFlag = false;
 
       DriveMode = M_ROTATE;
-      Param1 = NormHoek(Position.Hoek + Heading, 360); // Aantal te draaien graden (relatief).
+      Param1 = NormHoek(Heading - Position.Hoek, 360); // Aantal te draaien graden (relatief).
    }
 
 //-----------------------------------------------------------------------------
@@ -280,7 +280,7 @@ void TDrive::RotateHeading(int Heading)
 //-----------------------------------------------------------------------------
 void TDrive::Rotate(int Degrees)
    {
-      if (Flags.IsSet(1)) CSerial.printf("Drive.RotateRel\n");
+      if (Flags.IsSet(1)) CSerial.printf("Drive.Rotate\n");
 
       NewMovement = true;
       IsDoneFlag = false;
@@ -530,7 +530,6 @@ bool TDrive::XYTakt(bool FirstCall, int TargetX, int TargetY, int Speed, int End
          if (Flags.IsSet(1)) CSerial.printf ("XYTakt x: %d, y: %d, Speed: %d, EndSpeed: %d\n", TargetX, TargetY, Speed, EndSpeed);
          State = 0;
       }
-
 
       // doel bepalen (steeds opnieuw).
       // hoek & afstand bepalen, resultaat in graden*256 (360/circel) en mm
