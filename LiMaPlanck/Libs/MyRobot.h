@@ -5,7 +5,8 @@
 #ifndef MYROBOT_H
 #define MYROBOT_H
 
-#include "Arduino.h"
+#include <Arduino.h>
+#include <Servo.h>
 
 #include "Libs/LppMaster.h"   // contains code...
 
@@ -170,6 +171,8 @@ class TFlags
       bool SetIx(int Nr);
 };
 extern TFlags Flags;
+
+bool ServoSlope(Servo &S, int Setpoint, int Step);
 
 //-----------------------------------------------------------------------------
 // Encoders
