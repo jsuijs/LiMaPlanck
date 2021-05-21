@@ -104,7 +104,7 @@ void TDrive::Takt()
             break;
          }
          case M_ROTATE : {
-            IsDoneFlag = RotateRelTakt(FirstCall, Param1);
+            IsDoneFlag = RotateRelTakt(FirstCall, Param1, Param2);
             break;
          }
          case M_ARC : {
@@ -255,7 +255,7 @@ void TDrive::XY(int X, int Y, int Speed, int EndSpeed)
 // Updatable:  No
 // Indefinite: No
 //-----------------------------------------------------------------------------
-void TDrive::RotateHeading(int Heading)
+void TDrive::RotateHeading(int Heading, int RotateClip)
    {
       if (Flags.IsSet(1)) CSerial.printf("Drive.RotateHeading\n");
 
@@ -264,6 +264,7 @@ void TDrive::RotateHeading(int Heading)
 
       DriveMode = M_ROTATE;
       Param1 = NormHoek(Heading - Position.Hoek, 360); // Aantal te draaien graden (relatief).
+      Param2 = RotateClip; // Draaisnelheid (degrees * 16 / tick)
    }
 
 //-----------------------------------------------------------------------------
@@ -278,7 +279,7 @@ void TDrive::RotateHeading(int Heading)
 // Updatable:  No
 // Indefinite: No
 //-----------------------------------------------------------------------------
-void TDrive::Rotate(int Degrees)
+void TDrive::Rotate(int Degrees, int RotateClip)
    {
       if (Flags.IsSet(1)) CSerial.printf("Drive.Rotate\n");
 
@@ -286,7 +287,8 @@ void TDrive::Rotate(int Degrees)
       IsDoneFlag = false;
 
       DriveMode = M_ROTATE;
-      Param1 = Degrees; // Aantal te draaien graden (relatief).
+      Param1 = Degrees;    // Aantal te draaien graden (relatief).
+      Param2 = RotateClip; // Draaisnelheid (degrees * 16 / tick)
    }
 
 //-----------------------------------------------------------------------------
@@ -384,7 +386,7 @@ void TDrive::SpeedLRTakt(bool FirstCall, int SpeedL, int SpeedR, int MaxSlopeP)
 // Parameter: DeltaDegrees - gewenste aantal graden draaien
 // return: true when done
 //-----------------------------------------------------------------------------
-bool TDrive::RotateRelTakt(bool FirstCall, int DeltaDegrees)
+bool TDrive::RotateRelTakt(bool FirstCall, int DeltaDegrees, int RotateClip_q8)
    {  static int RestHoek_q8, PrevRestHoek_q8;
       static int VorigeHoek_q8;
       static char StilStand;
@@ -400,7 +402,7 @@ bool TDrive::RotateRelTakt(bool FirstCall, int DeltaDegrees)
       RestHoek_q8      -= Delta_q8;
       VorigeHoek_q8     = DezeHoek_q8;
 
-      int Clipped_q8 = Clip(RestHoek_q8, ROTATE_CLIP_Q8, -ROTATE_CLIP_Q8);
+      int Clipped_q8 = Clip(RestHoek_q8, RotateClip_q8, -RotateClip_q8);
       int SpeedR = Clipped_q8 * (float) ROTATE_P_GAIN + (RestHoek_q8 - PrevRestHoek_q8) * (float) ROTATE_D_GAIN;
       int SpeedL = -SpeedR;
 

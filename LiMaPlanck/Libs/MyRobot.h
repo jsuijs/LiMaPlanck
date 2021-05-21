@@ -83,8 +83,8 @@ class TDrive
       void SpeedRotation(int Speed, int Rotation_q8);
       void SpeedHeading(int Speed, int Heading);
       void XY(int X, int Y, int Speed, int EndSpeed);
-      void RotateHeading(int Heading);
-      void Rotate(int Degrees);
+      void RotateHeading(int Heading, int RotateClip = ROTATE_CLIP_Q8);
+      void Rotate(int Degrees, int RotateClip = ROTATE_CLIP_Q8);
       void ArcHeading(int Heading, int Radius, int Speed, int EndSpeed);
       void Arc(int Degrees, int Radius, int Speed, int EndSpeed);
       void Stop();
@@ -107,7 +107,7 @@ class TDrive
       bool SpeedRotationTakt(bool FirstCall, int InSpeed, int InRotation_q8);
       bool SpeedHeadingTakt(bool FirstCall, int InSpeed, int InHeading);
       bool XYTakt(bool FirstCall, int TargetX, int TargetY, int Speed, int EndSpeed);
-      bool RotateRelTakt(bool FirstCall, int DeltaDegrees);
+      bool RotateRelTakt(bool FirstCall, int DeltaDegrees, int RotateClip_q8);
       bool ArcRelTakt(bool FirstCall, int DeltaDegrees, int Radius, int Speed, int EndSpeed);
       bool StopTakt(bool FirstCall);
 };

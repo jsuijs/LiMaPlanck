@@ -243,6 +243,8 @@ void Execute(int Param[])
    if (Command.Match("DriveXY",        4)) Driver.XY(Param[0], Param[1], Param[2], Param[3]);
    if (Command.Match("DriveRotateH",   1)) Driver.RotateHeading(Param[0]);
    if (Command.Match("DriveRotate",    1)) Driver.Rotate(Param[0]);
+   if (Command.Match("DriveRotateH",   2)) Driver.RotateHeading(Param[0], Param[1]);
+   if (Command.Match("DriveRotate",    2)) Driver.Rotate(Param[0], Param[1]);
    if (Command.Match("DriveArcH",      4)) Driver.ArcHeading(Param[0], Param[1], Param[2], Param[3]);
    if (Command.Match("DriveArc",       4)) Driver.Arc(Param[0], Param[1], Param[2], Param[3]);
 
