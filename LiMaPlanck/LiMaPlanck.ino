@@ -17,9 +17,8 @@ TPosition      Position;
 TDrive         Driver;
 TCommand       Command(Execute);
 TLpp           Lpp;
-HardwareSerial Serial2 (PA3, PA2);
-//                   SDA   SCL
-TwoWire        Wire2(PB11, PB10);
+HardwareSerial Serial2 (PA3, PA2);  // rx, tx
+TwoWire        Wire2(PB11, PB10);   // sda, scl
 TFlags         Flags(32);
 
 Servo myservo;  // create servo object to control a servo
