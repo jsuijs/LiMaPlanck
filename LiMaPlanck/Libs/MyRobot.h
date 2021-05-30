@@ -81,12 +81,15 @@ class TDrive
       void Pwm(int PwmL, int PwmR);
       void SpeedLR(int SpeedL, int SpeedR);
       void SpeedRotation(int Speed, int Rotation_q8);
-      void SpeedHeading(int Speed, int Heading);
-      void XY(int X, int Y, int Speed, int EndSpeed);
-      void RotateHeading(int Heading, int RotateClip = ROTATE_CLIP_Q8);
       void Rotate(int Degrees, int RotateClip = ROTATE_CLIP_Q8);
-      void ArcHeading(int Heading, int Radius, int Speed, int EndSpeed);
       void Arc(int Degrees, int Radius, int Speed, int EndSpeed);
+
+      void XY(int X, int Y, int Speed, int EndSpeed);
+
+      void SpeedHeading(int Speed, int Heading);
+      void RotateHeading(int Heading, int RotateClip = ROTATE_CLIP_Q8);
+      void ArcHeading(int Heading, int Radius, int Speed, int EndSpeed);
+
       void Stop();
 
    private:
