@@ -14,6 +14,7 @@ static bool MissieRandomRijden(TState &S);
 static bool MissieDetectBlik(TState &S);
 static bool MissionTest(TState &S);
 bool __attribute__ ((weak)) MissionAloys1(TState &S) { S = S; return true; }
+bool __attribute__ ((weak)) MissionServo1(TState &S) { S = S; return true; }
 TState MissonS;  // Mission statemachine
 
 //-----------------------------------------------------------------------------
@@ -60,6 +61,7 @@ void ProgrammaTakt()
       break;
 
       case 2 : {  // Programma:
+        if (MissionServo1(MissonS)) Program.State = 0;
       }
       break;
 
