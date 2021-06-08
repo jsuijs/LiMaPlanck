@@ -92,7 +92,7 @@ void ProgrammaTakt()
       }
       break;
 
-      case 8 : { // Programma: UmbMark CW
+      case 8 : { // Programma: MissieBlikken
          if (MissieBlikken(MissonS)) Program.State = 0;
       }
       break;
@@ -626,7 +626,7 @@ static bool MissieTTijd(TState &S)
 static bool MissieBlikken(TState &S)
 {  static int x = 0;
    static int BlikNummer;      // Blikken ophalen
-   static int BlikPos;         // plaats berekenen
+   static int BlikPosY;        // plaats waar blik wordt weggezet
 
    S.Update("Mission Blikken");
 
@@ -637,7 +637,7 @@ static bool MissieBlikken(TState &S)
             Position.Reset();
             Lpp.Start();
             BlikNummer = 1;
-            BlikPos = 520;
+            BlikPosY = 520;    // voor 1e blik
          }
 
          if (S.StateTime() > 2000) {                        // Geef de lidar wat tijd
@@ -688,13 +688,12 @@ static bool MissieBlikken(TState &S)
       break;
 
       case 4 : {  // Grijper sluiten
-
          if (ServoSlope(myservo, 2300, 20)) S.State = 5;
       }
       break;
 
-      case 5 : {  // Achterwaards rijden naar 0.0
-         if (S.NewState) Driver.XY(0, BlikPos , -100, 0 );   // Blik op rij terugbrengen
+      case 5 : {  // Achterwaards rijden naar plaats om blik weg te zetten.
+         if (S.NewState) Driver.XY(0, BlikPosY , -100, 0 );
 
          if (Driver.IsDone()) S.State ++;
       }
@@ -726,27 +725,21 @@ static bool MissieBlikken(TState &S)
       }
       break;
 
-      case 10 : {  // Pos.0.0 > 90 gr draaien naar rijrichting
+      case 10 : {  // Kijk of we klaar zijn
          if (S.NewState) {
-            Driver.Rotate(90);
-            BlikPos = (BlikPos - 130);
-            BlikNummer ++;
-         }
 
-         if (Driver.IsDone()) S.State ++;
-      }
-      break;
+            BlikPosY -= 130;     // plaats van volgend blik
+            BlikNummer ++;       // nummer van volgend blik
 
-      case 11 : {  // Kijken naar einde blikzoeken
-         if (S.NewState) {
             if (BlikNummer >= 5) {
-               CSerial.printf("Onverwacht blik: %d, stop\n", BlikNummer);
+               CSerial.printf("5 blikken: klaar\n");
                return true;
             }
-            else {
-               S.State = 1;
-            }
+
+            Driver.Rotate(90);   // draai naar rijrichting
          }
+
+         if (Driver.IsDone()) S.State = 1; // volgend blik
       }
       break;
 
