@@ -11,7 +11,7 @@ static bool MissieUmbMark1(TState &S);
 static bool MissieTTijd(TState &S);
 static bool MissieHeenEnWeer(TState &S);
 static bool MissieRandomRijden(TState &S);
-static bool MissieDetectBlik(TState &S);
+static bool MissieBlikken(TState &S);
 static bool MissionTest(TState &S);
 bool __attribute__ ((weak)) MissionAloys1(TState &S) { S = S; return true; }
 bool __attribute__ ((weak)) MissionServo1(TState &S) { S = S; return true; }
@@ -93,7 +93,7 @@ void ProgrammaTakt()
       break;
 
       case 8 : { // Programma: UmbMark CW
-         if (MissieDetectBlik(MissonS)) Program.State = 0;
+         if (MissieBlikken(MissonS)) Program.State = 0;
       }
       break;
 
@@ -620,105 +620,139 @@ static bool MissieTTijd(TState &S)
 }
 
 //-----------------------------------------------------------------------------
-// MissieDetectBlik -
+// MissieBlikken -
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-static bool MissieDetectBlik(TState &S)
-{
-   static int Afstanden[90];
-   static int Target;
+static bool MissieBlikken(TState &S)
+{  static int x = 0;
+   static int BlikNummer;      // Blikken ophalen
+   static int BlikPos;         // plaats berekenen
 
-   static int StartRobotHoek;
-
-   S.Update("DetectBlik", Flags.IsSet(11));
+   S.Update("Mission Blikken");
 
    switch (S.State) {
-      case 0 : {    // draai naar rechts
+
+      case 0 : {  // LIDAR-STARTEN
          if (S.NewState) {
-            StartRobotHoek = Position.Hoek;
-            Driver.SpeedLR(100, -100);
+            Position.Reset();
+            Lpp.Start();
+            BlikNummer = 1;
+            BlikPos = 520;
          }
-         CSerial.printf("aaHoek: %d, Sonar: %d\n", Position.Hoek, LidarArray_V);
-         if (Driver.IsDone()) { // Als de beweging klaar is
-            S.State++; // naar volgende state
+
+         if (S.StateTime() > 2000) {                        // Geef de lidar wat tijd
+            if (ServoSlope(myservo, 550, 20)) S.State ++;   // wacht daarna op servo
          }
-         if (Position.Hoek - StartRobotHoek < -45 ) S.State ++;
+       }
+       break;
+
+      case 1 : { // default: rij rechtuit
+         if (S.NewState) Driver.SpeedLR(100, 100);
+
+         if (x !=  Lpp.Sensor[3].Distance) {
+            x =  Lpp.Sensor[3].Distance;
+            CSerial.printf("Lidar S2 Distance %d, Degrees: %d\n",
+                   Lpp.Sensor[2].Distance, Lpp.Sensor[2].Degrees32 / 32);
+         }
+
+         if (Lpp.Sensor[2].Distance < 500) S.State ++;   // Blik in bereik
       }
       break;
 
-      case 1 :  {  // scan naar links
+      case 2 : {  // Draai naar blik .... graden
          if (S.NewState) {
-            Driver.SpeedLR(-50, 50);
-            for (int x=0; x< 90; x++) Afstanden[x] = 999;
-         }
-         int Ix = Position.Hoek + 45 - StartRobotHoek;
-         if ((Ix >= 0) && (Ix < 90)) {
-             Afstanden[Ix] = LidarArray_V;
-         }
-         CSerial.printf("aaHoek: %d, Sonar: %d\n", Position.Hoek, LidarArray_V);
-         if (Position.Hoek - StartRobotHoek > 45 ) S.State ++;
-      }
-      break;
-
-      case 2 : {   // draai naar blik
-         if (S.NewState) {
-            int Min = Afstanden[0];
-            int First = 999, Last = 999;
-
-            for (int x=0; x< 90; x++) {
-               if (Afstanden[x] < Min) Min = Afstanden[x];
+            int BlikHoekCorrectie = (180 - Lpp.Sensor[2].Degrees32 / 32);
+            if (BlikHoekCorrectie > 0) {
+               BlikHoekCorrectie = (BlikHoekCorrectie + 2);
             }
-
-            for (int x=0; x< 90; x++) {
-               if (Afstanden[x] < (Min + 150)) {
-                  // blik in zicht
-                  if (First == 999) First = x;
-                  Last = x;
-               }
+            else {
+               BlikHoekCorrectie = (BlikHoekCorrectie - 4);
             }
-            CSerial.printf("Min: %d, First: %d, Last: %d", Min, First, Last);
-            Target = (First + Last) / 2 - 45;
-            Driver.SpeedLR(100, -100);
+            CSerial.printf("HoekCor: %d\n", BlikHoekCorrectie);
+            Driver.Rotate(BlikHoekCorrectie); // Berekende graden links of rechts
          }
 
-         if (Position.Hoek - StartRobotHoek < Target ) S.State ++;
+         if (Driver.IsDone()) S.State ++;
       }
       break;
 
-      case 3 : {    // rij naar blik
+      case 3 : {  // Naar blik rijden
+         if (S.NewState) Driver.SpeedLR(60, 60);     // Rijden naar blik
+
+         if (Lpp.Sensor[2].Distance < 130) {
+            CSerial.printf("blik gevonden: \n");
+            Driver.SpeedLR(0, 0);       // Stop motoren
+            S.State ++; // Naar de volgende state als de beweging klaar is
+         }
+      }
+      break;
+
+      case 4 : {  // Grijper sluiten
+
+         if (ServoSlope(myservo, 2300, 20)) S.State = 5;
+      }
+      break;
+
+      case 5 : {  // Achterwaards rijden naar 0.0
+         if (S.NewState) Driver.XY(0, BlikPos , -100, 0 );   // Blik op rij terugbrengen
+
+         if (Driver.IsDone()) S.State ++;
+      }
+      break;
+
+      case 6 : {  // Pos.0.0 > 180 gr draaien naar achterwand
+         if (S.NewState) Driver.RotateHeading(180);
+
+         if (Driver.IsDone()) S.State ++;
+      }
+      break;
+
+      case 7 : {  // Grijper openen
+         if (ServoSlope(myservo, 550, 20)) S.State ++;
+      }
+      break;
+
+      case 8 : {  // Pos.0.0 > 90 gr draaien richting 0.0
+        if (S.NewState) Driver.Rotate(90);
+
+        if (Driver.IsDone()) S.State ++;
+      }
+      break;
+
+      case 9 : {  // terug naar startpunt (0.0) voor volgende sessie
+         if (S.NewState) Driver.XY(0, 0 , 60, 0 );
+
+         if (Driver.IsDone()) S.State ++;
+      }
+      break;
+
+      case 10 : {  // Pos.0.0 > 90 gr draaien naar rijrichting
          if (S.NewState) {
-            Driver.SpeedHeading(200, Target + StartRobotHoek);
-//            GrijperMagneetVast(true);
+            Driver.Rotate(90);
+            BlikPos = (BlikPos - 130);
+            BlikNummer ++;
          }
-         CSerial.printf("aaHoek: %d, Sonar: %d\n", Position.Hoek, LidarArray_V);
-         if (Driver.IsDone()) { // Als de beweging klaar is
-            S.State++; // naar volgende state
-         }
-         if (LidarArray_V < 100) S.State ++;
+
+         if (Driver.IsDone()) S.State ++;
       }
       break;
 
-      case 4 : {    // rij terug
-         static int EndValue;
-
-         int OdoL, OdoR, OdoT;
-         Position.OdoGet(OdoL, OdoR, OdoT) ;
-
+      case 11 : {  // Kijken naar einde blikzoeken
          if (S.NewState) {
-            Driver.SpeedHeading(-200, Target + StartRobotHoek);
-             EndValue = OdoT + 500;
-
-         }
-         CSerial.printf("OdoT: %d\n", OdoT);
-         if ((OdoT - EndValue) > 0) {
-//              GrijperMagneetVast(false);
-           S.State ++;
+            if (BlikNummer >= 5) {
+               CSerial.printf("Onverwacht blik: %d, stop\n", BlikNummer);
+               return true;
+            }
+            else {
+               S.State = 1;
+            }
          }
       }
       break;
 
+      //****
       default : {
-         CSerial.printf("Error: ongeldige state in MissieDetectBlik (%d)\n", S.State);
+         CSerial.printf("Error: ongeldige state in MissieBlikken (%d)\n", S.State);
          return true;  // error => mission end
       }
    }
