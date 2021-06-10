@@ -27,7 +27,7 @@ void TState::Reset()
    }
 
 //-----------------------------------------------------------------------------
-// TState::Update - housekeeping, call this at the beginning of eacht takt.
+// TState::Update - housekeeping, call this at the beginning of each takt.
 //-----------------------------------------------------------------------------
 // * detect changes in State (from previous call)
 // * report state changes when Verbose is true
@@ -43,6 +43,20 @@ void TState::Update(const char *InName, bool Verbose)
          NewState       = true;
          StateStartTime = millis();
       }
+   }
+
+//-----------------------------------------------------------------------------
+// TState::InvalidState - Report invalid state
+//-----------------------------------------------------------------------------
+// Returns true, so the error can be handled with a single line statement:
+//
+//    default : return S.InvalidState(__FUNCTION__);   // Report invalid state & end mission
+//
+//-----------------------------------------------------------------------------
+bool TState::InvalidState(const char *FName)
+   {
+      CSerial.printf("Error: invalied state in %s (%d)\n", FName, State);
+      return true;
    }
 
 //-----------------------------------------------------------------------------

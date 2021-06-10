@@ -124,7 +124,7 @@ class TState
       void Reset();
 
       void Update(const char *InName, bool Verbose=true);
-
+      bool InvalidState(const char *FName);
       int StateTime();
 
       int  State;
