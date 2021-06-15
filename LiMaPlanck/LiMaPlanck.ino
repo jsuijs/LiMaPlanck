@@ -117,7 +117,8 @@ void setup() {
    Buzzer.Beep(30, 2);
    CSerial.printf("Opstarten gereed.\n");
 
-   myservo.attach(PB5);  // attaches the servo on pin 17 to the servo object
+   myservo.attach(PB5);    // attaches the servo on pin 17 to the servo object
+   myservo.write(550);     // default: gripper open
 }
 
 //---------------------------------------------------------------------------------------
