@@ -36,7 +36,7 @@ goto done
 :updated
 echo IDE settings updated.
 pause
-gote done
+goto done
 
 :Generate
 %Script%

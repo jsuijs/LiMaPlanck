@@ -641,7 +641,7 @@ static bool MissieBlikken(TState &S)
          }
 
          if (S.StateTime() > 2000) {                        // Geef de lidar wat tijd
-            if (ServoSlope(myservo, 550, 20)) S.State ++;   // wacht daarna op servo
+            if (ServoSlope(myservo, SERVO_OPEN, 20)) S.State ++;   // wacht daarna op servo
          }
        }
        break;
@@ -688,7 +688,7 @@ static bool MissieBlikken(TState &S)
       break;
 
       case 4 : {  // Grijper sluiten
-         if (ServoSlope(myservo, 2300, 20)) S.State = 5;
+         if (ServoSlope(myservo, SERVO_CLOSE, 20)) S.State = 5;
       }
       break;
 
@@ -707,7 +707,7 @@ static bool MissieBlikken(TState &S)
       break;
 
       case 7 : {  // Grijper openen
-         if (ServoSlope(myservo, 550, 20)) S.State ++;
+         if (ServoSlope(myservo, SERVO_OPEN, 20)) S.State ++;
       }
       break;
 
