@@ -8,8 +8,8 @@
 #include <Arduino.h>
 #include <Servo.h>
 
+#include "Libs/Flags.h"       // contains code...
 #include "Libs/LppMaster.h"   // contains code...
-
 #include "Libs/Commands.h"    // contains code...
 
 //-----------------------------------------------------------------------------
@@ -154,26 +154,6 @@ class TBuzzer
       int BeepCountDown, Toggle;
 };
 extern TBuzzer Buzzer;
-
-//-----------------------------------------------------------------------------
-class TFlags
-{
-   public:
-      TFlags(int NrFlags); // NrFlags 32 means 0..31
-
-      bool IsSet(int Nr);
-      void Set(int Nr, bool Value);
-
-      void Dump();
-
-   private:
-      int *FlagWords;
-      int NrFlagWords;  // WordIx + 1
-      int WordIx, BitIx;
-
-      bool SetIx(int Nr);
-};
-extern TFlags Flags;
 
 bool ServoSlope(Servo &S, int Setpoint, int Step);
 
