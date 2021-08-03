@@ -12,6 +12,7 @@
 //#define ROBOT_KAREL
 
 #define CSerial Serial2 // define Console-serial.
+#define MyPrintf CSerial.printf
 
 // Choose i2c for Lidar Preprocessor
 #include <Wire.h>
