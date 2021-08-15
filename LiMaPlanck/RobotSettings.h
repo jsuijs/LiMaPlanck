@@ -20,7 +20,7 @@ extern  TwoWire Wire2;
 #define LppWire Wire2
 
 // IO mapping
-const int BUZZER_PIN = PC13;
+const int BUZZER_PIN = PA4;
 
 //-----------------------------------------------------------------------------
 // TB6612 Motor configuration
