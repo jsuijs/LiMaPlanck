@@ -40,4 +40,4 @@ Optioneel   | Core   | Naam      | pin#   | ----   | pin#   | Naam      | Core  
  \#         | 3V3    | AV+       | \-     | <--->  | \-     | VCC       | \#     | \#        |
 
 
-* RX2 / TX2 is console-poort.
+\* RX2 / TX2 is console-poort.
