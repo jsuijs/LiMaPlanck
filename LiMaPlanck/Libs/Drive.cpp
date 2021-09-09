@@ -335,7 +335,7 @@ void TDrive::ArcHeading(int Heading, int Radius, int Speed, int EndSpeed)
 // Arc - Rij boog van Degrees (graden).
 //-----------------------------------------------------------------------------
 // Rij een boog tot de opgegeven richting.
-// - 'Heading' is de absolute hoek, in graden.
+// - 'Degrees' is de relatieve hoek, in graden.
 // - Radius is straal van de draaicircel in mm
 //
 // Updatable:  No
