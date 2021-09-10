@@ -609,6 +609,7 @@ bool TDrive::XYTakt(bool FirstCall, int TargetX, int TargetY, int Speed, int End
 bool TDrive::ArcRelTakt(bool FirstCall, int DeltaDegrees, int Radius, int Speed, int EndSpeed)
    {  static int   DoelOdoT, DegreesOffset_q8;
       static float TurnRate;
+      static int   TurnedDegrees, LastDegrees;
 
       int OdoL, OdoR, OdoT;  // afgelegde weg in mm
       Position.OdoGet(OdoL, OdoR, OdoT);
@@ -619,6 +620,8 @@ bool TDrive::ArcRelTakt(bool FirstCall, int DeltaDegrees, int Radius, int Speed,
          // - hoeveel graden we moeten draaien per afgelegde mm (Turnrate)
          DoelOdoT = OdoT + 2 * 3.14159 * Radius  * ABS(DeltaDegrees) / 360;
          TurnRate = 360 / 2 / 3.14159 / Radius; // TurnRate in graden / mm
+         TurnedDegrees  = 0;
+         LastDegrees    = Position.Hoek;
          DegreesOffset_q8 = Position.HoekHires();
          if (DeltaDegrees < 0) {
             TurnRate = -TurnRate;
@@ -626,8 +629,18 @@ bool TDrive::ArcRelTakt(bool FirstCall, int DeltaDegrees, int Radius, int Speed,
          if (Flags.IsSet(1)) CSerial.printf("ArcTakt First DoelOdoT: %d, TurnRate x 100: %d (%d %d %d %d)\n", DoelOdoT, (int)(TurnRate * 100), DeltaDegrees, Radius, OdoT, Position.Hoek);
       }
 
-      int RestantWeg = DoelOdoT - OdoT;
-      if (RestantWeg < 10)  {
+//      int RestantWeg = DoelOdoT - OdoT;
+//      if (RestantWeg < 10)  {
+//         return true;   // done
+//      }
+
+      // Update rotation & check
+      TurnedDegrees += NormHoek(Position.Hoek - LastDegrees, 360);
+      LastDegrees    = Position.Hoek;
+      int RemainingDegrees = DeltaDegrees - TurnedDegrees;
+      int RestantWeg = 2 * 3.14159 * Radius  * ABS(RemainingDegrees) / 360;
+      if (DeltaDegrees < 0) RemainingDegrees *= -1;
+      if (RemainingDegrees < 1)  {
          return true;   // done
       }
 
