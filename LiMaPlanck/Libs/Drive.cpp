@@ -651,17 +651,17 @@ bool TDrive::ArcRelTakt(bool FirstCall, int DeltaDegrees, int Radius, int Speed,
       // bepaal maximale snelheid op gegeven afstand van doel, en verschil tussen L en R o.b.v. radius
       int SpeedL = EenparigVertragen(RestantWeg, Speed, EndSpeed, MAX_SLOPE * MAIN_TAKT_RATE); // max speed
       int SpeedR = SpeedL;
+
+      // feed-forward for rotation
       int _Delta = SpeedL * (WIEL_BASIS / 2) / Radius;
       SpeedL += _Delta;
       SpeedR -= _Delta;
 
       // simpele P regelaar voor richting
-      {  // limit scope Correctie
-         int Correctie = (HoekError_q8 * PID_Kp) / 4096;
-         int ClippedCorrectie = Clip(Correctie, PID_OUT_CLIP * 256, PID_OUT_CLIP * -256);
-         SpeedL = SpeedL + (ClippedCorrectie * WIEL_BASIS) / (1024);
-         SpeedR = SpeedR - (ClippedCorrectie * WIEL_BASIS) / (1024);
-      }
+      int Correctie = (HoekError_q8 * PID_Kp) / 4096;
+      int ClippedCorrectie = Clip(Correctie, PID_OUT_CLIP * 256, PID_OUT_CLIP * -256);
+      SpeedL += (ClippedCorrectie * WIEL_BASIS) / (1024);
+      SpeedR -= (ClippedCorrectie * WIEL_BASIS) / (1024);
 
       // stuur de motoren
       SpeedLRTakt(FirstCall, SpeedL, SpeedR, MAX_SLOPE);
