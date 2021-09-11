@@ -620,33 +620,32 @@ bool TDrive::ArcRelTakt(bool FirstCall, int DeltaDegrees, int Radius, int Speed,
          // - hoeveel graden we moeten draaien per afgelegde mm (Turnrate)
          DoelOdoT = OdoT + 2 * 3.14159 * Radius  * ABS(DeltaDegrees) / 360;
          TurnRate = 360 / 2 / 3.14159 / Radius; // TurnRate in graden / mm
+         DegreesOffset_q8 = Position.HoekHires();
+
          TurnedDegrees  = 0;
          LastDegrees    = Position.Hoek;
-         DegreesOffset_q8 = Position.HoekHires();
+
          if (DeltaDegrees < 0) {
             TurnRate = -TurnRate;
          }
          if (Flags.IsSet(1)) CSerial.printf("ArcTakt First DoelOdoT: %d, TurnRate x 100: %d (%d %d %d %d)\n", DoelOdoT, (int)(TurnRate * 100), DeltaDegrees, Radius, OdoT, Position.Hoek);
       }
 
-//      int RestantWeg = DoelOdoT - OdoT;
-//      if (RestantWeg < 10)  {
-//         return true;   // done
-//      }
-
       // Update rotation & check
       TurnedDegrees += NormHoek(Position.Hoek - LastDegrees, 360);
       LastDegrees    = Position.Hoek;
       int RemainingDegrees = DeltaDegrees - TurnedDegrees;
-      int RestantWeg = 2 * 3.14159 * Radius  * ABS(RemainingDegrees) / 360;
+      //int RestantWeg = 2 * 3.14159 * Radius  * ABS(RemainingDegrees) / 360;
       if (DeltaDegrees < 0) RemainingDegrees *= -1;
-      if (RemainingDegrees < 1)  {
+
+      int RestantWeg = DoelOdoT - OdoT;
+      if (RestantWeg < 10)  {
          return true;   // done
       }
 
-      long CurrentHoek_q8 = Position.HoekHires(); //
-      int  TargetHoek  = DeltaDegrees - TurnRate * RestantWeg;  // deze hoek willen we nu hebben (graden).
-      long HoekError_q8   = NormHoek(CurrentHoek_q8 - DegreesOffset_q8 - TargetHoek * 256L, NORM_Q8);
+      long CurrentHoek_q8  = Position.HoekHires(); //
+      int  TargetHoek      = DeltaDegrees - TurnRate * RestantWeg;  // deze hoek willen we nu hebben (graden).
+      long HoekError_q8    = NormHoek(CurrentHoek_q8 - DegreesOffset_q8 - TargetHoek * 256L, NORM_Q8);
 
       // bepaal maximale snelheid op gegeven afstand van doel, en verschil tussen L en R o.b.v. radius
       int SpeedL = EenparigVertragen(RestantWeg, Speed, EndSpeed, MAX_SLOPE * MAIN_TAKT_RATE); // max speed
@@ -666,7 +665,7 @@ bool TDrive::ArcRelTakt(bool FirstCall, int DeltaDegrees, int Radius, int Speed,
       // stuur de motoren
       SpeedLRTakt(FirstCall, SpeedL, SpeedR, MAX_SLOPE);
 
-      if (Flags.IsSet(5)) CSerial.printf("ArcTakt FirstCall: %d DeltaDegrees: %d Radius: %d, RestantWeg: %d, TargetHoek: %d, CurHoek: %d, HoekError: %d, SpeedL: %d, SpeedR: %d\n",
+      if (Flags.IsSet(5)) CSerial.printf("ArcTakt3 : %d DeltaDegrees: %d Radius: %d, RestantWeg: %d, TargetHoek: %d, CurHoek: %d, HoekError: %d, SpeedL: %d, SpeedR: %d\n",
             FirstCall, DeltaDegrees, Radius, RestantWeg, TargetHoek, (int)(CurrentHoek_q8/256), (int)(HoekError_q8/256), SpeedL, SpeedR);
 
       return false; // not done yet
