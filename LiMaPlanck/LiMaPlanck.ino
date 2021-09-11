@@ -70,8 +70,9 @@ void setup() {
    CSerial.begin(115200);
    CSerial.printf("Starten\n");
 
-   Position.init();  // delayed constructor
-   Driver.init();    // delayed constructor
+   Flags.Set(20, true);    // Position print (each update)
+   Position.init();        // delayed constructor
+   Driver.init();          // delayed constructor
 
    SetupMotors();
    InitStmEncoders();
@@ -108,7 +109,6 @@ void setup() {
    //Flags.Set(6, true);     // 6 Driver.XYTakt
    Flags.Set(7, true);     // 7 Driver.SpeedRotationTakt
 
-   Flags.Set(20, true);     // Position print (each update)
 
    //Flags.Set(9, true);   // Lpp array dump
    Flags.Set(10, true);    // ProgrammaTakt programma-keuze
