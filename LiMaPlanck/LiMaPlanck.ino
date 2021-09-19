@@ -194,7 +194,7 @@ void ReadLpp()
    Lpp.ReadSensors();// lees lidar sensor data
 
    if (Flags.IsSet(9)) {
-      for (int i=0; i<11; i++) {
+      for (int i=0; i<16; i++) {
          CSerial.printf("%d ", Lpp.Array[i]);
       }
       CSerial.printf("\n");
@@ -225,6 +225,9 @@ void BlinkTakt()
    }
    Count ++;
 }
+
+#include "Libs/PassageFinder.cpp"
+TPassageFinder Passage;
 
 //-----------------------------------------------------------------------------
 // Execute - execute commando
@@ -263,5 +266,9 @@ void Execute(int Param[])
    if (Command.Match("FlagDump",       0)) Flags.Dump();
 
    if (Command.Match("Servo",          1)) myservo.write(Param[0]);
+
+   if (Command.Match("PassageSetup",   3)) Passage.Setup(Param[0], Param[1], Param[2]);
+   if (Command.Match("PassageFind",    2)) printf("PassageFind %d degrees\n", Passage.Find(Param[0], Param[1]));
+
 }
 
