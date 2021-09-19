@@ -8,8 +8,6 @@
 #include "Libs/Motors_TB6612.cpp"   // Kies je motor-sturing
 #include "Project.h"
 
-// include code
-
 void Execute();   // prototype
 
 // global instances
@@ -226,9 +224,6 @@ void BlinkTakt()
    Count ++;
 }
 
-#include "Libs/PassageFinder.cpp"
-TPassageFinder Passage;
-
 //-----------------------------------------------------------------------------
 // Execute - execute commando
 //-----------------------------------------------------------------------------
@@ -269,6 +264,4 @@ void Execute(int Param[])
 
    if (Command.Match("PassageSetup",   3)) Passage.Setup(Param[0], Param[1], Param[2]);
    if (Command.Match("PassageFind",    2)) printf("PassageFind %d degrees\n", Passage.Find(Param[0], Param[1]));
-
 }
-

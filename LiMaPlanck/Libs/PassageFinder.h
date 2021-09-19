@@ -22,6 +22,11 @@ class TPassageFinder {
       int Find(int NormDistance, int MinSegments);
 };
 
+extern TPassageFinder Passage;
+
+// --- C++ ---
+#ifdef MAIN
+
 //-----------------------------------------------------------------------------
 // TPassageFinder::Setup - Configure Lpp Array for passage detection
 //-----------------------------------------------------------------------------
@@ -113,3 +118,7 @@ int TPassageFinder::Find(int NormDistance, int MinSegments)
 
       return PassageDegrees;
    }
+
+TPassageFinder Passage;
+
+#endif // MAIN

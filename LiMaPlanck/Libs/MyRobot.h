@@ -8,12 +8,6 @@
 #include <Arduino.h>
 #include <Servo.h>
 
-#include "Libs/Flags.h"       // contains code...
-#include "Libs/LppMaster.h"   // contains code...
-#include "Libs/Commands.h"    // contains code...
-
-//-----------------------------------------------------------------------------
-// Position.cpp
 #define TICKS_360_GRADEN   (360L * 256 * 256 / ODO_HEADING)
 #define GRAD2RAD(x)        ((float)(x) / 57.2957795)
 #define MAIN_TAKT_RATE     (1000 / MAIN_TAKT_INTERVAL)   // Hz
@@ -23,8 +17,16 @@
 #define ABS(x)             ( (x>=0) ? x : -x )
 #define NORM_Q8            (360L * 256)
 
-#define FRAME_END             0xC0    /* indicates end of packet */
-#define FRAME_START           0xC1    /* indicates start of packet */
+#define FRAME_END          0xC0  // indicates end of packet
+#define FRAME_START        0xC1  // indicates start of packet
+
+#include "Libs/Flags.h"          // contains code...
+#include "Libs/LppMaster.h"      // contains code...
+#include "Libs/Commands.h"       // contains code...
+#include "Libs/PassageFinder.h"  // contains code...
+
+//-----------------------------------------------------------------------------
+// Position.cpp
 
 template <typename T> inline
 T ABSOLUTE(const T& v) { return v < 0 ? -v : v; }
