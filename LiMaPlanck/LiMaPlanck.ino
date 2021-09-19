@@ -111,6 +111,7 @@ void setup() {
    //Flags.Set(9, true);   // Lpp array dump
    Flags.Set(10, true);    // ProgrammaTakt programma-keuze
    Flags.Set(11, true);    // ProgrammaTakt Missie-takt
+   Flags.Set(12, true);    // PassageFinder
 
    Buzzer.Beep(30, 2);
    CSerial.printf("Opstarten gereed.\n");

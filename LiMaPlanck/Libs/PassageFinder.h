@@ -69,12 +69,12 @@ int TPassageFinder::Find(int NormDistance, int MinSegments)
          int Deg = (ArrayDegrees * (ArrayCount-1)) / 2 - i * ArrayDegrees;
          int Dist1 = Lpp.Array[i].Distance;
          int Dist2 = Dist1 * cos(GRAD2RAD(Deg));
-         if (Flags.IsSet(10)) printf("%d %d %d %d\n", i, Deg, Dist1, Dist2);
+         if (Flags.IsSet(12)) printf("%d %d %d %d\n", i, Deg, Dist1, Dist2);
 
          switch(State) {
             case 0 : {  // wait for edge
                if (Dist2 < NormDistance) {
-                  if (Flags.IsSet(10)) printf("State 0 -> 10 @ %d\n", i);
+                  if (Flags.IsSet(12)) printf("State 0 -> 10 @ %d\n", i);
                   State = 10;
                }
             }
@@ -82,7 +82,7 @@ int TPassageFinder::Find(int NormDistance, int MinSegments)
 
             case 10 : {  // wait for passage start
                if (Dist2 > NormDistance) {
-                  if (Flags.IsSet(10)) printf("State 10 -> 20 @ %d\n", i);
+                  if (Flags.IsSet(12)) printf("State 10 -> 20 @ %d\n", i);
                   NewStart = i;
                   State = 20;
                }
@@ -95,9 +95,9 @@ int TPassageFinder::Find(int NormDistance, int MinSegments)
                   if ((NewLen >= MinSegments) && (NewLen > PassageLen)) {
                      PassageLen = NewLen;
                      PassageStart = NewStart;
-                     if (Flags.IsSet(10)) printf("End Start: %d, i: %d NewLen %d, store\n", NewStart, i, NewLen);
+                     if (Flags.IsSet(12)) printf("End Start: %d, i: %d NewLen %d, store\n", NewStart, i, NewLen);
                   } else {
-                     if (Flags.IsSet(10)) printf("End Start: %d, i: %d NewLen %d, pass\n", NewStart, i, NewLen);
+                     if (Flags.IsSet(12)) printf("End Start: %d, i: %d NewLen %d, pass\n", NewStart, i, NewLen);
                   }
                   State = 10;
                }
