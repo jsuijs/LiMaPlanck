@@ -268,7 +268,7 @@ void TDrive::RotateHeading(int Heading, int RotateClip)
    }
 
 //-----------------------------------------------------------------------------
-// Rotate - draai naar absolute heading (graden).
+// Rotate - draai graden (relatief).
 //-----------------------------------------------------------------------------
 // Draai de stilstaande robot naar opgegeven richting.
 // - 'Degrees' is het aantal graden, positief = tegen de klok in. Waarde mag
