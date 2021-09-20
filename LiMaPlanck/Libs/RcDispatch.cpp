@@ -47,17 +47,29 @@ void RcDispatch(int &RcData)
       // PF-keys
       case RC_STOP   : PfKeySet(-1);       break; // STOP (special, but passed to ProgrammaTakt)
 
-      case RC_F01    : PfKeySet( 1);       break; // mark
-      case RC_F02    : PfKeySet( 2);       break; // audio
-      case RC_F03    : PfKeySet( 3);       break; // title menu
-      case RC_F04    : PfKeySet( 4);       break; // sub title
-      case RC_F05    : PfKeySet( 5);       break; // input
-      case RC_F06    : PfKeySet( 6);       break; // tv
-      case RC_F07    : PfKeySet( 7);       break; // hdd
-      case RC_F08    : PfKeySet( 8);       break; // hdd
-      case RC_F09    : PfKeySet( 9);       break; // zoom
-      case RC_F10    : PfKeySet(10);       break; // -
-      case RC_F11    : PfKeySet(11);       break; // +
-      case RC_F12    : PfKeySet(12);       break; // store
+      case RC_F01    : PfKeySet( 1);       break;
+      case RC_F02    : PfKeySet( 2);       break;
+      case RC_F03    : PfKeySet( 3);       break;
+      case RC_F04    : PfKeySet( 4);       break;
+      case RC_F05    : PfKeySet( 5);       break;
+      case RC_F06    : PfKeySet( 6);       break;
+      case RC_F07    : PfKeySet( 7);       break;
+      case RC_F08    : PfKeySet( 8);       break;
+      case RC_F09    : PfKeySet( 9);       break;
+      case RC_F10    : PfKeySet(10);       break;
+      case RC_F11    : PfKeySet(11);       break;
+      case RC_F12    : PfKeySet(12);       break;
+#ifdef RC_F13
+      case RC_F13    : PfKeySet(13);       break;
+#endif
+#ifdef RC_F14
+      case RC_F14    : PfKeySet(14);       break;
+#endif
+#ifdef RC_F15
+      case RC_F15    : PfKeySet(15);       break;
+#endif
+#ifdef RC_F16
+      case RC_F16    : PfKeySet(16);       break;
+#endif
    }
 }
