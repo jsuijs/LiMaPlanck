@@ -80,7 +80,6 @@ void Slope(int &SlopeInOut, int Setpoint, int Step)
       SlopeInOut -= Step;
       if (SlopeInOut < Setpoint) SlopeInOut = Setpoint; // correct overshoot
    }
-   return;
 }
 
 //----------------------------------------------------------------------------
