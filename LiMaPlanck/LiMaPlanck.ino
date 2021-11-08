@@ -21,17 +21,17 @@ TFlags         Flags(32);
 
 Servo myservo;  // create servo object to control a servo
 
-int LidarArray_L100;
-int LidarArray_L80 ;
-int LidarArray_L60 ;
+//int LidarArray_L100;
+//int LidarArray_L80 ;
+//int LidarArray_L60 ;
 int LidarArray_L40 ;
-int LidarArray_L20 ;
+//int LidarArray_L20 ;
 int LidarArray_V   ;
-int LidarArray_R20 ;
+//int LidarArray_R20 ;
 int LidarArray_R40 ;
-int LidarArray_R60 ;
-int LidarArray_R80 ;
-int LidarArray_R100;
+//int LidarArray_R60 ;
+//int LidarArray_R80 ;
+//int LidarArray_R100;
 
 //---------------------------------------------------------------------------------------
 // RC5 stuff start
@@ -178,7 +178,7 @@ void LppSensorDefaultSetup()
    Lpp.SensorSetupCan(2, 135, 90);  // Sensor 2, vanaf 135 graden, segment van 90 graden
    Lpp.SensorSetup(3, 70, 40);   // Sensor 3, vanaf 70 graden, segment van 40 graden LockDown 5=8-Slalom
    Lpp.SensorSetup(4, 110, 40);  // Sensor 4, vanaf 110 graden, segment van 40 graden
-   Lpp.SensorSetup(5, 150, 60);  // Sensor 4, vanaf 150 graden, segment van 60 graden
+   Lpp.SensorSetup(5, 150, 60);  // Sensor 5, vanaf 150 graden, segment van 60 graden
    Lpp.SensorSetup(6, 210, 40);  // Sensor 4, vanaf 210 graden, segment van 40 graden
    Lpp.SensorSetup(7, 250, 40);  // Sensor 7, vanaf 250 graden, segment van 40 graden
 }
@@ -198,17 +198,9 @@ void ReadLpp()
       }
       CSerial.printf("\n");
    }
-   LidarArray_L100   = Lpp.Array[ 0].Distance;
-   LidarArray_L80    = Lpp.Array[ 1].Distance;
-   LidarArray_L60    = Lpp.Array[ 2].Distance;
    LidarArray_L40    = Lpp.Array[ 3].Distance;
-   LidarArray_L20    = Lpp.Array[ 4].Distance;
    LidarArray_V      = Lpp.Array[ 5].Distance;
-   LidarArray_R20    = Lpp.Array[ 6].Distance;
    LidarArray_R40    = Lpp.Array[ 7].Distance;
-   LidarArray_R60    = Lpp.Array[ 8].Distance;
-   LidarArray_R80    = Lpp.Array[ 9].Distance;
-   LidarArray_R100   = Lpp.Array[10].Distance;
 }
 
 //-----------------------------------------------------------------------------

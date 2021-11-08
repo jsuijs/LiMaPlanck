@@ -142,12 +142,12 @@ struct TLppArrayData
 //-----------------------------------------------------------------------------
 struct TLppStatusData
 {
-   char ID;             // 0
-   char SwRevision;     // 1
-   char RotationCount;  // 2
-   char RotationTime;   // 3 - in ms
+   char  ID;            // 0
+   char  SwRevision;    // 1
+   char  RotationCount; // 2
+   char  RotationTime;  // 3 - in ms
    short SampleRate;    //  4 & 5- samples in last 100 ms
-   char free06;         // 6
+   char  free06;        // 6
    char  Cmd;           //  7 - just about always zero....
    char  RotSpeed;      //  8
    char  OffsetX;       //  9 - in 2mm steps
