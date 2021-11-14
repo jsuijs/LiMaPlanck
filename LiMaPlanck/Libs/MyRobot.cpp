@@ -173,9 +173,10 @@ extern "C" int _write(int file, char *ptr, int len)
 {
     int i;
     file = file;
-    for (i = 0; i < len; i++)
+    len  = len;
+    for (i = 0; *ptr; i++)
     {
         CSerial.print(*ptr++);
     }
-    return len;
+    return i;
 }

@@ -72,10 +72,10 @@ void setup() {
    LppWire.begin();
    if (Lpp.begin()) {
 
-      Lpp.SetOffsetDegrees(184);    // Align lidar with robotlib coordinate system; 180 Degrees = forward.
-      Lpp.SetReverse(0);            // Angle to the left is positive.
+      Lpp.SetOffsetDegrees(4);      // Align lidar with robotlib coordinate system; 180 Degrees = forward.
+      Lpp.SetReverse(1);            // Angle to the left is positive.
 
-      Lpp.ArraySetup(70, 20, 11);   // Setup array with 11 segments of 20 degrees
+      //Lpp.ArraySetup(70, 20, 11);   // Setup array with 11 segments of 20 degrees
 
       LppSensorDefaultSetup();      // Separate function, so we can reload later.
 
@@ -161,14 +161,14 @@ void loop() {
 //---------------------------------------------------------------------------------------
 void LppSensorDefaultSetup()
 {
-   Lpp.SensorSetup(0, -15, 30);  // Sensor 0  achterwaarts (-15 + 30 = +15 graden)
-   Lpp.SensorSetup(1, 90, 180);  // Sensor 1, vanaf 90 graden, (+90 + 180 = 270 graden)
-   Lpp.SensorSetupCan(2, 135, 90);  // Sensor 2, vanaf 135 graden, segment van 90 graden
-   Lpp.SensorSetup(3, 70, 40);   // Sensor 3, vanaf 70 graden, segment van 40 graden LockDown 5=8-Slalom
-   Lpp.SensorSetup(4, 110, 40);  // Sensor 4, vanaf 110 graden, segment van 40 graden
-   Lpp.SensorSetup(5, 150, 60);  // Sensor 5, vanaf 150 graden, segment van 60 graden
-   Lpp.SensorSetup(6, 210, 40);  // Sensor 4, vanaf 210 graden, segment van 40 graden
-   Lpp.SensorSetup(7, 250, 40);  // Sensor 7, vanaf 250 graden, segment van 40 graden
+   Lpp.SensorSetup(0, 165, 30);     // Sensor 0  achterwaarts (165 -> 195 (-165) graden)
+   Lpp.SensorSetup(1, -90, 180);    // Sensor 1, van -90  tot 90 graden, (rechts, voor, links)
+   Lpp.SensorSetupCan(2, -45, 90);  // Sensor 2, van -45 tot +45 (voorwaarts)
+   Lpp.SensorSetup(3, 180-70, 40);   // Sensor 3, vanaf 70 graden, segment van 40 graden LockDown 5=8-Slalom
+   Lpp.SensorSetup(4, 30, 40);         // Sensor 4, van 30 tot 70 graden (links voor)
+   Lpp.SensorSetup(5, -30, 60);        // Sensor 5, van -30 tot 30 graden (voorwaarts)
+   Lpp.SensorSetup(6, 180-210, 40);    // Sensor 4, vanaf 210 graden, segment van 40 graden
+   Lpp.SensorSetup(7, 180-250, 40);  // Sensor 7, vanaf 250 graden, segment van 40 graden
 }
 
 //---------------------------------------------------------------------------------------
@@ -183,6 +183,13 @@ void ReadLpp()
    if (Flags.IsSet(9)) {
       for (int i=0; i<16; i++) {
          CSerial.printf("%d ", Lpp.Array[i]);
+      }
+      CSerial.printf("\n");
+   }
+
+   if (Flags.IsSet(9)) {
+      for (int i=0; i<8; i++) {
+         CSerial.printf("%d ", Lpp.Sensor[i].Distance);
       }
       CSerial.printf("\n");
    }
@@ -229,6 +236,8 @@ void Execute(int Param[])
    if (Command.Match("LppStatus",      0)) { Lpp.ReadStatus(); Lpp.PrintStatus(); }
    if (Command.Match("LppStart",       0)) Lpp.Start();
    if (Command.Match("LppStop",        0)) Lpp.Stop();
+   if (Command.Match("LppSetupS",      3)) Lpp.SensorSetup(Param[0], Param[1], Param[2]);  // Sensor #, start & width
+   if (Command.Match("LppPrintS",      0)) Lpp.PrintSensors();
 
    if (Command.Match("PfKey",          1)) PfKeySet(Param[0]);
    if (Command.Match("Position",       0)) Position.Print();

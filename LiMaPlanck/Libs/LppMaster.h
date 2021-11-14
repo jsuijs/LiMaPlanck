@@ -413,7 +413,11 @@ bool TLpp::ReadSensors(int Count)
 
       SensorCount = Count;
       if (SensorCount > 8) SensorCount = 8;
-      return _ReadShorts(R_V0_DISTANCE_H, SensorCount * 2, (lpp_int *) Sensor);
+      bool ret = _ReadShorts(R_V0_DISTANCE_H, SensorCount * 2, (lpp_int *) Sensor);
+      for (int i=0; i<Count; i++) {
+         if (Sensor[i].Degrees32 > (180*32)) Sensor[i].Degrees32 -= (360*32);
+      }
+      return ret;
    }
 
 //-----------------------------------------------------------------------------
