@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Duckling.cpp - Eende-kuiken (volgt de moeder)
+// MissionDuckling.cpp - Eende-kuiken (volgt de moeder)
 //-----------------------------------------------------------------------------
 #include "RobotSettings.h"
 #include "Libs/MyRobot.h"
