@@ -21,18 +21,6 @@ TFlags         Flags(32);
 
 Servo myservo;  // create servo object to control a servo
 
-//int LidarArray_L100;
-//int LidarArray_L80 ;
-//int LidarArray_L60 ;
-int LidarArray_L40 ;
-//int LidarArray_L20 ;
-int LidarArray_V   ;
-//int LidarArray_R20 ;
-int LidarArray_R40 ;
-//int LidarArray_R60 ;
-//int LidarArray_R80 ;
-//int LidarArray_R100;
-
 //---------------------------------------------------------------------------------------
 // RC5 stuff start
 #include "Libs/RC5.h"
@@ -198,9 +186,6 @@ void ReadLpp()
       }
       CSerial.printf("\n");
    }
-   LidarArray_L40    = Lpp.Array[ 3].Distance;
-   LidarArray_V      = Lpp.Array[ 5].Distance;
-   LidarArray_R40    = Lpp.Array[ 7].Distance;
 }
 
 //-----------------------------------------------------------------------------

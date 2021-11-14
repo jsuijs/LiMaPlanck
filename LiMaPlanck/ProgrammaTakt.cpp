@@ -91,11 +91,11 @@ void ProgrammaTakt()
       }
       break;
 
-      case 9 : { // Programma: Heen en Weer
-         MissonS.Param1 = 200;  // speed
-         if (MissieHeenEnWeer(MissonS)) Program.State = 0;
-      }
-      break;
+//      case 9 : { // Programma: Heen en Weer
+//         MissonS.Param1 = 200;  // speed
+//         if (MissieHeenEnWeer(MissonS)) Program.State = 0;
+//      }
+//      break;
 
       case 10 : { // Programma: ttijd
          MissonS.Param1 = 300;  // speed
