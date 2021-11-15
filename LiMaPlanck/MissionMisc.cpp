@@ -7,19 +7,20 @@
 
 
 //-----------------------------------------------------------------------------
-// Rijden1Takt - pwm trapje, print pwm + toerental
+// MissionRijden1 - pwm trapje, print pwm + toerental
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool Rijden1Takt(bool Init)
+bool MissionRijden1(TState &S)
 {
    static int Step;
    static bool Oplopend;
    static int Slow;
 
-   if (Init) {
+   if (S.State == 0) {
       Step = 0;
       Oplopend = true;
       Slow = 0;
+      S.State = 1;
    }
 
    if (Slow == 0) {
@@ -47,9 +48,6 @@ bool Rijden1Takt(bool Init)
    return false;  // Nog niet klaar.
 }
 
-#define UMB_MARK_AFSTAND 800    // mm
-#define UMB_MARK_SPEED 300    // mm/sec
-
 //-----------------------------------------------------------------------------
 // MissionTest - state machine
 //-----------------------------------------------------------------------------
@@ -57,7 +55,7 @@ bool Rijden1Takt(bool Init)
 bool MissionTest(TState &S)
 {  static int x = 0;
 
-   S.Update("Test", Flags.IsSet(11));
+   S.Update(__FUNCTION__, Flags.IsSet(11));
 
    switch (S.State) {
 
@@ -106,7 +104,7 @@ return 0;
 bool MissieTTijd(TState &S)
 {  int x;
 
-   S.Update("TTijd", Flags.IsSet(11));
+   S.Update(__FUNCTION__, Flags.IsSet(11));
 
    switch (S.State) {
 
@@ -303,7 +301,7 @@ bool MissieBlikken(TState &S)
    static int BlikNummer;      // Blikken ophalen
    static int BlikPosY;        // plaats waar blik wordt weggezet
 
-   S.Update("Mission Blikken");
+   S.Update(__FUNCTION__, Flags.IsSet(11));
 
    switch (S.State) {
 
@@ -435,7 +433,7 @@ int AfstBediening;
 //-----------------------------------------------------------------------------
 bool MissieRandomRijden(TState &S)
 {
-   S.Update("RandomRijden", Flags.IsSet(11));
+   S.Update(__FUNCTION__, Flags.IsSet(11));
 
 //   int Lidar_A = Lpp.Sensor[0].Distance;         // Afstand achterzijde
 //   int Lidar_grV = Lpp.Sensor[1].Degrees32 / 32; // Scannen(1) Hoek van 90 graden + 180 gr tot 270 graden

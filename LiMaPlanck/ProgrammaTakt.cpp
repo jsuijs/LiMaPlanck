@@ -50,7 +50,7 @@ void ProgrammaTakt()
       break;
 
       case 1 : { // Programma: rijden1
-         if (Rijden1Takt(Program.NewState)) Program.State = 0;
+         if (MissionRijden1(Program)) Program.State = 0;
       }
       break;
 
@@ -115,7 +115,7 @@ void ProgrammaTakt()
 ////-----------------------------------------------------------------------------
 //bool MissionTemplate(TState &S)
 //{
-//   S.Update(__FUNCTION__);
+//   S.Update(__FUNCTION__, Flags.IsSet(11));
 //
 //   switch (S.State) {
 //      case 0 : {  //

@@ -14,7 +14,7 @@ void LppSensorDefaultSetup();
 bool MissionAloys1(TState &S);
 bool MissionDuckling(TState &S);
 
-bool Rijden1Takt(bool Init);
+bool MissionRijden1(TState &S);
 bool MissieTTijd(TState &S);
 //bool MissieHeenEnWeer(TState &S);
 bool MissieRandomRijden(TState &S);

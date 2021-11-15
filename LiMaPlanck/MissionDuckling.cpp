@@ -31,7 +31,7 @@ void LppSensorDucklingSetup()
 bool MissionDuckling(TState &S)
 {  static int MDistance = 9999, MDegrees_q5 = 0;
 
-   S.Update("Duckling");
+   S.Update(__FUNCTION__, Flags.IsSet(11));
 
    switch (S.State) {
       case 0 : {  // LIDAR-START
