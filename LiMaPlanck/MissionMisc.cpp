@@ -24,6 +24,7 @@ bool MissionGripperTest(TState & S) // Eerste Servo Test
         if (ServoSlope(myservo, 550, 20)) S.State ++; //grijper open
       }
       break;
+
     case 1 : {                        // Start loop open-sluiten
         if (S.NewState) {
           printf("Servo 550 in state %d\n", S.State);
@@ -66,8 +67,6 @@ bool MissionGripperTest(TState & S) // Eerste Servo Test
 }
 //*************************************
 
-
-
 //-----------------------------------------------------------------------------
 // MissionOdoTest - state machine  >> 3000 heen - 180gr draaien - 3000 terug <<
 //-----------------------------------------------------------------------------
@@ -78,7 +77,6 @@ bool MissionGripperTest(TState & S) // Eerste Servo Test
 //-----------------------------------------------------------------------------
 bool MissionOdoTest(TState &S)
 {
-
   S.Update(__FUNCTION__, Flags.IsSet(11));
 
   switch (S.State) {
@@ -86,7 +84,7 @@ bool MissionOdoTest(TState &S)
     case 0 : {  // naar 3000mm testrit
         if (S.NewState) {
           Position.Reset();
-          Driver.XY(3000, 0 , 200, 0 );
+          Driver.XY(DefaultDistance, 0 , 200, 0 );
         }
 
         if (Driver.IsDone()) S.State += 10;
@@ -121,14 +119,9 @@ bool MissionRandomRijden(TState &S)
 {
   S.Update(__FUNCTION__, Flags.IsSet(11));
 
-  //   int Lidar_A = Lpp.Sensor[0].Distance;         // Afstand achterzijde
-  //   int Lidar_grV = Lpp.Sensor[1].Degrees32 / 32; // Scannen(1) Hoek van 90 graden + 180 gr tot 270 graden
-  //   int Lidar_90V = Lpp.Sensor[2].Distance;       // Scannen(2) Korste Afstand van 135 graden + 90 gr tot 225 graden
-//  int Lidar_Blik_L  = Lpp.Sensor[3].Distance;  // Scannen(3) Korste Afstand van 70 graden + 40 gr tot 110 graden
   int Lidar_Blik_LV = Lpp.Sensor[4].Distance;  // Scannen(4) Korste Afstand van 110 graden + 40 gr tot 150 graden
   int Lidar_Blik_V  = Lpp.Sensor[5].Distance;  // Scannen(5) Korste Afstand van 150 graden + 60 gr tot 210 graden
   int Lidar_Blik_RV = Lpp.Sensor[6].Distance;  // Scannen(6) Korste Afstand van 210 graden + 40 gr tot 250 graden
-//  int Lidar_Blik_R  = Lpp.Sensor[7].Distance;  // Scannen(7) Korste Afstand van 250 graden + 40 gr tot 290 graden
 
   switch (S.State) {
 

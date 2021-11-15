@@ -240,6 +240,7 @@ void Execute(int Param[])
    if (Command.Match("Flag",           2)) Flags.Set(Param[0], Param[1]);
    if (Command.Match("FlagDump",       0)) Flags.Dump();
 
-   if (Command.Match("Servo",          1)) myservo.write(Param[0]);
+   if (Command.Match("DefaultDistance",2)) DefaultDistance = Param[0];
 
+   if (Command.Match("Servo",          1)) myservo.write(Param[0]);
 }

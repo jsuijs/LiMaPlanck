@@ -10,6 +10,7 @@
 bool __attribute__ ((weak)) MissionAloys1(TState &S) { S = S; return true; }
 bool __attribute__ ((weak)) MissionServo1(TState &S) { S = S; return true; }
 TState MissonS;  // Mission statemachine
+int DefaultDistance = 3000;
 
 //-----------------------------------------------------------------------------
 // ProgrammaTakt - program-selection & call the program (mission)

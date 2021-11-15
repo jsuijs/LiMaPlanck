@@ -9,9 +9,10 @@
 #include <Servo.h>
 extern Servo myservo;
 
+
 void LppSensorDefaultSetup();
+
 bool MissionGripperTest(TState & S);
-bool MissionUmbMark(TState &S);
 bool MissionOdoTest(TState &S);
 bool MissionRandomRijden(TState &S);
 bool MissionSuperSlalom(TState &S);
@@ -24,6 +25,7 @@ bool MissionTTijdOpening1(TState &S);      // T-Tijd met opening zoeken in vak -
 bool MissionVectorStart1(TState &S);
 
 extern TState MissonS;  // Mission statemachine
+extern int DefaultDistance;
 void ReadLijnsensor();
 
 #endif
