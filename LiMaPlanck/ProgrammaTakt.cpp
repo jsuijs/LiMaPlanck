@@ -69,18 +69,6 @@ void ProgrammaTakt()
       }
       break;
 
-      case 5 : { // Programma: UmbMark CCW
-         MissonS.Param1 = 1;                // set CCW
-         if (MissieUmbMark1(MissonS)) Program.State = 0;
-      }
-      break;
-
-      case 6 : { // Programma: UmbMark CW
-         MissonS.Param1 = -1;               // set CW
-         if (MissieUmbMark1(MissonS)) Program.State = 0;
-      }
-      break;
-
       case 7 : { // Programma:
          if (MissionTest(MissonS)) Program.State = 0;
       }
