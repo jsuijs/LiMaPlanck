@@ -260,7 +260,7 @@ bool TLpp::begin()
          if (r == true) {
             // check here for version, sometimes we get the wrong one on startup
             if (Status.SwRevision != INTERFACE_VERSION) {
-               CSerial.printf("Lpp.begin() failed (interface version error - %d, expected %d\n", (int) Status.SwRevision, INTERFACE_VERSION);
+               printf("Lpp.begin() failed (interface version error - %d, expected %d\n", (int) Status.SwRevision, INTERFACE_VERSION);
                r = false;  // report as error when we run out of retries
                delay(250);
                continue;
@@ -271,7 +271,7 @@ bool TLpp::begin()
       }
 
       if (r == false) {
-         CSerial.printf("Lpp.begin() failed (i2c error)\n");
+         printf("Lpp.begin() failed (i2c error)\n");
          return false;
       }
 
@@ -287,7 +287,7 @@ bool TLpp::begin()
 bool TLpp::Start()
    {
       if (EnableMode == 0) {
-         CSerial.printf("Lpp.Start() error: EnableMode 0\n");
+         printf("Lpp.Start() error: EnableMode 0\n");
          return false;  // begin not called, or failure
       }
       EnableMode = 2;   // active
@@ -426,9 +426,9 @@ bool TLpp::ReadSensors(int Count)
 //-----------------------------------------------------------------------------
 void TLpp::PrintStatus()
    {
-      CSerial.printf("LidarID: %d, Sw: %d, RotCount: %d, RotTime: %d, SampleRate: %d\n",
+      printf("LidarID: %d, Sw: %d, RotCount: %d, RotTime: %d, SampleRate: %d\n",
             Status.ID, Status.SwRevision, Status.RotationCount, Status.RotationTime, Status.SampleRate);
-      CSerial.printf("Cfg RotSpeed: %d, OffsetAngle: %d, Reverse: %d\n",
+      printf("Cfg RotSpeed: %d, OffsetAngle: %d, Reverse: %d\n",
             Status.RotSpeed, Status.OffsetAngle, Status.Reverse);
    }
 
@@ -438,12 +438,12 @@ void TLpp::PrintStatus()
 //-----------------------------------------------------------------------------
 void TLpp::PrintArray()
    {
-      if (EnableMode != 2) CSerial.printf("Lpp.PrintArray() warning: EnableMode != 2\n");
+      if (EnableMode != 2) printf("Lpp.PrintArray() warning: EnableMode != 2\n");
 
       for (int i=0; i<ArrayCount; i++) {
-         CSerial.printf("%4d ", Array[i].Distance);
+         printf("%4d ", Array[i].Distance);
       }
-      CSerial.printf("\n");
+      printf("\n");
    }
 
 //-----------------------------------------------------------------------------
@@ -452,10 +452,10 @@ void TLpp::PrintArray()
 //-----------------------------------------------------------------------------
 void TLpp::PrintSensors()
    {
-      if (EnableMode != 2) CSerial.printf("Lpp.PrintSensors() warning: EnableMode != 2\n");
+      if (EnableMode != 2) printf("Lpp.PrintSensors() warning: EnableMode != 2\n");
 
       for (int i=0; i<SensorCount; i++) {
-         CSerial.printf("%d Distance: %d, Degrees: %d (%d)\n", i, Sensor[i].Distance, NormDegrees(Sensor[i].Degrees32 / 32), Sensor[i].Degrees32);
+         printf("%d Distance: %d, Degrees: %d (%d)\n", i, Sensor[i].Distance, NormDegrees(Sensor[i].Degrees32 / 32), Sensor[i].Degrees32);
       }
    }
 
@@ -468,7 +468,7 @@ void TLpp::ReadPrintSensorCfg(int Nr)
       char RxBuffer[6];
 
       if ((Nr < -1) || (Nr > 7)) {
-         CSerial.printf("Error: sensor # out of range (%d), 0..7 for sensors, -1 for array.\n", Nr);
+         printf("Error: sensor # out of range (%d), 0..7 for sensors, -1 for array.\n", Nr);
          return;
       }
 
@@ -476,7 +476,7 @@ void TLpp::ReadPrintSensorCfg(int Nr)
       I2cSendReceive(LPP_I2C_ADDRESS, 1, 6, (lpp_tx_buffer *)TxBuffer, (lpp_rx_buffer *)RxBuffer);
 
       short TmpStart = (((int)RxBuffer[2]) << 8) + RxBuffer[3];
-      CSerial.printf("Sensor %d, Mode: %d, Count: %d, Start: %d, Step: %d\n",
+      printf("Sensor %d, Mode: %d, Count: %d, Start: %d, Step: %d\n",
          Nr, RxBuffer[0], RxBuffer[1], TmpStart, (((int)RxBuffer[4]) << 8) + RxBuffer[5]);
    }
 
@@ -597,12 +597,12 @@ bool I2cSendReceive(byte I2cSlaveAddress, byte TxCount, byte RxCount, const byte
    byte r;
 
    if (Lpp.I2cDebug) {
-      CSerial.printf("I2cSendReceive(%d %d %d)\n", I2cSlaveAddress, TxCount, RxCount);
+      printf("I2cSendReceive(%d %d %d)\n", I2cSlaveAddress, TxCount, RxCount);
    }
 
    if (TxCount > 0) {
       if (Lpp.I2cDebug > 1) {
-         CSerial.printf("TxBuf:\n");
+         printf("TxBuf:\n");
          HexDump(TxBuffer, TxCount);
       }
 
@@ -626,7 +626,7 @@ bool I2cSendReceive(byte I2cSlaveAddress, byte TxCount, byte RxCount, const byte
          RxBuffer[i] = LppWire.read();
       }
       if (Lpp.I2cDebug > 1) {
-         CSerial.printf("RxBuf:\n");
+         printf("RxBuf:\n");
          HexDump(RxBuffer, RxCount);
       }
    }
@@ -652,37 +652,37 @@ void HexDump( const void *Data, unsigned int Length, unsigned int Offset)
    unsigned int Track2 = 0 ;
 
    for (unsigned int Index=0 ; Index < Length ; Index = Index+16) {
-      CSerial.printf( "%04x: ", Offset + Index ) ;
+      printf( "%04x: ", Offset + Index ) ;
 
       for (unsigned int j=0; j < 16; j++) {
          if( Track1 < Length ) {
-            CSerial.printf("%02x", data[Index+j]);
+            printf("%02x", data[Index+j]);
          } else {
-            CSerial.printf("  ");
+            printf("  ");
          }
 
-         CSerial.printf( " " ) ;
+         printf( " " ) ;
          Track1++ ;
       }
 
-      CSerial.printf(" ");
+      printf(" ");
       for (unsigned int j=0 ; j < 16 ; j++) {
          if (Track2 < Length) {
             if (data[ Index+j ] < 32 ) {
-               CSerial.printf(".");
+               printf(".");
             } else {
                if (data[ Index+j ] < 127 ) {
-                  CSerial.printf( "%c", data[ Index+j ]);
+                  printf( "%c", data[ Index+j ]);
                } else {
-                  CSerial.printf(".");
+                  printf(".");
                }
             }
          } else {
-            CSerial.printf( " " ) ;
+            printf( " " ) ;
          }
          Track2++ ;
       }
-      CSerial.printf( "\r\n" ) ;
+      printf( "\r\n" ) ;
    }
 }
 #endif // HEXDUMP_DEFINED

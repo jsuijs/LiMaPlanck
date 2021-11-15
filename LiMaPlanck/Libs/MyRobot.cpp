@@ -37,7 +37,7 @@ void TState::Update(const char *InName, bool Verbose)
    {
       NewState = false;
       if (PrevState != State) {
-         if (Verbose) CSerial.printf("%s state %d -> %d\n", InName, PrevState, State);
+         if (Verbose) printf("%s state %d -> %d\n", InName, PrevState, State);
 
          PrevState      = State;
          NewState       = true;
@@ -55,7 +55,7 @@ void TState::Update(const char *InName, bool Verbose)
 //-----------------------------------------------------------------------------
 bool TState::InvalidState(const char *FName)
    {
-      CSerial.printf("Error: invalied state in %s (%d)\n", FName, State);
+      printf("Error: invalied state in %s (%d)\n", FName, State);
       return true;
    }
 

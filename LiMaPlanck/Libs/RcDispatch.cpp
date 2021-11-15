@@ -11,7 +11,7 @@ static int _PfKey = 0;  // see PfKeyGet()
 //-----------------------------------------------------------------------------
 void PfKeySet(int InKey)
 {
-   CSerial.printf("PfKeySet %d\n", InKey);
+   printf("PfKeySet %d\n", InKey);
    _PfKey = InKey;
 }
 
@@ -35,7 +35,7 @@ void RcDispatch(int &RcData)
    if (!RcData) return; // geen nieuwe code ontvangen
 
    RcData &= 0xF7FF;   // mask toggle bit
-   CSerial.printf("Rc5: 0x%04x\n", RcData);
+   printf("Rc5: 0x%04x\n", RcData);
    int NewCode = RcData;
    RcData = 0; // wis verwerkte code (RcData is referentie)
 

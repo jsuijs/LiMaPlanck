@@ -26,7 +26,7 @@ void MotorsSetup()
 //------------------------------------------------------------------------------
 void Motors(int PwmL, int PwmR)
 {
-  //  CSerial.printf("Motors %d %d\n", PwmL, PwmR);
+  //  printf("Motors %d %d\n", PwmL, PwmR);
   //--------
   // Motor L
   //--------

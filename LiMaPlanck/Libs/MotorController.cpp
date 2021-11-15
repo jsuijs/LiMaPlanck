@@ -25,7 +25,7 @@ void MotorController(int SetpointL, int SetpointR)
    volatile int SetpointL_Ticks = (SetpointL * 4L * MAIN_TAKT_INTERVAL) / ODO_TICK_TO_METRIC;
    volatile int SetpointR_Ticks = (SetpointR * 4L * MAIN_TAKT_INTERVAL) / ODO_TICK_TO_METRIC;
 
-  //CSerial.printf("!! %d %d %d %d\n", SetpointL, SetpointL_Ticks, MAIN_TAKT_INTERVAL, ODO_TICK_TO_METRIC);
+  //printf("!! %d %d %d %d\n", SetpointL, SetpointL_Ticks, MAIN_TAKT_INTERVAL, ODO_TICK_TO_METRIC);
 
    //----------------
    // Left controller
@@ -76,7 +76,7 @@ void MotorController(int SetpointL, int SetpointR)
    }
 
    Motors(PowerL, PowerR);
-//   CSerial.printf("PID Soll: %d / %d, Ist: %d / %d, I: %d / %d, Power: %d / %d\n",
+//   printf("PID Soll: %d / %d, Ist: %d / %d, I: %d / %d, Power: %d / %d\n",
 //         SetpointL_Ticks, SetpointR_Ticks, Position.ActSpeedL, Position.ActSpeedR, Mc.IErrorL, Mc.IErrorR, PowerL, PowerR);
 }
 

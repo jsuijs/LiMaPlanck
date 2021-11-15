@@ -33,7 +33,7 @@ void TPosition::OdoGet(int &OdoL_out, int &OdoR_out, int &OdoT_out)
 //------------------------------------------------------------------------
 void TPosition::Reset()
    {
-      CSerial.printf("ResetRobotPosition\n");
+      printf("ResetRobotPosition\n");
       VarRobotXPos_q10     = 0;
       VarRobotYPos_q10     = 0;
       VarRobotDegrees_q8   = 0;
@@ -55,7 +55,7 @@ void TPosition::Reset()
 void TPosition::Print()
    {
       Update();
-      CSerial.printf("RobotPosition X: %d, Y: %d, Hoek: %d, ActSpeed %d / %d\n", XPos, YPos, Hoek,ActSpeedL, ActSpeedR);
+      printf("RobotPosition X: %d, Y: %d, Hoek: %d, ActSpeed %d / %d\n", XPos, YPos, Hoek,ActSpeedL, ActSpeedR);
    }
 
 //-----------------------------------------------------------------------------
@@ -84,15 +84,15 @@ void TPosition::Takt()
       long d = OdoR_ticks - OdoL_ticks;
       if (d > TICKS_360_GRADEN) {
          OdoL_ticks += TICKS_360_GRADEN;
-         CSerial.printf("OdoL_ticks jump up %ld\n", OdoL_ticks);
+         printf("OdoL_ticks jump up %ld\n", OdoL_ticks);
       }
 
       if (d < -TICKS_360_GRADEN) {
          OdoL_ticks -= TICKS_360_GRADEN;
-         CSerial.printf("OdoL_ticks jump down %ld\n", OdoL_ticks);
+         printf("OdoL_ticks jump down %ld\n", OdoL_ticks);
       }
 
-      //   CSerial.printf("ActSpeedL: %d, ActSpeedR: %d, OdoL_ticks: %ld, OdoR_ticks: %ld\n",
+      //   printf("ActSpeedL: %d, ActSpeedR: %d, OdoL_ticks: %ld, OdoR_ticks: %ld\n",
       //      ActSpeedL, ActSpeedR, OdoL_ticks, OdoR_ticks);
 
       if ((ActSpeedL !=0) || (ActSpeedR != 0)) { // als we verplaatst zijn
@@ -118,8 +118,8 @@ void TPosition::Takt()
          VarRobotYPos_q10 += DeltaT_q10 * sin(RadHoek);
 
          Update();
-//       CSerial.printf("SpeedL: %d, SpeedR: %d, Lticks: %ld, Rticks: %ld, DeltaL: %ld, DeltaR: %ld, XPos: %d YPos: %d Hoek: %d\n",
-//	      ActSpeedL, ActSpeedR, OdoL_ticks, OdoR_ticks, DeltaL, DeltaR, XPos, YPos, Hoek);
+//       printf("SpeedL: %d, SpeedR: %d, Lticks: %ld, Rticks: %ld, DeltaL: %ld, DeltaR: %ld, XPos: %d YPos: %d Hoek: %d\n",
+//          ActSpeedL, ActSpeedR, OdoL_ticks, OdoR_ticks, DeltaL, DeltaR, XPos, YPos, Hoek);
       }
    }
 
@@ -151,9 +151,9 @@ void TPosition::Update()
       Hoek  = VarRobotDegrees_q8 / 256;   // RobotHoekPos in graden
 
       if (Flags.IsSet(20)) {
-         CSerial.printf("%cPOSITION %d %d ", FRAME_START, XPos, YPos);
-         CSerial.print(VarRobotDegrees_q8 / 14667.7);
-         CSerial.printf("%c\n", FRAME_END);
+         printf("%cPOSITION %d %d ", FRAME_START, XPos, YPos);
+         CSerial.print(VarRobotDegrees_q8 / 14667.7);  // Note: float in format string doesn't work on stm32duino
+         printf("%c\n", FRAME_END);
       }
    }
 
@@ -222,11 +222,11 @@ void InitStmEncoders()
    sEncoderConfig.IC2Filter               = 0;
 
    Encoder_Handle.Instance = MAQUEENPLUS_TIMER_ENCL;
-   if(HAL_TIM_Encoder_Init(&Encoder_Handle, &sEncoderConfig) != HAL_OK) CSerial.println("TIM2 init error");
+   if(HAL_TIM_Encoder_Init(&Encoder_Handle, &sEncoderConfig) != HAL_OK) printf("TIM2 init error");
    HAL_TIM_Encoder_Start(&Encoder_Handle, TIM_CHANNEL_ALL);
 
    Encoder_Handle.Instance = MAQUEENPLUS_TIMER_ENCR;
-   if(HAL_TIM_Encoder_Init(&Encoder_Handle, &sEncoderConfig) != HAL_OK) CSerial.println("TIM3 init error");
+   if(HAL_TIM_Encoder_Init(&Encoder_Handle, &sEncoderConfig) != HAL_OK) printf("TIM3 init error");
    HAL_TIM_Encoder_Start(&Encoder_Handle, TIM_CHANNEL_ALL);
 
 //   systick_attach_callback(&encoder1_read);

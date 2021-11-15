@@ -37,7 +37,7 @@ bool Rijden1Takt(bool Init)
     if (Step < -255) Oplopend = true;
 
     Driver.Pwm(Step, Step);
-    CSerial.printf("Pwm: %d, Speed: %d / %d\n", Step, Position.ActSpeedL, Position.ActSpeedR);
+    printf("Pwm: %d, Speed: %d / %d\n", Step, Position.ActSpeedL, Position.ActSpeedR);
     Position.Print();
 
     if (Oplopend && (Step == 0)) {
@@ -149,7 +149,7 @@ bool MissieUmbMark1(TState &S)
       break;
 
       default : {
-         CSerial.printf("Error: ongeldige state in MissieUmbMark1 (%d)\n", S.State);
+         printf("Error: ongeldige state in MissieUmbMark1 (%d)\n", S.State);
          return true;  // error => mission end
       }
    }
@@ -191,7 +191,7 @@ bool MissionTest(TState &S)
 
 
       default : {
-         CSerial.printf("Error: ongeldige state in MissionTest (%d)\n", S.State);
+         printf("Error: ongeldige state in MissionTest (%d)\n", S.State);
          return true;  // error => mission end
       }
    }
@@ -201,6 +201,7 @@ bool MissionTest(TState &S)
 static int VolgRechts()
 {
 //@@   return (400 - LidarArray_R40)/50;  // wand volgen
+return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -302,7 +303,7 @@ bool MissieTTijd(TState &S)
          x = VolgRechts();  // wand volgen
          x = Clip(x, -5, 5);
          Driver.SpeedHeading(S.Param1, x + 90);  // Volg rechtse wand
-//@@         CSerial.printf("LidarArray_R40: %d, x: %d\n", LidarArray_R40, x);
+//@@         printf("LidarArray_R40: %d, x: %d\n", LidarArray_R40, x);
 
 //@@         if (LidarArray_L40 < TT_FRONT_DETECT) S.State += 10; // Naar volgende state als we de wand voor ons zien
       }
@@ -392,7 +393,7 @@ bool MissieTTijd(TState &S)
       break;
 
       default : {
-         CSerial.printf("Error: ongeldige state in MissieTTijd (%d)\n", S.State);
+         printf("Error: ongeldige state in MissieTTijd (%d)\n", S.State);
          return true;  // error => mission end
       }
    }
@@ -431,7 +432,7 @@ bool MissieBlikken(TState &S)
 
          if (x !=  Lpp.Sensor[3].Distance) {
             x =  Lpp.Sensor[3].Distance;
-            CSerial.printf("Lidar S2 Distance %d, Degrees: %d\n",
+            printf("Lidar S2 Distance %d, Degrees: %d\n",
                    Lpp.Sensor[2].Distance, Lpp.Sensor[2].Degrees32 / 32);
          }
 
@@ -448,7 +449,7 @@ bool MissieBlikken(TState &S)
             else {
                BlikHoekCorrectie = (BlikHoekCorrectie - 4);
             }
-            CSerial.printf("HoekCor: %d\n", BlikHoekCorrectie);
+            printf("HoekCor: %d\n", BlikHoekCorrectie);
             Driver.Rotate(BlikHoekCorrectie); // Berekende graden links of rechts
          }
 
@@ -460,7 +461,7 @@ bool MissieBlikken(TState &S)
          if (S.NewState) Driver.SpeedLR(60, 60);     // Rijden naar blik
 
          if (Lpp.Sensor[2].Distance < 130) {
-            CSerial.printf("blik gevonden: \n");
+            printf("blik gevonden: \n");
             Driver.SpeedLR(0, 0);       // Stop motoren
             S.State ++; // Naar de volgende state als de beweging klaar is
          }
@@ -512,7 +513,7 @@ bool MissieBlikken(TState &S)
             BlikNummer ++;       // nummer van volgend blik
 
             if (BlikNummer >= 5) {
-               CSerial.printf("5 blikken: klaar\n");
+               printf("5 blikken: klaar\n");
                return true;
             }
 
@@ -525,7 +526,7 @@ bool MissieBlikken(TState &S)
 
       //****
       default : {
-         CSerial.printf("Error: ongeldige state in MissieBlikken (%d)\n", S.State);
+         printf("Error: ongeldige state in MissieBlikken (%d)\n", S.State);
          return true;  // error => mission end
       }
    }
@@ -641,10 +642,7 @@ bool MissieRandomRijden(TState &S)
       }
       break;
 
-      default : {
-         CSerial.printf("Error: ongeldige state in MissieRandomRijden (%d)\n", S.State);
-         return true;  // error => mission end
-      }
+      default : return S.InvalidState(__FUNCTION__);   // Report invalid state & end mission
    }
    return false;  // mission nog niet gereed
 }

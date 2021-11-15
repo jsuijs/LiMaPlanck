@@ -54,7 +54,7 @@ void HAL_SYSTICK_Callback(void) { Buzzer.Takt(); }
 void setup() {
    // start serial
    CSerial.begin(115200);
-   CSerial.printf("Starten\n");
+   printf("Starten\n");
 
    Flags.Set(20, true);    // Position print (each update)
    Position.init();        // delayed constructor
@@ -83,7 +83,7 @@ void setup() {
       Lpp.ReadStatus();
       Lpp.PrintStatus();
    } else {
-      CSerial.printf("LPP I2C error.\n");
+      printf("LPP I2C error.\n");
       Buzzer.BeepWait(200, 3);
    }
 
@@ -95,14 +95,13 @@ void setup() {
    //Flags.Set(6, true);     // 6 Driver.XYTakt
    Flags.Set(7, true);     // 7 Driver.SpeedRotationTakt
 
-
    //Flags.Set(9, true);   // Lpp array dump
    Flags.Set(10, true);    // ProgrammaTakt programma-keuze
    Flags.Set(11, true);    // ProgrammaTakt Missie-takt
    Flags.Set(12, true);    // PassageFinder
 
    Buzzer.Beep(30, 2);
-   CSerial.printf("Opstarten gereed.\n");
+   printf("Opstarten gereed.\n");
 
    myservo.attach(PB5);    // attaches the servo on pin 17 to the servo object
    myservo.write(550);     // default: gripper open
@@ -148,8 +147,8 @@ void loop() {
 
       //int Batterij = analogRead(BATTERIJ_PIN);
       //int Spanning = (int) (145L * Batterij / 960);  // 14.8 volt geeft waarde 964
-      //CSerial.printf("Batterij: %d (V * 10) (%d)\n", Spanning, Batterij);
-      //CSerial.printf("Lijn: %d (%d %d %d)\n", Lijn, digitalRead(5), digitalRead(6), digitalRead(7));
+      //printf("Batterij: %d (V * 10) (%d)\n", Spanning, Batterij);
+      //printf("Lijn: %d (%d %d %d)\n", Lijn, digitalRead(5), digitalRead(6), digitalRead(7));
    }
 
    Command.Takt(CSerial);  // Console command interpreter
@@ -161,14 +160,14 @@ void loop() {
 //---------------------------------------------------------------------------------------
 void LppSensorDefaultSetup()
 {
-   Lpp.SensorSetup(0, 165, 30);     // Sensor 0  achterwaarts (165 -> 195 (-165) graden)
-   Lpp.SensorSetup(1, -90, 180);    // Sensor 1, van -90  tot 90 graden, (rechts, voor, links)
-   Lpp.SensorSetupCan(2, -45, 90);  // Sensor 2, van -45 tot +45 (voorwaarts)
-   Lpp.SensorSetup(3, 180-70, 40);   // Sensor 3, vanaf 70 graden, segment van 40 graden LockDown 5=8-Slalom
-   Lpp.SensorSetup(4, 30, 40);         // Sensor 4, van 30 tot 70 graden (links voor)
-   Lpp.SensorSetup(5, -30, 60);        // Sensor 5, van -30 tot 30 graden (voorwaarts)
-   Lpp.SensorSetup(6, 180-210, 40);    // Sensor 4, vanaf 210 graden, segment van 40 graden
-   Lpp.SensorSetup(7, 180-250, 40);  // Sensor 7, vanaf 250 graden, segment van 40 graden
+   Lpp.SensorSetup(0,  165, 30);    // Achterwaarts 180 +/- 15
+   Lpp.SensorSetup(1, -110, 40);    // Rechts, -90 +/- 20
+   Lpp.SensorSetup(2,  -70, 40);    // Rechts-voor -50 +/- 20
+   Lpp.SensorSetup(3,  -30, 60);    // Voor, 0 +/- 30
+   Lpp.SensorSetup(4,   30, 40);    // Links-voor, 50 +/- 20
+   Lpp.SensorSetup(5,   70, 40);    // Links   90 +/- 20
+   Lpp.SensorSetupCan(6, -45, 90);  // Blikdetectie voor, 0 +/- 45
+//   Lpp.SensorSetup(7, 180-250, 40);  // Vrije sensor, stel in als benodigd bij de missie
 }
 
 //---------------------------------------------------------------------------------------
@@ -181,17 +180,8 @@ void ReadLpp()
    Lpp.ReadSensors();// lees lidar sensor data
 
    if (Flags.IsSet(9)) {
-      for (int i=0; i<16; i++) {
-         CSerial.printf("%d ", Lpp.Array[i]);
-      }
-      CSerial.printf("\n");
-   }
-
-   if (Flags.IsSet(9)) {
-      for (int i=0; i<8; i++) {
-         CSerial.printf("%d ", Lpp.Sensor[i].Distance);
-      }
-      CSerial.printf("\n");
+      Lpp.PrintArray();
+      Lpp.PrintSensors();
    }
 }
 
@@ -243,7 +233,7 @@ void Execute(int Param[])
    if (Command.Match("Position",       0)) Position.Print();
    if (Command.Match("PositionReset",  0)) Position.Reset();
 
-   if (Command.Match("Flag",           1)) CSerial.printf("Flag %d is %d\n", Param[0], Flags.IsSet(Param[0]));
+   if (Command.Match("Flag",           1)) printf("Flag %d is %d\n", Param[0], Flags.IsSet(Param[0]));
    if (Command.Match("Flag",           2)) Flags.Set(Param[0], Param[1]);
    if (Command.Match("FlagDump",       0)) Flags.Dump();
 

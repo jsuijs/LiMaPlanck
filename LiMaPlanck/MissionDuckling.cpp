@@ -58,7 +58,7 @@ bool MissionDuckling(TState &S)
                   MDegrees_q5  = Lpp.Sensor[i].Degrees32;
                }
             }
-            CSerial.printf("Mother initial at %d mm, %d degrees, sensor: %d \n", MDistance, MDegrees_q5/32, (MDegrees_q5/32 - 120) / 15);
+            printf("Mother initial at %d mm, %d degrees, sensor: %d \n", MDistance, MDegrees_q5/32, (MDegrees_q5/32 - 120) / 15);
          }
 
          // ** follow mother **
@@ -77,7 +77,7 @@ bool MissionDuckling(TState &S)
                            2 * Lpp.Sensor[i].Distance * MDistance *
                            cos( (Lpp.Sensor[i].Degrees32 - MDegrees_q5) / (32 * 57.3) );
             int C = sqrt(C2);
-            CSerial.printf("Sensor: %d, Distance: %d, Degrees: %d, Delta: %d\n",
+            printf("Sensor: %d, Distance: %d, Degrees: %d, Delta: %d\n",
                   i, Lpp.Sensor[i].Distance, Lpp.Sensor[i].Degrees32/32, C);
 
             // Store smallest distance
@@ -89,13 +89,13 @@ bool MissionDuckling(TState &S)
          }
          MDistance   = NewDistance;
          MDegrees_q5 = NewDegrees_q5;
-         CSerial.printf("Mother at %d mm, %d degrees, sensor: %d \n", MDistance, MDegrees_q5/32, (MDegrees_q5/32 - 120) / 15);
+         printf("Mother at %d mm, %d degrees, sensor: %d \n", MDistance, MDegrees_q5/32, (MDegrees_q5/32 - 120) / 15);
       }
       break;
 
 
       default : {
-         CSerial.printf("Error: ongeldige state in MissieTemplate (%d)\n", S.State);
+         printf("Error: ongeldige state in MissieTemplate (%d)\n", S.State);
          return true;  // error => mission end
       }
    }

@@ -55,7 +55,7 @@ bool TFlags::IsSet(int Nr)
 void TFlags::Set(int Nr, bool Value)
    {
       if (!SetIx(Nr)) {
-         CSerial.printf("ERROR setting flag %d\n", Nr);
+         printf("ERROR setting flag %d\n", Nr);
          return;
       }
       if (Value) {
@@ -63,7 +63,7 @@ void TFlags::Set(int Nr, bool Value)
       } else {
          FlagWords[WordIx] &= 0xFFFFFFFF ^ (1<<BitIx);
       }
-      CSerial.printf("Flag %d set to %d (%d %d %d)\n", Nr, Value, WordIx, BitIx, NrFlagWords);
+      printf("Flag %d set to %d (%d %d %d)\n", Nr, Value, WordIx, BitIx, NrFlagWords);
    }
 
 //-----------------------------------------------------------------------------
@@ -72,9 +72,9 @@ void TFlags::Set(int Nr, bool Value)
 //-----------------------------------------------------------------------------
 void TFlags::Dump()
    {
-      CSerial.printf("NrFlagWords: %d\n", NrFlagWords);
-      for (int i=0; i<NrFlagWords; i++) CSerial.printf("%08x ", FlagWords[i]);
-      CSerial.printf("\n");
+      printf("NrFlagWords: %d\n", NrFlagWords);
+      for (int i=0; i<NrFlagWords; i++) printf("%08x ", FlagWords[i]);
+      printf("\n");
    }
 
 //-----------------------------------------------------------------------------
