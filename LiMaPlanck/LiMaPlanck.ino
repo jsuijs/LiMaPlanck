@@ -229,6 +229,9 @@ void Execute(int Param[])
    if (Command.Match("LppSetupS",      3)) Lpp.SensorSetup(Param[0], Param[1], Param[2]);  // Sensor #, start & width
    if (Command.Match("LppPrintS",      0)) Lpp.PrintSensors();
 
+   if (Command.Match("PassageSetup",   3)) Passage.Setup(Param[0], Param[1], Param[2]);
+   if (Command.Match("PassageFind",    2)) printf("PassageFind %d degrees\n", Passage.Find(Param[0], Param[1]));
+
    if (Command.Match("PfKey",          1)) PfKeySet(Param[0]);
    if (Command.Match("Position",       0)) Position.Print();
    if (Command.Match("PositionReset",  0)) Position.Reset();
@@ -239,6 +242,4 @@ void Execute(int Param[])
 
    if (Command.Match("Servo",          1)) myservo.write(Param[0]);
 
-   if (Command.Match("PassageSetup",   3)) Passage.Setup(Param[0], Param[1], Param[2]);
-   if (Command.Match("PassageFind",    2)) printf("PassageFind %d degrees\n", Passage.Find(Param[0], Param[1]));
 }

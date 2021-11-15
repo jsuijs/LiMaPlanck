@@ -50,12 +50,12 @@ void ProgrammaTakt()
       break;
 
       case 1 : { // Programma: rijden1
-         if (MissionRijden1(Program)) Program.State = 0;
+//         if (MissionRijden1(Program)) Program.State = 0;
       }
       break;
 
-      case 2 : {  // Programma:
-        if (MissionServo1(MissonS)) Program.State = 0;
+    case 2 : {  // Programma: Grijper open/toe
+        if (MissionGripperTest(MissonS)) Program.State = 0;  //**Grijper open/toe
       }
       break;
 
@@ -70,12 +70,12 @@ void ProgrammaTakt()
       break;
 
       case 7 : { // Programma:
-         if (MissionTest(MissonS)) Program.State = 0;
+//         if (MissionTest(MissonS)) Program.State = 0;
       }
       break;
 
       case 8 : { // Programma: MissieBlikken
-         if (MissieBlikken(MissonS)) Program.State = 0;
+//         if (MissieBlikken(MissonS)) Program.State = 0;
       }
       break;
 
@@ -87,17 +87,28 @@ void ProgrammaTakt()
 
       case 10 : { // Programma: ttijd
          MissonS.Param1 = 300;  // speed
-         if (MissieTTijd(MissonS)) Program.State = 0;
+//         if (MissieTTijd(MissonS)) Program.State = 0;
       }
       break;
 
       case 11 : { // Programma:
-         if (MissieRandomRijden(MissonS)) Program.State = 0;
+        if (MissionRandomRijden(MissonS)) Program.State = 0;
       }
       break;
 
       case 12 : { // Programma: test1
          Driver.Rotate(90);
+      }
+      break;
+    case 102 : { // Programma: MissionOdoTest CW
+        MissonS.Param1 = -1;               // set CW
+        if (MissionOdoTest(MissonS)) Program.State = 0;
+      }
+      break;
+
+    case 103 : { // Programma: MissionOdoTest CCW
+        MissonS.Param1 = 1;                // set CCW
+        if (MissionOdoTest(MissonS)) Program.State = 0;
       }
       break;
 
