@@ -151,9 +151,13 @@ void TPosition::Update()
       Hoek  = VarRobotDegrees_q8 / 256;   // RobotHoekPos in graden
 
       if (Flags.IsSet(20)) {
-         printf("%cPOSITION %d %d ", FRAME_START, XPos, YPos);
-         CSerial.print(VarRobotDegrees_q8 / 14667.7);  // Note: float in format string doesn't work on stm32duino
-         printf("%c\n", FRAME_END);
+         // Note: float in format string doesn't work on
+         // stm32duino and prinf seems to buffer until
+         // newline, so three print-statements with CSerial
+         // are required to print the position message:
+         CSerial.printf("%cPOSITION %d %d ", FRAME_START, XPos, YPos);
+         CSerial.print(VarRobotDegrees_q8 / 14667.7);
+         CSerial.printf("%c\n", FRAME_END);
       }
    }
 

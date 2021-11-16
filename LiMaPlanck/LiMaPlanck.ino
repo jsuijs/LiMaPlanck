@@ -220,8 +220,9 @@ void Execute(int Param[])
    if (Command.Match("DriveRotate",    2)) Driver.Rotate(Param[0], Param[1]);
    if (Command.Match("DriveArcH",      4)) Driver.ArcHeading(Param[0], Param[1], Param[2], Param[3]);
    if (Command.Match("DriveArc",       4)) Driver.Arc(Param[0], Param[1], Param[2], Param[3]);
+   if (Command.Match("DriveStop",      0)) Driver.Stop();
 
-   if (Command.Match("Stop",           0)) Driver.Stop();
+   if (Command.Match("Stop",           0)) PfKeySet(-1);
 
    if (Command.Match("LppStatus",      0)) { Lpp.ReadStatus(); Lpp.PrintStatus(); }
    if (Command.Match("LppStart",       0)) Lpp.Start();
@@ -240,7 +241,7 @@ void Execute(int Param[])
    if (Command.Match("Flag",           2)) Flags.Set(Param[0], Param[1]);
    if (Command.Match("FlagDump",       0)) Flags.Dump();
 
-   if (Command.Match("DefaultDistance",2)) DefaultDistance = Param[0];
+   if (Command.Match("DefaultDistance",1)) DefaultDistance = Param[0];
 
    if (Command.Match("Servo",          1)) myservo.write(Param[0]);
 }

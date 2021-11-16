@@ -15,49 +15,49 @@ bool MissionGripperTest(TState & S) // Eerste Servo Test
 
   switch (S.State) {
 
-    case 0 : {  // Grijper open
+    case 0 : {          // Grijper openen (als deze nog niet open is)
         if (S.NewState) {
           Driver.Pwm(0, 0);
-          printf("Wachttijd OpStart : %d\n", S.State);
+          printf("Grijper - opstart\n");
         }
 
-        if (ServoSlope(myservo, 550, 20)) S.State ++; //grijper open
+        if (ServoSlope(myservo, 550, 20)) S.State += 10;
       }
       break;
 
-    case 1 : {                        // Start loop open-sluiten
+    case 10 : {         // Grijper sluiten
         if (S.NewState) {
-          printf("Servo 550 in state %d\n", S.State);
+          printf("Grijper Servo naar 2300\n");
         }
 
-        if (S.StateTime() > 3000) S.State++; // Wacht
+        if (ServoSlope(myservo, 2300, 20)) S.State += 10;
       }
       break;
 
-    case 2 : {              // Grijper naar sluiten
+    case 20 : {  // Wachttijd grijper gesloten
         if (S.NewState) {
-          printf("Servo 550 in state %d\n", S.State);
+          printf("Grijper wacht\n");
         }
 
-        if (ServoSlope(myservo, 2300, 20)) S.State ++;
+        if (S.StateTime() > 3000) S.State += 10;
       }
       break;
 
-    case 3 : {  // Wachttijd grijper gesloten
+    case 30 : {         // Grijper openen
         if (S.NewState) {
-          printf("Servo 2300 in state %d\n", S.State);
+          printf("Servo naar 550\n");
         }
 
-        if (S.StateTime() > 3000) S.State++; // Wacht
+        if (ServoSlope(myservo, 550, 20)) S.State += 10;
       }
       break;
 
-    case 4 : {  // Grijper naar open
+    case 40 : {  // Wachttijd grijper open
         if (S.NewState) {
-          printf("Servo 2300 in state %d\n", S.State);
+          printf("Grijper wacht\n");
         }
 
-        if (ServoSlope(myservo, 550, 20)) S.State = 1;  //++;
+        if (S.StateTime() > 3000) S.State = 10;
       }
       break;
 
@@ -95,7 +95,7 @@ bool MissionOdoTest(TState &S)
         if (S.NewState) {
           Driver.Rotate(180 * S.Param1); // 180 graden links of rechts
         }
-        if (Driver.IsDone()) S.State = 4; // Naar de volgende state als de beweging klaar is
+        if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
       }
       break;
 
@@ -160,7 +160,7 @@ bool MissionRandomRijden(TState &S)
         if (Lidar_Blik_V < 240) {
           // print a random number from 0 to 6
           int randNumber = random(2);
-          CSerial.println(randNumber);
+          printf("Randon: %d\n", randNumber);
           if (randNumber == 1) {
             S.State = 603;      // 180 gr R/Om draaien
           }
