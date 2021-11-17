@@ -68,11 +68,12 @@ bool MissionGripperTest(TState & S) // Eerste Servo Test
 //*************************************
 
 //-----------------------------------------------------------------------------
-// MissionOdoTest - state machine  >> 3000 heen - 180gr draaien - 3000 terug <<
+// MissionOdoTest - Heenrijde, draaien en terugrijden.
 //-----------------------------------------------------------------------------
 // Ten behoeve van calibratie odometrie
 //
 // input: S.Param1 = 1 (CCW) of -1 (CW)
+// DefaultDistance: Te rijden afstand.
 //
 //-----------------------------------------------------------------------------
 bool MissionOdoTest(TState &S)
@@ -112,108 +113,78 @@ bool MissionOdoTest(TState &S)
 }
 
 //-----------------------------------------------------------------------------
-// RandomRijdenTakt -
+// MissionRandomRijden -
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 bool MissionRandomRijden(TState &S)
 {
   S.Update(__FUNCTION__, Flags.IsSet(11));
 
-  int Lidar_Blik_LV = Lpp.Sensor[4].Distance;  // Scannen(4) Korste Afstand van 110 graden + 40 gr tot 150 graden
-  int Lidar_Blik_V  = Lpp.Sensor[5].Distance;  // Scannen(5) Korste Afstand van 150 graden + 60 gr tot 210 graden
-  int Lidar_Blik_RV = Lpp.Sensor[6].Distance;  // Scannen(6) Korste Afstand van 210 graden + 40 gr tot 250 graden
+  int Lidar_Blik_V  = Lpp.Sensor[S_VIJF].Distance;
+
+  // Alleen LV/RV afstanden kleiner dan Lid_Max hebben invloed op rijrichting
+  const short int Lid_Max = 500;          // Lidar Meetwaarde beperken
+  int Lidar_Blik_LV = min(Lpp.Sensor[S_VIER].Distance, Lid_Max);
+  int Lidar_Blik_RV = min(Lpp.Sensor[S_ZES].Distance,  Lid_Max);
 
   switch (S.State) {
 
     //----------------------------------------------------------------------
-    //      *** MaxonRobot - Slalom=8 - Rijden LockDown Challenge !!! 02-09-2020
-    //----------------------------------------------------------------------
-    case 0 : { // LIDAR-STARTEN 8 - Rijden LockDown Challenge
+    case 0 : { // LIDAR-STARTEN
         if (S.NewState) {
           Driver.Pwm(0, 0);
           Lpp.Start();
         }
 
-        if (S.StateTime() > 2000) {   //Wacht op start lidar
-          S.State = 601;              //Random rijden in bak
+        if (S.StateTime() > 2000) {    // Wacht op start lidar
+          S.State = 10;                // Random rijden in bak
         }
       }
       break;
 
     //----------------------------------------------------------------------
-    //      *** Maxon2 Robot - Random rijden
-    //----------------------------------------------------------------------
-    case 601 : { // Random rijden
+    case 10 : { // Random rijden
 
         if (S.NewState) {
         }
-
-        int Lid_Max = 500;          // Lidar Meetwaarde beperken
-        //if (Lidar_grV > Lid_Max)   Lidar_grV = Lid_Max;        // 90><180 gr valse meting
-        //if (Lidar_90V > Lid_Max)   Lidar_90V = Lid_Max;        // 135><225 gr valse meting
-//        if (Lidar_Blik_L  > Lid_Max)  Lidar_Blik_L  = Lid_Max;   // 70><110 gr valse meting
-        if (Lidar_Blik_LV > Lid_Max)  Lidar_Blik_LV = Lid_Max;   // 110><150 gr valse meting
-        if (Lidar_Blik_V  > Lid_Max)  Lidar_Blik_V  = Lid_Max;   // 150><210 gr valse meting
-        if (Lidar_Blik_RV > Lid_Max)  Lidar_Blik_RV = Lid_Max;   // 210><250 gr valse meting
-//        if (Lidar_Blik_R  > Lid_Max)  Lidar_Blik_R  = Lid_Max;   // 250><290 gr valse meting
 
         if (Lidar_Blik_V < 240) {
-          // print a random number from 0 to 6
-          int randNumber = random(2);
-          printf("Randon: %d\n", randNumber);
+          int randNumber = random(2);  // Random: 0 or 1
+          printf("Random: %d\n", randNumber);
           if (randNumber == 1) {
-            S.State = 603;      // 180 gr R/Om draaien
+            Driver.Rotate(-90);        // draai naar recht
+            S.State = 20;              // wacht tot draai klaar is.
+            break;
           }
           else {
-            S.State = 604;      // 180 gr L/Om draaien
+            Driver.Rotate(-90);        // draai naar links
+            S.State = 20;              // wacht tot draai klaar is.
+            break;
           }
         }
-        if ((  Lidar_Blik_LV < 200) && (Lidar_Blik_V < 250) && (Lidar_Blik_RV < 200)) {
-          S.State = 602;      // 180 gr R/Om draaien
-        }
+
         if ((Lidar_Blik_LV < 200) || (Lidar_Blik_RV > Lidar_Blik_LV)) {
-          Driver.SpeedLR(150, 90);   // Rechts afdraaien
+          Driver.SpeedLR(150, 90);     // Rechts afdraaien
           break;
         }
+
         if ((Lidar_Blik_RV < 200) || (Lidar_Blik_LV > Lidar_Blik_RV)) {
-          Driver.SpeedLR(90, 150);   //Links afdraaien
+          Driver.SpeedLR(90, 150);     //Links afdraaien
           break;
         }
-        Driver.SpeedLR(150, 150);   // default rechtuit
+
+        Driver.SpeedLR(150, 150);      // default rechtuit
       }
       break;
 
     //----------------------------------------------------------------------
-    case 602 : { // 180 gr RECHTSOM draaien - Random rijden
+    case 20 : { // Wacht tot Driver (draai) klaar is
 
-        if (S.NewState) {
-          Driver.Rotate(-180);
-        }
-        if (Driver.IsDone()) S.State = 601;
+        if (Driver.IsDone()) S.State = 10;
       }
       break;
 
-    //----------------------------------------------------------------------
-    case 603 : { // 90 gr RECHTSOM draaien - Random rijden
-
-        if (S.NewState) {
-          Driver.Rotate(-90);
-        }
-        if (Driver.IsDone()) S.State = 601;
-      }
-      break;
-
-    //----------------------------------------------------------------------
-    case 604 : { // 90 gr LINKSOM draaien - Random rijden
-
-        if (S.NewState) {
-          Driver.Rotate(90);
-        }
-        if (Driver.IsDone()) S.State = 601;
-      }
-      break;
-
-      default : return S.InvalidState(__FUNCTION__);   // Report invalid state & end mission
+    default : return S.InvalidState(__FUNCTION__);    // Report invalid state & end mission
   }
   return false;  // mission nog niet gereed
 }
