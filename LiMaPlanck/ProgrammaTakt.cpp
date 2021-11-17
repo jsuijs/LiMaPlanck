@@ -70,7 +70,7 @@ void ProgrammaTakt()
       break;
 
       case 7 : { // Programma:
-//         if (MissionTest(MissonS)) Program.State = 0;
+         if (MissionSuperSlalom(MissonS)) Program.State = 0;
       }
       break;
 
