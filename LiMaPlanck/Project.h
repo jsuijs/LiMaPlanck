@@ -38,4 +38,10 @@ const int S_VIJF  = 3;
 const int S_ZES   = 2;
 const int S_ZEVEN = 1;
 
+// Nieuwe namen voor sensoren
+const int S_ACHTER      = 0;
+const int S_RECHTS_VOOR = 2;
+const int S_VOOR        = 3;
+const int S_LINKS_VOOR  = 4;
+
 #endif

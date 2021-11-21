@@ -14,15 +14,14 @@
 //passagefind 800 2
 //int PassageStart; // start of detected passage
 //int PassageLen;   // width (in ArrayDegrees) of passage
-//printf("PassageLen Adres %d\n", Passage);  // << Dit is het adres waar de class in het geheugen staat. Ga je niks mee doen...
 //-----------------------------------------------------------------------------
 bool MissionSuperSlalom(TState &S)
 {
-  S.Update(__FUNCTION__);
   static int Pos1X;
   static int Pos1Y = 500;  // 600;
   static int Pos2X;
-  //static int Pos2Y;
+
+  S.Update(__FUNCTION__);
 
   switch (S.State) {
 
@@ -42,17 +41,21 @@ bool MissionSuperSlalom(TState &S)
     case 10 : {   // R1= Opening -1- zoeken
         if (S.NewState) Driver.SpeedLR(150, 150);   // default rechtuit
 
-        if (Lpp.Sensor[S_NUL].Distance > 650) {     // Rijden tot eerste blik (voldoende afstand tot achterwand)
+        if (Lpp.Sensor[S_ACHTER].Distance > 650) {     // Rijden tot eerste blik (voldoende afstand tot achterwand)
 
           int Deg = Passage.Find(800, 5);          // 2 -800 meetlengte opening 2 blikken
 
-          printf("HoekOpening %d, Passage Start %d, Len %d\n",
+          printf("1 Richting: %d, Passage Start %d, Len %d\n",
              Deg, Passage.PassageStart, Passage.PassageLen);
 
-          if (Deg < - 3 ) {                       // -0- Opening aan de linkerzijde
-             Driver.SpeedLR(0, 0);                 // Stoppen
-             Pos1X = (Position.XPos + 100);        // merkpunt opening -1R- Y0
-             S.State += 10;
+          if (Deg < 3600) {   // Doorgang gezien
+            if (Deg < 10) {   // Doorgang nog niet ver voorbij => niet start-vak
+              if (Deg > -9 ) {                      // -0- Opening aan de linkerzijde
+                Driver.SpeedLR(0, 0);                 // Stoppen
+                Pos1X = (Position.XPos + 100);        // merkpunt opening -1R- Y0
+                S.State += 10;
+              }
+            }
           }
         }
       }
@@ -96,16 +99,17 @@ bool MissionSuperSlalom(TState &S)
 
         if (S.StateTime() > 2000) {      // Wacht tot volgende blik
 
-          int Deg = Passage.Find(800, 8);     // 2 -800 meetlengte opening 2 blikken
+          int Deg = Passage.Find(800, 5);     // 2 -800 meetlengte opening 2 blikken
 
-          printf("HoekOpening %d\n", Deg);
-          printf("PassageStart %d\n", Passage.PassageStart);
-          printf("PassageLen %d\n", Passage.PassageLen);
-          if (Deg < 3600) {
-            if (Deg > 2 ) {               // -0- Opening aan de Rechterzijde
-              Driver.SpeedLR(0, 0);         // Stoppen
-              Pos2X = (Position.XPos + 120);        // merkpunt opening -2L- Y600
-              S.State += 10;
+          printf("2 Richting: %d, Passage Start %d, Len %d\n",
+             Deg, Passage.PassageStart, Passage.PassageLen);
+          if (Deg < 3600) {   // Doorgang gezien
+            if (Deg < 10) {   // Doorgang nog niet ver voorbij => niet start-vak
+              if (Deg > 2 ) {               // -0- Opening aan de Rechterzijde
+                Driver.SpeedLR(0, 0);         // Stoppen
+                Pos2X = (Position.XPos + 120);        // merkpunt opening -2L- Y600
+                S.State += 10;
+              }
             }
           }
         }
@@ -144,7 +148,6 @@ bool MissionSuperSlalom(TState &S)
 
     case 90 : {   // R3=  Derde opening = vak -B-
         if (S.NewState) {
-          printf("case 80 :Naar x 2900. 0 pos. \n");
           Driver.XY(2900, 0 , 150, 0 );   // X=3000 naar eindpunt vak -B-
         }
         if (Driver.IsDone()) {

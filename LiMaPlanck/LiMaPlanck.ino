@@ -98,7 +98,7 @@ void setup() {
    //Flags.Set(9, true);   // Lpp array dump
    Flags.Set(10, true);    // ProgrammaTakt programma-keuze
    Flags.Set(11, true);    // ProgrammaTakt Missie-takt
-   Flags.Set(12, true);    // PassageFinder
+//   Flags.Set(12, true);    // PassageFinder
 
    Buzzer.Beep(30, 2);
    printf("Opstarten gereed.\n");
@@ -229,6 +229,7 @@ void Execute(int Param[])
    if (Command.Match("LppStop",        0)) Lpp.Stop();
    if (Command.Match("LppSetupS",      3)) Lpp.SensorSetup(Param[0], Param[1], Param[2]);  // Sensor #, start & width
    if (Command.Match("LppPrintS",      0)) Lpp.PrintSensors();
+   if (Command.Match("LppPrintA",      0)) Lpp.PrintArray();
 
    if (Command.Match("PassageSetup",   3)) Passage.Setup(Param[0], Param[1], Param[2]);
    if (Command.Match("PassageFind",    2)) printf("PassageFind %d degrees\n", Passage.Find(Param[0], Param[1]));

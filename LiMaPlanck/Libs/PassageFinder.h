@@ -114,9 +114,9 @@ int TPassageFinder::Find(int NormDistance, int MinSegments)
          return 3600;
       }
 
-      int PassageDegrees = (ArrayDegrees * (ArrayCount-1)) / 2 - ((PassageStart * 2 + PassageLen) * ArrayDegrees) / 2;
+      int PassageDegrees = ArrayDegrees * ( (PassageStart * 2 + PassageLen) - (ArrayCount-1) ) / 2;
 
-      printf("Passage.Find result: %d Degrees - Start: %d, Len: %d, D1: %d, D2: %d\n",
+      printf("Passage.Find result: %d Degrees (rel) - Start: %d, Len: %d, D1: %d, D2: %d\n",
          PassageDegrees, PassageStart, PassageLen, Lpp.Array[PassageStart - 1].Distance, Lpp.Array[PassageStart + PassageLen].Distance);
 
       return PassageDegrees;

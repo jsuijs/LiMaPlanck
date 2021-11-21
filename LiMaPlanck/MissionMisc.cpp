@@ -120,12 +120,12 @@ bool MissionRandomRijden(TState &S)
 {
   S.Update(__FUNCTION__, Flags.IsSet(11));
 
-  int Lidar_Blik_V  = Lpp.Sensor[S_VIJF].Distance;
+  int Lidar_Blik_V  = Lpp.Sensor[S_VOOR].Distance;
 
   // Alleen LV/RV afstanden kleiner dan Lid_Max hebben invloed op rijrichting
   const short int Lid_Max = 500;          // Lidar Meetwaarde beperken
-  int Lidar_Blik_LV = min(Lpp.Sensor[S_VIER].Distance, Lid_Max);
-  int Lidar_Blik_RV = min(Lpp.Sensor[S_ZES].Distance,  Lid_Max);
+  int Lidar_Blik_LV = min(Lpp.Sensor[S_LINKS_VOOR].Distance, Lid_Max);
+  int Lidar_Blik_RV = min(Lpp.Sensor[S_RECHTS_VOOR].Distance,  Lid_Max);
 
   switch (S.State) {
 
