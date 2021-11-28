@@ -21,9 +21,9 @@ bool MissionDuckling(TState &S);
 bool MissionLijnVolgen(TState &S);        //LijnSensor 5xBPW40
 bool MissionSlalom1(TState &S);
 bool MissionTTijdOpening1(TState &S);      // T-Tijd met opening zoeken in vak -C-
-bool MissionVectorStart1(TState &S);
+bool MissionStartVector1(TState &S);
 
-extern TState MissonS;  // Mission statemachine
+extern TState SubS;  // Sub-mission statemachine
 extern int DefaultDistance;
 void ReadLijnsensor();
 

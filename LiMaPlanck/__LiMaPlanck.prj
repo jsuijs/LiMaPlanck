@@ -52,3 +52,4 @@ Create Tagfile=0
 13=MissionDuckling.cpp
 14=MissionMisc.cpp
 15=MissionSuperSlalom.cpp
+16=MissionStartvector.cpp

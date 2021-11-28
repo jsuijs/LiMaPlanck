@@ -8,7 +8,8 @@
 // prototypes
 
 bool __attribute__ ((weak)) MissionAloys1(TState &S) { S = S; return true; }
-TState MissonS;  // Mission statemachine
+static TState MissonS;  // Mission statemachine
+TState SubS;            // Sub-mission statemachine
 int DefaultDistance = 2000;
 
 //-----------------------------------------------------------------------------
@@ -44,7 +45,7 @@ void ProgrammaTakt()
       case 0 : { // Program: stand-still
          if (Program.NewState) {
             Driver.Pwm(0, 0); // only on entry, so CLI-commands can be used in this state.
-            Lpp.Stop();
+            //Lpp.Stop();
          }
       }
       break;
@@ -54,7 +55,7 @@ void ProgrammaTakt()
       }
       break;
 
-    case 2 : {  // Programma: Grijper open/toe
+      case 2 : {  // Programma: Grijper open/toe
         if (MissionGripperTest(MissonS)) Program.State = 0;  //**Grijper open/toe
       }
       break;
@@ -100,15 +101,21 @@ void ProgrammaTakt()
          Driver.Rotate(90);
       }
       break;
-    case 102 : { // Programma: MissionOdoTest CW
-        MissonS.Param1 = -1;               // set CW
-        if (MissionOdoTest(MissonS)) Program.State = 0;
+
+      case 101 : { // Programma: MissionStartVector1
+         if (MissionStartVector1(MissonS)) Program.State = 0;
       }
       break;
 
-    case 103 : { // Programma: MissionOdoTest CCW
-        MissonS.Param1 = 1;                // set CCW
-        if (MissionOdoTest(MissonS)) Program.State = 0;
+      case 102 : { // Programma: MissionOdoTest CW
+         MissonS.Param1 = -1;               // set CW
+         if (MissionOdoTest(MissonS)) Program.State = 0;
+      }
+      break;
+
+      case 103 : { // Programma: MissionOdoTest CCW
+         MissonS.Param1 = 1;                // set CCW
+         if (MissionOdoTest(MissonS)) Program.State = 0;
       }
       break;
 
