@@ -11,19 +11,19 @@ const int lidar_sign = -1;
 //-----------------------------------------------------------------------------
 static int VolgLinksVW()          // Wandvolgen VoorWaards
 {
-   return (350 - Lpp.Sensor[S_VIER].Distance) / 3;  // wand volgen R40  - 50
+   return (350 - Lpp.Sensor[S_VIER].Distance) / 3;
 }
 
 //-----------------------------------------------------------------------------
 static int VolgLinksAW()          // Wandvolgen AchterWaards
 {
-   return (315 - Lpp.Sensor[S_DRIE].Distance) / 3;  // wand volgen R40  - 50
+   return (315 - Lpp.Sensor[S_DRIE].Distance) / 3;
 }
 
-
+//-----------------------------------------------------------------------------
 static void MapSensorSetup(int Sensor, int Start, int Width)
 {
-   Lpp.SensorSetup(Sensor,   (Start * lidar_sign) + lidar_Offset - Width, Width);
+   Lpp.SensorSetup(Sensor, (Start * lidar_sign) + lidar_Offset - Width, Width);
 }
 
 //-----------------------------------------------------------------------------
@@ -146,7 +146,6 @@ bool MissionStartVector1(TState &S)
          printf("Let op: default\n");
 //         Driver.SpeedLR(0, 0);               // Stoppen
          S.State = 30;
-         }
       }
       break;
 
@@ -226,8 +225,8 @@ bool MissionStartVector1(TState &S)
       break;
 
       default : return S.InvalidState(__FUNCTION__);  // Report invalid state & end mission
-  }
-  return false;                                       // Nog niet klaar.
+   }
+   return false;                                       // Nog niet klaar.
 }
 
 //********* Einde StartVECTOR ****
