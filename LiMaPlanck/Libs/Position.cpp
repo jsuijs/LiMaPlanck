@@ -6,7 +6,7 @@
 #include "stdio.h"
 
 //-----------------------------------------------------------------------------
-// TPosition - constructor
+// TPosition::TPosition - constructor
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 TPosition::TPosition()
@@ -15,7 +15,7 @@ TPosition::TPosition()
    }
 
 //-----------------------------------------------------------------------------
-// OdoGet - Get OdoL, R (in mm), OdoT (absolute waarde, in mm)
+// TPosition::OdoGet - Get OdoL, R (in mm), OdoT (absolute waarde, in mm)
 //-----------------------------------------------------------------------------
 // Gebruik deze routine voor besturing waarbij de x/y/hoek niet
 // bruikbaar (of handig) is.
@@ -28,17 +28,25 @@ void TPosition::OdoGet(int &OdoL_out, int &OdoR_out, int &OdoT_out)
    }
 
 //------------------------------------------------------------------------
-// ResetRobotPosition - Zet huidige positie op 0, 0, 0
+// TPosition::Reset - Zet positie op 0, 0, 0
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 void TPosition::Reset()
    {
+      Set(0,0,0);
+   }
+//------------------------------------------------------------------------
+// TPosition::Set - Zet positie op gegeven waarde.
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+void TPosition::Set(float X, float Y, float Degrees)
+   {
       printf("ResetRobotPosition\n");
-      VarRobotXPos_q10     = 0;
-      VarRobotYPos_q10     = 0;
-      VarRobotDegrees_q8   = 0;
+      VarRobotXPos_q10     = X / 1024;
+      VarRobotYPos_q10     = Y / 1024;
+      VarRobotDegrees_q8   = Degrees / 256;
 
-      // odo hulp vars:
+      // wis odo hulp vars:
       OdoL_ticks = 0;
       OdoR_ticks = 0;
       OdoT_q10   = 0;
@@ -49,7 +57,7 @@ void TPosition::Reset()
    }
 
 //-----------------------------------------------------------------------------
-// PrintRobotPositie -
+// TPosition::Print -
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void TPosition::Print()
@@ -59,7 +67,7 @@ void TPosition::Print()
    }
 
 //-----------------------------------------------------------------------------
-// OdoTakt - Lees encoders & werk RobotPositie bij
+// TPosition::Takt - Lees encoders & werk RobotPositie bij
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void TPosition::Takt()
@@ -130,7 +138,7 @@ void TPosition::Takt()
 //------------------------------------------------------------------------
 
 //------------------------------------------------------------------------
-// Update - update public var's
+// TPosition::Update - update public var's
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 void TPosition::Update()

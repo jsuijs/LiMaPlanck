@@ -39,6 +39,7 @@ class TPosition
       void init() { Reset(); }
       void Takt();
       void Reset();
+      void Set(float X, float Y, float Degrees);
 
       void OdoGet(int &OdoL_out, int &OdoR_out, int &OdoT_out) ;
       void Print();

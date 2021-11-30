@@ -72,7 +72,7 @@ void setup() {
    LppWire.begin();
    if (Lpp.begin()) {
 
-      Lpp.SetOffsetDegrees(-4);      // Align lidar with robotlib coordinate system; 0 Degrees = forward.
+      Lpp.SetOffsetDegrees(-4);     // Align lidar with robotlib coordinate system; 0 Degrees = forward.
       Lpp.SetReverse(1);            // Angle to the left is positive.
 
       //Lpp.ArraySetup(70, 20, 11);   // Setup array with 11 segments of 20 degrees
