@@ -11,13 +11,15 @@ const int lidar_sign = -1;
 //-----------------------------------------------------------------------------
 static int VolgLinksVW()          // Wandvolgen VoorWaards
 {
-   return (350 - Lpp.Sensor[S_VIER].Distance) / 3;
+        int Afstand = (340 - Lpp.Sensor[4].Distance) / 2;    //340    350
+        return constrain(Afstand, -20, 20);
 }
 
 //-----------------------------------------------------------------------------
 static int VolgLinksAW()          // Wandvolgen AchterWaards
 {
-   return (315 - Lpp.Sensor[S_DRIE].Distance) / 3;
+        int Afstand = (330 - Lpp.Sensor[3].Distance) / 2;    // 330  315
+        return constrain(Afstand, -20, 20);
 }
 
 //-----------------------------------------------------------------------------
@@ -33,13 +35,6 @@ static void MapSensorSetup(int Sensor, int Start, int Width)
 bool MissionStartVector1(TState &S)
 {
    static int AWScannen;      // X * Heen en weer rijden om Achterwand te scannen
-
-  //Lpp0;    Lidar Achter   -15 <> +15 graden
-  //Lpp1;    Lidar Voor     135 <> 125 graden
-  //Lpp3;    Lidar L-achter  45 <> 65  graden
-  //Lpp4;    Lidar L-voor   125 <> 145 graden
-  //Lpp6;    Lidar L-voor   210 <> 250 graden
-  //Lpp7;    Lidar Rechts   250 <> 290 graden
 
    S.Update(__FUNCTION__, Flags.IsSet(11));
 
@@ -58,7 +53,8 @@ bool MissionStartVector1(TState &S)
             MapSensorSetup(S_EEN,   165, 30);  // Sensor 1C, vanaf 165 graden, (+165 + 30 = 195 graden) **StartVector**
             MapSensorSetup(S_DRIE,   40, 20);  // Sensor 3B, vanaf 35 graden, segment van 40 graden -   **StartVector**
             MapSensorSetup(S_VIER,  125, 20);  // Sensor 4B, vanaf 125 graden, segment van 20 graden -  **StartVector**
-            MapSensorSetup(S_ZEVEN, 260, 20);  // Sensor 7B, vanaf 250 graden, segment van 20 graden     **StartVector**
+            MapSensorSetup(S_ZEVEN, 265, 10);  // Sensor 7B, vanaf 250 graden, segment van 20 graden     **StartVector**
+
             Lpp.Start();
 
             printf("Wachttijd Op Start : %d\n", S.State);
@@ -91,37 +87,33 @@ bool MissionStartVector1(TState &S)
       }
       break;
 
-      case 10 : {       // Afstand Hoek-wanden corrigeren
+      case 10 : {    // Klem in hoek? Afstand Hoek-wanden corrigeren
          if (S.NewState) {
-            printf("case 2: Afstand Hoek-wanden corigeren in -A- \n");
-            Driver.Rotate(-25);                      // 20 graden Rechtsom
+            Driver.Rotate(-90);                      // 20 graden Rechtsom
          }
 
          if (Driver.IsDone()) {
-            Driver.Stop();
-            if ((Lpp.Sensor[S_EEN]. Distance <= 300) && (Lpp.Sensor[S_NUL]. Distance <= 300)) { // Klem in hoek?
-               S.State = 15;
-            }
-            else {
-               S.State = 20;
-            }
+            Driver.SpeedLR(0, 0);                    // Stoppen
+            S.State = 12;
          }
       }
       break;
 
-      case 15 : {       // Afstand Hoek-wanden corrigeren
-         if (S.NewState) {
-            printf("case 2: Afstand Hoek-wanden corigeren in -A- \n");
-            Driver.Rotate(40);                       // 40 graden Linkom
+      case 12 : {    // Klem in hoek? Afstand Hoek-wanden corrigeren
+         if (S.StateTime() > 1000) {
+            Position.Reset();
+            S.State = 13;
          }
+      }
+      break;
 
+      case 13 : { // Uit hoek-klem Rijden in vak -A- (v2)
+         if (S.NewState) {
+            Driver.XY(150, 0, 100, 0 );   // 150 mm = een beetje schuin uit hoek rijden
+         }
          if (Driver.IsDone()) {
-            Driver.Stop();
-            if ((Lpp.Sensor[S_EEN]. Distance <= 300) && (Lpp.Sensor[S_NUL]. Distance <= 300)) { // Klem in hoek?
-               S.State = 10;
-            }
-            else {
-               S.State = 20;
+            if (S.StateTime() >= 1000) {
+               S.State = 1;               // Terug naar rotate StartVector
             }
          }
       }
@@ -178,14 +170,10 @@ bool MissionStartVector1(TState &S)
       break;
 
       case 50 : {      // Afstand tot (X)achterwand
-         if (S.NewState) {
-            printf("case 5: Afstand tot (X)Rechter wand \n");
-            Driver.SpeedLR(50, 50);                    // stukje Voorw. rijden
-         }
 
-         Driver.SpeedLR(50, (50 - VolgLinksVW()));    // Voorwaards uitlijnen
+         Driver.SpeedLR(70, (70 - VolgLinksVW()));    // Voorwaards uitlijnen
 
-         if (Lpp.Sensor[S_NUL].Distance >= 600) {     // Midden vak -A- TE VERVANGEN DOOR EEN VARIABLE = H&W-TT-Blikken
+         if (Lpp.Sensor[S_NUL].Distance >= 560) {     // Midden vak -A- TE VERVANGEN DOOR EEN VARIABLE = H&W-TT-Blikken
             Driver.Stop();
             S.State = 60;
          }
