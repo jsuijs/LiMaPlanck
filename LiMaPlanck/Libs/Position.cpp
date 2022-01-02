@@ -35,6 +35,7 @@ void TPosition::Reset()
    {
       Set(0,0,0);
    }
+
 //------------------------------------------------------------------------
 // TPosition::Set - Zet positie op gegeven waarde.
 //------------------------------------------------------------------------
@@ -245,17 +246,17 @@ void InitStmEncoders()
 }
 
 void ReadStmEncodersDelta(int &Left, int &Right)
-   {  static int RawEncoderLeft, RawEncoderRight;
+{  static int RawEncoderLeft, RawEncoderRight;
 
-      // save prev values
-      int PrevEncoderLeft  = RawEncoderLeft;
-      int PrevEncoderRight = RawEncoderRight;
+   // save prev values
+   int PrevEncoderLeft  = RawEncoderLeft;
+   int PrevEncoderRight = RawEncoderRight;
 
-      // read raw
-      RawEncoderLeft  = -TimerEncL.getCount(); // flip sign here if required
-      RawEncoderRight = TimerEncR.getCount(); // flip sign here if required
+   // read raw
+   RawEncoderLeft  = -TimerEncL.getCount();  // flip sign here if required
+   RawEncoderRight = TimerEncR.getCount();   // flip sign here if required
 
-      // difference (cast to short int required to properly handle wrap around of 16-bit counters)
-      Left  = (short int)(RawEncoderLeft  - PrevEncoderLeft);
-      Right = (short int)(RawEncoderRight - PrevEncoderRight);
-   }
+   // difference (cast to short int required to properly handle wrap around of 16-bit counters)
+   Left  = (short int)(RawEncoderLeft  - PrevEncoderLeft);
+   Right = (short int)(RawEncoderRight - PrevEncoderRight);
+}
