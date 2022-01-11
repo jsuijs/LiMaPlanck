@@ -21,6 +21,8 @@ TFlags         Flags(32);
 
 Servo myservo;  // create servo object to control a servo
 
+TApa102 Leds(21, PB12, PB13);
+
 //---------------------------------------------------------------------------------------
 // RC5 stuff start
 #include "Libs/RC5.h"
@@ -59,6 +61,7 @@ void setup() {
    Flags.Set(20, true);    // Position print (each update)
    Position.init();        // delayed constructor
    Driver.init();          // delayed constructor
+   Leds.Init();
 
    SetupMotors();
    InitStmEncoders();
@@ -245,4 +248,9 @@ void Execute(int Param[])
    if (Command.Match("DefaultDistance",1)) DefaultDistance = Param[0];
 
    if (Command.Match("Servo",          1)) myservo.write(Param[0]);
+
+   if (Command.Match("LedsH",          2)) { Leds.HSV(Param[0], Param[1]);                      Leds.Commit(); }
+   if (Command.Match("LedsBright",     1)) { Leds.Brightness = Param[0];                        Leds.Commit(); }
+   if (Command.Match("LedsRgb",        4)) { Leds.RGB(Param[0], Param[1], Param[2], Param[3]);  Leds.Commit(); }
+
 }

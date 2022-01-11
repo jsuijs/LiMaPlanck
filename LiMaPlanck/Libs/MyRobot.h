@@ -17,6 +17,9 @@
 #define ABS(x)             ( (x>=0) ? x : -x )
 #define NORM_Q8            (360L * 256)
 
+template <typename T> inline
+T ABSOLUTE(const T& v) { return v < 0 ? -v : v; }
+
 #define FRAME_END          0xC0  // indicates end of packet
 #define FRAME_START        0xC1  // indicates start of packet
 
@@ -24,12 +27,10 @@
 #include "Libs/LppMaster.h"      // contains code...
 #include "Libs/Commands.h"       // contains code...
 #include "Libs/PassageFinder.h"  // contains code...
+#include "Libs/Apa102.h"         // contains code...
 
 //-----------------------------------------------------------------------------
 // Position.cpp
-
-template <typename T> inline
-T ABSOLUTE(const T& v) { return v < 0 ? -v : v; }
 
 //-----------------------------------------------------------------------------
 class TPosition
