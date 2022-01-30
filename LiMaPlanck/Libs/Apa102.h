@@ -43,12 +43,12 @@ public:
    void RGB(int Nr, uint8_t Red, uint8_t Green, uint8_t Blue);
    void HSV(int Nr, uint8_t Hue, uint8_t Saturation=255, uint8_t Value=255);
 
-   void  Clear();
-
+   void Clear();
+   int  NrLeds() { return _NrLeds; } ;
    uint8_t  Brightness;
 
 protected:
-   int      NrLeds;
+   int      _NrLeds;
    TColor  *Leds;
 };
 
@@ -86,12 +86,12 @@ private:
 // TColorLed::TColorLed - constructor
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-TColorLed::TColorLed(int InNrLeds) : NrLeds(InNrLeds)
+TColorLed::TColorLed(int InNrLeds) : _NrLeds(InNrLeds)
    {
 
-      Leds = (TColor *)malloc(sizeof(TColor) * (NrLeds));  // one extra to be sure
+      Leds = (TColor *)malloc(sizeof(TColor) * (_NrLeds));  // one extra to be sure
       if (Leds == NULL) {
-         NrLeds = 0;
+         _NrLeds = 0;
       }
 
       Clear();
@@ -104,7 +104,7 @@ TColorLed::TColorLed(int InNrLeds) : NrLeds(InNrLeds)
 void TColorLed::Clear()
    {
       Brightness = 255;
-      for (int i=0; i<NrLeds; i++) Leds[i].Color = 0;
+      for (int i=0; i<_NrLeds; i++) Leds[i].Color = 0;
    }
 
 //-----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ void TColorLed::Clear()
 //-----------------------------------------------------------------------------
 void TColorLed::RGB(int Nr, uint8_t R, uint8_t G, uint8_t B)
    {
-      if ((Nr < 0) || (Nr >= NrLeds)) return;
+      if ((Nr < 0) || (Nr >= _NrLeds)) return;
       Leds[Nr].RGB(R, G, B);
    }
 
@@ -123,7 +123,7 @@ void TColorLed::RGB(int Nr, uint8_t R, uint8_t G, uint8_t B)
 //-----------------------------------------------------------------------------
 void TColorLed::RGB(int Nr, TColor RGB)
    {
-      if ((Nr < 0) || (Nr >= NrLeds)) return;
+      if ((Nr < 0) || (Nr >= _NrLeds)) return;
       Leds[Nr] = RGB;
    }
 
@@ -133,7 +133,7 @@ void TColorLed::RGB(int Nr, TColor RGB)
 //-----------------------------------------------------------------------------
 void TColorLed::HSV(int Nr, uint8_t Hue, uint8_t Saturation, uint8_t Value)
    {
-      if ((Nr < 0) || (Nr >= NrLeds)) return;
+      if ((Nr < 0) || (Nr >= _NrLeds)) return;
       Leds[Nr].HSV(Hue, Saturation, Value);
    }
 
@@ -202,7 +202,7 @@ void TApa102::Commit()
       SPI_writeApa(0);  // Start Frame
 
       // for each LED
-      for (int i=0; i<NrLeds; i++) {
+      for (int i=0; i<_NrLeds; i++) {
          TColor D = Leds[i];
          D.Dummy = 0xE0 | (Brightness >> 3);   // Pre-amble & Brightness
          SPI_writeApa(D);
@@ -211,7 +211,7 @@ void TApa102::Commit()
       SPI_writeApa(0);   // Reset frame - Only needed for SK9822, has no effect on APA102
 
       // End frame: 8+8*(leds >> 4) clock cycles (at least one pulse for every 2 leds)
-      for (int i=0; i<=NrLeds; i+=16) {
+      for (int i=0; i<=_NrLeds; i+=16) {
          SPI_write(0);  // 8 more clock cycles
       }
    }

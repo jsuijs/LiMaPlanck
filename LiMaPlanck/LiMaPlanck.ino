@@ -21,7 +21,7 @@ TFlags         Flags(32);
 
 Servo myservo;  // create servo object to control a servo
 
-TApa102 Leds(21, PB12, PB13);
+TApa102 Leds(60, PB12, PB13);
 
 //---------------------------------------------------------------------------------------
 // RC5 stuff start
@@ -203,6 +203,27 @@ void BlinkTakt()
 }
 
 //-----------------------------------------------------------------------------
+// Degrees2RingIndex -
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int Degrees2RingIndex(int Degrees)
+{
+   // Settings
+   const int NrLeds = Leds.NrLeds();
+   const int DegreesOffset = 180;    // change to set 1 and -1 degrees at proper led
+   const int Clockwise = false;      // change to set -90 and 90 degrees at the proper led
+
+   // Calculation
+   int Index = ((Degrees + DegreesOffset) * NrLeds) / 360;
+   if (Clockwise) Index *= -1;
+
+   while (Index < 0)       Index += NrLeds;
+   while (Index >= NrLeds) Index -= NrLeds;
+
+   return Index;
+}
+
+//-----------------------------------------------------------------------------
 // Execute - execute commando
 //-----------------------------------------------------------------------------
 // Called via CmdTakt() when a command is received from the serial port.
@@ -249,8 +270,11 @@ void Execute(int Param[])
 
    if (Command.Match("Servo",          1)) myservo.write(Param[0]);
 
+   if (Command.Match("LedsClear",      0)) { Leds.Clear();                                      Leds.Commit(); }
    if (Command.Match("LedsH",          2)) { Leds.HSV(Param[0], Param[1]);                      Leds.Commit(); }
    if (Command.Match("LedsBright",     1)) { Leds.Brightness = Param[0];                        Leds.Commit(); }
    if (Command.Match("LedsRgb",        4)) { Leds.RGB(Param[0], Param[1], Param[2], Param[3]);  Leds.Commit(); }
+
+   if (Command.Match("LedsRingH",      2)) { Leds.HSV(Degrees2RingIndex(Param[0]), Param[1]);                      Leds.Commit(); }
 
 }
