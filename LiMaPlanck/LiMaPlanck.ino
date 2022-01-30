@@ -136,6 +136,8 @@ void loop() {
       Position.Takt();  // Lees & verwerk encoder data
       ProgrammaTakt();  // Voer (stapje van) geselecteerde programma uit
       Driver.Takt();    // stuur motoren aan
+
+      LedTakt();
    }
 
    // Seconde interval
@@ -277,4 +279,61 @@ void Execute(int Param[])
 
    if (Command.Match("LedsRingH",      2)) { Leds.HSV(Degrees2RingIndex(Param[0]), Param[1]);                      Leds.Commit(); }
 
+}
+
+//const TColor CRGB_BLUE  (0x00, 0x80, 0xFF);   // Azure
+
+void Ledjes(int Center, int Kleur)
+{   TColor CHi, CLo;
+
+      if (Kleur == 0) {
+         CHi = CRGB_BLUE;
+         CLo = TColor(0, 128/16, 255/16);
+      }
+
+      if (Kleur == 1) {
+         CHi = CRGB_RED;
+         CLo = TColor(255/16, 0, 0);
+      }
+
+      Leds.Clear();
+      Leds.Brightness = 8;
+      Leds.RGB(Center - 4, CLo);
+      Leds.RGB(Center - 3, CHi);
+      Leds.RGB(Center - 2, CLo);
+
+      Leds.RGB(Center + 2, CLo);
+      Leds.RGB(Center + 3, CHi);
+      Leds.RGB(Center + 4, CLo);
+      Leds.Commit();
+}
+
+void LedTakt()
+{  static int State = 0;
+   static int Center = 0;
+
+   switch (State) {
+      case 0 : {
+         Leds.Clear();
+         Leds.Brightness = 8;
+         Leds.Commit();
+         Center = 20;
+         State = 10;
+      }
+      break;
+
+      case 10 : {
+         Ledjes(Center, 1);
+         Center ++;
+         if (Center > 40) State += 10;
+      }
+      break;
+
+      case 20 : {
+         Ledjes(Center, 0);
+         Center --;
+         if (Center < 20) State = 10;
+      }
+      break;
+   }
 }

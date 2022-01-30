@@ -44,4 +44,6 @@ const int S_RECHTS_VOOR = 2;
 const int S_VOOR        = 3;
 const int S_LINKS_VOOR  = 4;
 
+void LedTakt();
+
 #endif

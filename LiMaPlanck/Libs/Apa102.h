@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Flags.h  - Control a string of APA102 RGB LEDs
+// Apa102.h  - Control a string of APA102 RGB LEDs
 //-----------------------------------------------------------------------------
 // Derived from RobotLib
 // Note: #define MAIN enables acutual code, in adition to prototypes
@@ -31,6 +31,14 @@ public:
       };
    };
 };
+
+const TColor CRGB_RED   (0xFF, 0x00, 0x00);
+const TColor CRGB_YELLOW(0xFF, 0xB0, 0x00);   // Yellow/Orange
+const TColor CRGB_GREEN (0x00, 0xFF, 0x00);
+const TColor CRGB_BLUE  (0x00, 0x80, 0xFF);   // Azure
+const TColor CRGB_PURPLE(0xC0, 0x00, 0xFF);   // Magenta/violet
+const TColor CRGB_WHITE (0x80, 0x80, 0x80);
+const TColor CRGB_BLACK (0x00, 0x00, 0x00);   // Off
 
 class TColorLed
 {
@@ -94,6 +102,7 @@ TColorLed::TColorLed(int InNrLeds) : _NrLeds(InNrLeds)
          _NrLeds = 0;
       }
 
+      Brightness = 255;
       Clear();
    }
 
@@ -103,7 +112,6 @@ TColorLed::TColorLed(int InNrLeds) : _NrLeds(InNrLeds)
 //-----------------------------------------------------------------------------
 void TColorLed::Clear()
    {
-      Brightness = 255;
       for (int i=0; i<_NrLeds; i++) Leds[i].Color = 0;
    }
 
@@ -223,6 +231,7 @@ void TApa102::Commit()
 //-----------------------------------------------------------------------------
 void TApa102::SPI_writeApa(TColor D)
    {
+      printf("writeApa %d %d %d %d\n", D.Dummy, D.B, D.G, D.R);
       SPI_write(D.Dummy);  // Brightness
       SPI_write(D.B);
       SPI_write(D.G);
@@ -243,7 +252,6 @@ void TApa102::SPI_write(uint8_t c)
          ClockHigh();      // Data-sample available
 
          c = c<<1;
-         delayMicroseconds(1);
 
          ClockLow();
       }
