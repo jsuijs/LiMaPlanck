@@ -164,7 +164,6 @@ void TColor::HSV(uint8_t Hue, uint8_t Saturation, uint8_t Value)
       G = Value * mix(constrain(ABSOLUTE(fract(h + 0.6666666) * 6.0 - 3.0) - 1.0, 0.0, 1.0), s);
       B = Value * mix(constrain(ABSOLUTE(fract(h + 0.3333333) * 6.0 - 3.0) - 1.0, 0.0, 1.0), s);
       Dummy = 0;
-      //printf("Hue %f, Sat: %f, RGB: %d %d %d (%f)\n", h, s, Red, Green, Blue, ABS(fract(h + 1.0      ) * 6.0 - 3.0) - 1.0);
    }
 
 //-----------------------------------------------------------------------------
@@ -231,7 +230,6 @@ void TApa102::Commit()
 //-----------------------------------------------------------------------------
 void TApa102::SPI_writeApa(TColor D)
    {
-      printf("writeApa %d %d %d %d\n", D.Dummy, D.B, D.G, D.R);
       SPI_write(D.Dummy);  // Brightness
       SPI_write(D.B);
       SPI_write(D.G);

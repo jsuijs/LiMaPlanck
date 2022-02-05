@@ -283,7 +283,7 @@ void Execute(int Param[])
 
 //const TColor CRGB_BLUE  (0x00, 0x80, 0xFF);   // Azure
 
-void Ledjes(int Center, int Kleur)
+void LedEyes(int Center, int Kleur)
 {   TColor CHi, CLo;
 
       if (Kleur == 0) {
@@ -309,8 +309,15 @@ void Ledjes(int Center, int Kleur)
 }
 
 void LedTakt()
-{  static int State = 0;
-   static int Center = 0;
+{  static int State;
+   static int Center;
+   static int SpeedCounter;
+
+   if (SpeedCounter > 0) {
+      SpeedCounter --;
+      return;
+   }
+   SpeedCounter = 1;
 
    switch (State) {
       case 0 : {
@@ -323,14 +330,14 @@ void LedTakt()
       break;
 
       case 10 : {
-         Ledjes(Center, 1);
+         LedEyes(Center, 1);
          Center ++;
          if (Center > 40) State += 10;
       }
       break;
 
       case 20 : {
-         Ledjes(Center, 0);
+         LedEyes(Center, 1);
          Center --;
          if (Center < 20) State = 10;
       }
