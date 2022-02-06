@@ -22,7 +22,7 @@ public:
    void HSV(uint8_t Hue, uint8_t Saturation=255, uint8_t Value=255);
 
    union {
-      unsigned long Color;
+      uint32_t Color;
       struct {
          uint8_t Dummy;
          uint8_t R;

@@ -281,8 +281,6 @@ void Execute(int Param[])
 
 }
 
-//const TColor CRGB_BLUE  (0x00, 0x80, 0xFF);   // Azure
-
 void LedEyes(int Center, int Kleur)
 {   TColor CHi, CLo;
 
