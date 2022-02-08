@@ -21,7 +21,7 @@ bool MissionGripperTest(TState & S) // Eerste Servo Test
           printf("Grijper - opstart\n");
         }
 
-        if (ServoSlope(myservo, 550, 20)) S.State += 10;
+        if (ServoSlope(myservo, SERVO_OPEN, 20)) S.State += 10;
       }
       break;
 
@@ -30,7 +30,7 @@ bool MissionGripperTest(TState & S) // Eerste Servo Test
           printf("Grijper Servo naar 2300\n");
         }
 
-        if (ServoSlope(myservo, 2300, 20)) S.State += 10;
+        if (ServoSlope(myservo, SERVO_CLOSE, 20)) S.State += 10;
       }
       break;
 
@@ -45,10 +45,10 @@ bool MissionGripperTest(TState & S) // Eerste Servo Test
 
     case 30 : {         // Grijper openen
         if (S.NewState) {
-          printf("Servo naar 550\n");
+          printf("Servo naar SERVO_OPEN\n");
         }
 
-        if (ServoSlope(myservo, 550, 20)) S.State += 10;
+        if (ServoSlope(myservo, SERVO_OPEN, 20)) S.State += 10;
       }
       break;
 

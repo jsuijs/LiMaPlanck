@@ -33,7 +33,7 @@ bool MissionSuperSlalom(TState &S)
         }
 
         if (S.StateTime() > 3000) {      // Wacht op start lidar
-          if (ServoSlope(myservo, 550, 20)) S.State += 10; // Grijper open
+          if (ServoSlope(myservo, SERVO_OPEN, 20)) S.State += 10; // Grijper open
         }
       }
       break;
