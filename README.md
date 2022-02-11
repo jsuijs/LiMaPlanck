@@ -9,6 +9,9 @@ LiMaPlanck staat voor Lidar-Maple-Planck.
 Dit project bevat de code van de hoofd-controller en toont een aantal technieken die handig zijn bij de besturing van robot.
 Het is een verdere uitwerking van de robot die in de CAR workshop is gebouwd.
 
+De robot maakt gebruik van een STM32F103 controller. De board manager URL voor de arduino plugin:
+https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json
+
 De code van de Lidar PreProcessor is geen open source.
 
 ![Het aansluitschema](Lidar-x1-2-STM32schema.png)
