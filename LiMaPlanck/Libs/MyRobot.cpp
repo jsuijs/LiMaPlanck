@@ -34,13 +34,15 @@ void TState::Reset()
 //-----------------------------------------------------------------------------
 void TState::Update(const char *InName, bool Verbose)
    {
+      int Now = millis();
+      if (Now == StateStartTime) printf("Waarschuwing: S.Update wordt waarschijnlijk dubbel aangeroepen!\n");
       NewState = false;
       if (PrevState != State) {
          if (Verbose) printf("%s state %d -> %d\n", InName, PrevState, State);
 
          PrevState      = State;
          NewState       = true;
-         StateStartTime = millis();
+         StateStartTime = Now;
       }
    }
 
