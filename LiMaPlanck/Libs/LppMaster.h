@@ -142,12 +142,12 @@ struct TLppArrayData
 //-----------------------------------------------------------------------------
 struct TLppStatusData
 {
-   char  ID;            // 0
-   char  SwRevision;    // 1
-   char  RotationCount; // 2
-   char  RotationTime;  // 3 - in ms
+   char  ID;            //  0
+   char  SwRevision;    //  1
+   char  RotationCount; //  2
+   char  RotationTime;  //  3 - in ms
    short SampleRate;    //  4 & 5- samples in last 100 ms
-   char  free06;        // 6
+   char  free06;        //  6
    char  Cmd;           //  7 - just about always zero....
    char  RotSpeed;      //  8
    char  OffsetX;       //  9 - in 2mm steps
@@ -160,6 +160,15 @@ struct TLppStatusData
    char  CanEdge;       // 17 - min edge size (delta between two samples, in mm) for CAN start/end
    char  CanMin;        // 18 - min angle of can (units tbd)
    char  CanMax;        // 19 - max angle of can (units tbd)
+};
+
+//-----------------------------------------------------------------------------
+struct TLppSetupData
+{
+   char Mode;
+   int StartAngle;
+   int StepAngle;
+   int StepCount;
 };
 
 //-----------------------------------------------------------------------------
@@ -203,11 +212,13 @@ class TLpp {
       bool ReadSensors(int Count = 8);
 
       bool IsRunning();
+
+      void Dump();
       void PrintStatus();
       void PrintArray();
       void PrintSensors();
 
-      void ReadPrintSensorCfg(int Nr);
+      TLppSetupData ReadPrintSensorCfg(int Nr, bool Silent = false);
 
       int I2cDebug; // for non-robotlib Arduino only
   private:
@@ -460,24 +471,64 @@ void TLpp::PrintSensors()
    }
 
 //-----------------------------------------------------------------------------
+// TLpp::Dump -
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void TLpp::Dump()
+   {
+      PrintStatus();
+      PrintArray();
+      PrintSensors();
+   }
+
+//-----------------------------------------------------------------------------
 // TLpp::ReadPrintSensorCfg -
 //-----------------------------------------------------------------------------
+//
+// Note: this (pretty raw) data is closely related to the Lpp firmware and is
+//       likely to vary on different versions of the firmware.
+//
+// Nr:
+//      -1  Array
+//    0..7  Sensor
+//
+// Mode is the starting point.
+//    0  not configured (or not read)
+//    3  normal virtual sensor
+//    4  can sensor
 //-----------------------------------------------------------------------------
-void TLpp::ReadPrintSensorCfg(int Nr)
+TLppSetupData TLpp::ReadPrintSensorCfg(int Nr, bool Silent)
    {  char TxBuffer[1];
       char RxBuffer[6];
 
+      TLppSetupData R;
+      R.Mode = 0; // default = not configured
+
       if ((Nr < -1) || (Nr > 7)) {
          printf("Error: sensor # out of range (%d), 0..7 for sensors, -1 for array.\n", Nr);
-         return;
+         return R;
       }
 
+      Nr++; // map -1 (array) to base (R_A_MODE) and 0..7 to virtual sensors (1..8 offset)
       TxBuffer[0] = R_A_MODE + Nr * 8;
-      I2cSendReceive(LPP_I2C_ADDRESS, 1, 6, (lpp_tx_buffer *)TxBuffer, (lpp_rx_buffer *)RxBuffer);
+      bool ret = I2cSendReceive(LPP_I2C_ADDRESS, 1, 6, (lpp_tx_buffer *)TxBuffer, (lpp_rx_buffer *)RxBuffer);
+      if (ret == false) {
+         printf("ReadPrintSensorCfg: i2c error");
+         return R;
+      }
 
-      short TmpStart = (((int)RxBuffer[2]) << 8) + RxBuffer[3];
-      printf("Sensor %d, Mode: %d, Count: %d, Start: %d, Step: %d\n",
-         Nr, RxBuffer[0], RxBuffer[1], TmpStart, (((int)RxBuffer[4]) << 8) + RxBuffer[5]);
+      R.Mode         = RxBuffer[0];
+      R.StepCount    = RxBuffer[1];
+      R.StartAngle   = (((int)RxBuffer[2]) << 8) + RxBuffer[3];
+      R.StepAngle    = (((int)RxBuffer[4]) << 8) + RxBuffer[5];
+
+      if (R.StartAngle>32767) R.StartAngle -= 65536;
+
+      if (!Silent) {
+         printf("Sensor %d, Mode: %d, Count: %d, Start: %d, Step: %d\n",
+            Nr, R.Mode, R.StepCount, R.StartAngle, R.StepAngle);
+      }
+      return R;
    }
 
 //-----------------------------------------------------------------------------
