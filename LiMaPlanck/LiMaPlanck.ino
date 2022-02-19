@@ -22,6 +22,9 @@ TFlags         Flags(32);
 Servo myservo;  // create servo object to control a servo
 
 TApa102 Leds(60, PB12, PB13);
+const int LEDRING_OFFSET      = 180;   // change to set 1 and -1 degrees at proper led
+const int LEDRING_CLOCKWISE   = false; // change to set -90 and 90 degrees at the proper led
+#include "Libs/LedRingLpp.h"
 
 //---------------------------------------------------------------------------------------
 // RC5 stuff start
@@ -133,6 +136,7 @@ void loop() {
       NextMainTakt = ms + MAIN_TAKT_INTERVAL;  // zet tijd voor volgende interval
       // hier de periodieke acties voor deze interval
       ReadLpp();
+      ShowLppSensor(6);
       Position.Takt();  // Lees & verwerk encoder data
       ProgrammaTakt();  // Voer (stapje van) geselecteerde programma uit
       Driver.Takt();    // stuur motoren aan
@@ -204,26 +208,7 @@ void BlinkTakt()
    Count ++;
 }
 
-//-----------------------------------------------------------------------------
-// Degrees2RingIndex -
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-int Degrees2RingIndex(int Degrees)
-{
-   // Settings
-   const int NrLeds = Leds.NrLeds();
-   const int DegreesOffset = 180;    // change to set 1 and -1 degrees at proper led
-   const int Clockwise = false;      // change to set -90 and 90 degrees at the proper led
 
-   // Calculation
-   int Index = ((Degrees + DegreesOffset) * NrLeds) / 360;
-   if (Clockwise) Index *= -1;
-
-   while (Index < 0)       Index += NrLeds;
-   while (Index >= NrLeds) Index -= NrLeds;
-
-   return Index;
-}
 
 //-----------------------------------------------------------------------------
 // Execute - execute commando
@@ -279,66 +264,6 @@ void Execute(int Param[])
 
    if (Command.Match("LedsRingH",      2)) { Leds.HSV(Degrees2RingIndex(Param[0]), Param[1]);                      Leds.Commit(); }
 
-}
+   if (Command.Match("ShowLppSensor",  1)) { ShowLppSensor(Param[0]); }
 
-void LedEyes(int Center, int Kleur)
-{   TColor CHi, CLo;
-
-      if (Kleur == 0) {
-         CHi = CRGB_BLUE;
-         CLo = TColor(0, 128/16, 255/16);
-      }
-
-      if (Kleur == 1) {
-         CHi = CRGB_RED;
-         CLo = TColor(255/16, 0, 0);
-      }
-
-      Leds.Clear();
-      Leds.Brightness = 8;
-      Leds.RGB(Center - 4, CLo);
-      Leds.RGB(Center - 3, CHi);
-      Leds.RGB(Center - 2, CLo);
-
-      Leds.RGB(Center + 2, CLo);
-      Leds.RGB(Center + 3, CHi);
-      Leds.RGB(Center + 4, CLo);
-      Leds.Commit();
-}
-
-void LedTakt()
-{  static int State;
-   static int Center;
-   static int SpeedCounter;
-
-   if (SpeedCounter > 0) {
-      SpeedCounter --;
-      return;
-   }
-   SpeedCounter = 1;
-
-   switch (State) {
-      case 0 : {
-         Leds.Clear();
-         Leds.Brightness = 8;
-         Leds.Commit();
-         Center = 20;
-         State = 10;
-      }
-      break;
-
-      case 10 : {
-         LedEyes(Center, 1);
-         Center ++;
-         if (Center > 40) State += 10;
-      }
-      break;
-
-      case 20 : {
-         LedEyes(Center, 1);
-         Center --;
-         if (Center < 20) State = 10;
-      }
-      break;
-   }
 }
