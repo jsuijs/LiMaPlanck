@@ -108,8 +108,8 @@ void ShowLppSensor(int Nr)
 {
    TLppSetupData R = Lpp.ReadPrintSensorCfg(Nr, true);
 
-   printf("Mode: %d, Count: %d, Start: %d, Step: %d, Act: %d, %d\n",
-         R.Mode, R.StepCount, R.StartAngle, R.StepAngle, Lpp.Sensor[Nr].Degrees32 / 32, Lpp.Sensor[Nr].Distance);
+//   printf("Mode: %d, Count: %d, Start: %d, Step: %d, Act: %d, %d\n",
+//         R.Mode, R.StepCount, R.StartAngle, R.StepAngle, Lpp.Sensor[Nr].Degrees32 / 32, Lpp.Sensor[Nr].Distance);
 
    Leds.Clear();
 
