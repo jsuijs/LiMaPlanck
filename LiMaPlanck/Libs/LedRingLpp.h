@@ -33,17 +33,12 @@ int Degrees2RingIndex(int Degrees)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void LedEyes(int Center, int InColor)
-{   TColor CHi, CLo;
+{   TColor CHi;
 
-      if (InColor == 0) {
-         CHi = CRGB_BLUE;
-         CLo = TColor(0, 128/16, 255/16);
-      }
-
-      if (InColor == 1) {
-         CHi = CRGB_RED;
-         CLo = TColor(255/16, 0, 0);
-      }
+      if (InColor == 0) CHi = CRGB_BLUE;
+      if (InColor == 1) CHi = CRGB_RED;
+      TColor CLo = CHi;
+      CLo.Dim(16);
 
       Leds.Clear();
       Leds.Brightness = 8;
@@ -106,22 +101,29 @@ return;
 //-----------------------------------------------------------------------------
 void ShowLppSensor(int Nr)
 {
+
+   if ((Nr < -1) || (Nr > 7)) return;
+
    TLppSetupData R = Lpp.ReadPrintSensorCfg(Nr, true);
 
 //   printf("Mode: %d, Count: %d, Start: %d, Step: %d, Act: %d, %d\n",
 //         R.Mode, R.StepCount, R.StartAngle, R.StepAngle, Lpp.Sensor[Nr].Degrees32 / 32, Lpp.Sensor[Nr].Distance);
 
    Leds.Clear();
+   Leds.Brightness = 8;
 
    // Mark sensor-range blue
-   Leds.Brightness = 8;
+   TColor C = CRGB_BLUE;
+   C.Dim(16);
    for (int i=R.StartAngle; i<(R.StartAngle + R.StepAngle); i++) {
-      Leds.HSV(Degrees2RingIndex(i), 150);   // blauw
+      Leds.RGB(Degrees2RingIndex(i), C);
    }
 
    // mark sensor detection heading (based on cached reading)
+   C = CRGB_RED;
+   C.Dim(16);
    if (Lpp.Sensor[Nr].Distance < 9999) {
-      Leds.HSV(Degrees2RingIndex(Lpp.Sensor[Nr].Degrees32 / 32), 0);   // rood
+      Leds.RGB(Degrees2RingIndex(Lpp.Sensor[Nr].Degrees32 / 32), C);
    }
 
    Leds.Commit();

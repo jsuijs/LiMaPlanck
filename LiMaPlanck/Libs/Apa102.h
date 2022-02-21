@@ -18,6 +18,7 @@ public:
    TColor(uint8_t Red, uint8_t Green, uint8_t Blue) :
       Dummy(0), R(Red), G(Green), B(Blue)  {};
 
+   void Dim(int Divisor);
    void RGB(uint8_t Red, uint8_t Green, uint8_t Blue);
    void HSV(uint8_t Hue, uint8_t Saturation=255, uint8_t Value=255);
 
@@ -47,7 +48,7 @@ public:
    TColorLed(int NrLeds);
    virtual void Commit() = 0;
 
-   void RGB(int Nr, TColor RGB);
+   void RGB(int Nr, const TColor RGB);
    void RGB(int Nr, uint8_t Red, uint8_t Green, uint8_t Blue);
    void HSV(int Nr, uint8_t Hue, uint8_t Saturation=255, uint8_t Value=255);
 
@@ -129,7 +130,7 @@ void TColorLed::RGB(int Nr, uint8_t R, uint8_t G, uint8_t B)
 // TColorLed::RGB - set LED[Nr] to RGB
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void TColorLed::RGB(int Nr, TColor RGB)
+void TColorLed::RGB(int Nr, const TColor RGB)
    {
       if ((Nr < 0) || (Nr >= _NrLeds)) return;
       Leds[Nr] = RGB;
@@ -175,6 +176,18 @@ void TColor::RGB(uint8_t Red, uint8_t Green, uint8_t Blue)
       R = Red;
       G = Green;
       B = Blue;
+   }
+
+//-----------------------------------------------------------------------------
+// TColor::Dim - Reduce color intensity of RGB values
+//-----------------------------------------------------------------------------
+// Note: see also 'brightness' setting in ColorLed class.
+//-----------------------------------------------------------------------------
+void TColor::Dim(int Divisor)
+   {
+      R /= Divisor;
+      G /= Divisor;
+      B /= Divisor;
    }
 
 //-----------------------------------------------------------------------------
