@@ -70,24 +70,55 @@ const float ROTATE_D_GAIN     =  0.05;
    //
    // Define RC5-codes of (amongst others) function-keys
    //
-   const int RC_STOP      = 0x3775; // STOP robot - stop button (Function-key -1)
+   const int RC_STOP       = 0x3775; // STOP robot - stop button (Function-key -1)
 
-   const int RC_F01       = 0x3770; // mark
-   const int RC_F02       = 0x2745; // audio
-   const int RC_F03       = 0x2741; // title menu
-   const int RC_F04       = 0x2749; // sub title
-   const int RC_F05       = 0x2744; // input
-   const int RC_F06       = 0x2740; // tv
-   const int RC_F07       = 0x2746; // hdd
-   const int RC_F08       = 0x274a; // on line
-   const int RC_F09       = 0x3769; // zoom
-   const int RC_F10       = 0x274c; // - volume
-   const int RC_F11       = 0x3751; // + volume
-   const int RC_F12       = 0x3750; // store
+   const int RC_F01        = 0x3770; // mark
+   const int RC_F02        = 0x2745; // audio
+   const int RC_F03        = 0x2741; // title menu
+   const int RC_F04        = 0x2749; // sub title
+   const int RC_F05        = 0x2744; // input
+   const int RC_F06        = 0x2740; // tv
+   const int RC_F07        = 0x2746; // hdd
+   const int RC_F08        = 0x274a; // on line
+   const int RC_F09        = 0x3769; // zoom
+   const int RC_F10        = 0x274c; // - volume
+   const int RC_F11        = 0x3751; // + volume
+   const int RC_F12        = 0x3750; // store
+
+   const int LPP_OFFSET    = -3;
+   const int LPP_REVERSE   = 1;
 
    const int SERVO_CLOSE   = 2200;
    const int SERVO_OPEN    =  550;
 #endif // ROBOT_JOEP
+
+
+//=============kk===============================
+#ifdef ROBOT_KAREL
+   //
+   // Define RC5-codes of (amongst others) function-keys
+   //
+   const int RC_STOP       = 0x3775; // STOP robot - stop button (Function-key -1)
+
+   const int RC_F01        = 0x3770; // mark
+   const int RC_F02        = 0x2745; // audio
+   const int RC_F03        = 0x2741; // title menu
+   const int RC_F04        = 0x2749; // sub title
+   const int RC_F05        = 0x2744; // input
+   const int RC_F06        = 0x2740; // tv
+   const int RC_F07        = 0x2746; // hdd
+   const int RC_F08        = 0x274a; // on line
+   const int RC_F09        = 0x3769; // zoom
+   const int RC_F10        = 0x274c; // - volume
+   const int RC_F11        = 0x3751; // + volume
+   const int RC_F12        = 0x3750; // store
+
+   const int LPP_OFFSET    = 180;
+   const int LPP_REVERSE   = 1;
+
+   const int SERVO_CLOSE   = 2200;
+   const int SERVO_OPEN    =  550;
+#endif // ROBOT_KAREL
 
 //=============av===============================
 #ifdef ROBOT_ALOYS
@@ -108,6 +139,9 @@ const float ROTATE_D_GAIN     =  0.05;
    const int RC_F10        = 0x300a; // DrKn << >>
    const int RC_F11        = 0x300d; // Mute = knop 13!!
    const int RC_F12        = 0x300b; // Knop CH+P/C
+
+   const int LPP_OFFSET    = 180;
+   const int LPP_REVERSE   = 1;
 
    const int SERVO_CLOSE   = 2300;
    const int SERVO_OPEN    =  550;
