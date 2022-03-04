@@ -8,8 +8,6 @@
 #include "Libs/Motors_TB6612.cpp"   // Kies je motor-sturing
 #include "Project.h"
 
-void Execute();   // prototype
-
 // global instances
 TPosition      Position;
 TDrive         Driver;
