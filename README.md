@@ -37,7 +37,7 @@ Optioneel   | Core   | Naam      | pin#   | ----   | pin#   | Naam      | Core  
  \#         | \#     | RESET     | \-     | <--->  | 18     | PB4       | RC5    | \-           |
  Linesensor | \-     | PC15      | 12     | <--->  | 17     | PB5       | \-     | Servo        |
  Linesensor | \-     | PC14      | 13     | <--->  | 16     | PB6       | \-     | TX1          |
- Linesensor | \-     | PC12      | 14     | <--->  | 15     | PB7       | \-     | RX1          |
+ Linesensor | \-     | PC13      | 14     | <--->  | 15     | PB7       | \-     | RX1          |
  \#         | \#     | VBat      | \-     | <--->  | 32     | PB8/BUT   | \-     | \-           |
  \#         | GND    | AV-       | \-     | <--->  | \-     | GND       | GND    | \#           |
  \#         | 3V3    | AV+       | \-     | <--->  | \-     | VCC       | \#     | \#           |
