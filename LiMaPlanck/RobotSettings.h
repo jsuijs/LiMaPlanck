@@ -113,7 +113,7 @@ const float ROTATE_D_GAIN     =  0.05;
    const int RC_F11        = 0x3751; // + volume
    const int RC_F12        = 0x3750; // store
 
-   const int LPP_OFFSET    = 180;
+   const int LPP_OFFSET    = -3;
    const int LPP_REVERSE   = 1;
 
    const int SERVO_CLOSE   = 2200;
@@ -139,12 +139,13 @@ const float ROTATE_D_GAIN     =  0.05;
    const int RC_F10        = 0x300a; // DrKn << >>
    const int RC_F11        = 0x300d; // Mute = knop 13!!
    const int RC_F12        = 0x300b; // Knop CH+P/C
+	 const int RC_F14        = 0x3018; // Knop Knop -A-
 
-   const int LPP_OFFSET    = 180;
+   const int LPP_OFFSET    = -4;
    const int LPP_REVERSE   = 1;
 
    const int SERVO_CLOSE   = 2300;
-   const int SERVO_OPEN    =  550;
+const int SERVO_OPEN    =  500;
 #endif // ROBOT_ALOYS
 
 #endif
