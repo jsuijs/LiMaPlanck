@@ -531,7 +531,7 @@ TLppSetupData TLpp::ReadPrintSensorCfg(int Nr, bool Silent)
 
       if (!Silent) {
          printf("Sensor %d, Mode: %d, Count: %d, Start: %d, Step: %d\n",
-            Nr, R.Mode, R.StepCount, R.StartAngle, R.StepAngle);
+            Nr-1, R.Mode, R.StepCount, R.StartAngle, R.StepAngle);
       }
       return R;
    }

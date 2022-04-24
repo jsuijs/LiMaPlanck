@@ -22,6 +22,7 @@ bool MissionLijnVolgen(TState &S);        //LijnSensor 5xBPW40
 bool MissionSlalom1(TState &S);
 bool MissionTTijdOpening1(TState &S);      // T-Tijd met opening zoeken in vak -C-
 bool MissionStartVector1(TState &S);
+bool MissionBlikken(TState &S);
 
 extern TState SubS;  // Sub-mission statemachine
 extern int DefaultDistance;
