@@ -21,8 +21,7 @@ bool MissionBlikken(TState &S) //  **
 {
    static TState MissionSubS;  // State of sub-mission   ++  StartVector
    static int BlikNummer;      // 6-Blikken ophalen
-   static int BlikPos;         // plaats berekenen
-   static int Missie;          // Rit nr 1=B en 2=C
+   static int MissieFase;          // Rit nr 1=B en 2=C
 
    S.Update(__FUNCTION__, Flags.IsSet(11));  //   ++  StartVector
 
@@ -34,8 +33,7 @@ bool MissionBlikken(TState &S) //  **
             //Lpp.Start();
             OldSensorSetupCan(2, 120, 120);  // Sensor 2, vanaf 120 graden, segment van 120 graden  **blikken**
 
-            Missie = 1;                     // is zoeken in vak -A <> B-
-            BlikPos = 580;
+            MissieFase = 1;                     // is zoeken in vak -A <> B-
             printf("Case 0-Naar-Wachttijd AV-OpStart : %d\n", S.State);
          }
 
@@ -55,8 +53,6 @@ bool MissionBlikken(TState &S) //  **
          }
 
          if (MissionStartVector1(MissionSubS)) {
-            Missie = 1;                    // is zoeken in vak -A <> B-
-            Position.Reset();
             printf("na StartVector = case 1 naar case 2 \n");
             S.State++; // Naar de volgende state als de missie klaar is.
          }
@@ -66,7 +62,7 @@ bool MissionBlikken(TState &S) //  **
  //  ==EINDE-STARTVECTOR==
       case 2 : {
          if (S.NewState) {
-            if (Missie == 1) {             // Blikken zoeken in vak A<>B
+            if (MissieFase == 1) {             // Blikken zoeken in vak A<>B
                S.State = 20;
             } else {
                S.State = 100;                 // Blikken zoeken in vak -C-
@@ -76,13 +72,9 @@ bool MissionBlikken(TState &S) //  **
       break;
 
       case 100 : {
-         if (S.NewState) {   //if (Missie == 2) // Blikken zoeken in vak -C-
-            Driver.XY(1500, 0 , 200, 0 );   // Naar midden parcour -C- rijden
-         }
+         if (S.NewState) Driver.XY(1500, 0 , 200, 0 );   // Naar midden parcour -C- rijden
 
-         if (Driver.IsDone()) {
-            S.State = 101;
-         }
+         if (Driver.IsDone()) S.State = 101;
       }
       break;
 
@@ -108,11 +100,11 @@ bool MissionBlikken(TState &S) //  **
 
       case 106 : {  // Selecteren naar vak -C- Of naar EINDE opdracht
 
-         if (Missie == 2) {
+         if (MissieFase == 2) {
              S.State = 101;       //Blikken zoeken in vak -C-
          }
 
-         if (Missie == 3) {
+         if (MissieFase == 3) {
             S.State = 107;        // Einde Opdracht Blikzoeken
          }
       }
@@ -137,13 +129,13 @@ bool MissionBlikken(TState &S) //  **
 
          if (Position.XPos >= 2800) {    // 300 3100 Einde vak -B-
             Driver.SpeedLR(0, 0);           // Motoren Stoppen
-            Missie = 2;                     // Gaan zoeken in vak -C-
+            MissieFase = 2;                     // Gaan zoeken in vak -C-
             S.State = 105;
          }
 
          if (Position.YPos >= 1600) {    // Einde vak -C-
             Driver.SpeedLR(0, 0);            // Motoren Stoppen
-            Missie = 3;                      // Klaar in vak -C-
+            MissieFase = 3;                      // Klaar in vak -C-
             S.State = 105;
          }
 
@@ -152,97 +144,81 @@ bool MissionBlikken(TState &S) //  **
 
          if (Lpp.Sensor[2].Distance < 600) {
             Driver.SpeedLR(0, 0);            // Motoren Stoppen
-            S.State = 21;
+            S.State = 300;
          }
       }
       break;
 
-      case 21 : { // BLIK GEZIEN-Draai naar blik .... graden
+      case 300 : { // BLIK GEZIEN-Draai naar blik .... graden
          if (S.NewState) {
             int BlikHoekCorrectie = Lpp.Sensor[2].Degrees32 / 32;
             if (BlikHoekCorrectie > 0) {
-               BlikHoekCorrectie = (BlikHoekCorrectie + 2);
+               BlikHoekCorrectie += 2;
             }
             else {
-               BlikHoekCorrectie = (BlikHoekCorrectie - 4);
+               BlikHoekCorrectie -= 4;
             }
             printf("HoekCor: %d\n", (BlikHoekCorrectie));
             Driver.Rotate(BlikHoekCorrectie); // Berekende graden links of rechts
          }
          if (Driver.IsDone()) {
             Driver.SpeedLR(0, 0);       // Rijden naar blik
-            S.State = 3;
+            S.State += 10;
          }
       }
       break;
 
-      case 3 : {  // Naar blik rijden
-         if (S.NewState) {
-            printf("case 3: \n");
-            Driver.SpeedLR(80, 80);     // Rijden naar blik
-         }
+      case 310 : {  // Naar blik rijden
+         if (S.NewState) Driver.SpeedLR(80, 80);
 
          if (Lpp.Sensor[2].Distance < 130) {
-            //if (LidarArray_V < 130) {
             Driver.SpeedLR(0, 0);       // Stop motoren
             printf("blik gevonden: \n");
-            S.State ++; // Naar de volgende state als de beweging klaar is
+            S.State += 10; // Naar de volgende state als de beweging klaar is
          }
       }
       break;
 
-      case 4 : {  // Grijper sluiten
-         if (S.NewState) {
-            printf("case 4: Grijper sluiten \n");
+      case 320 : {  // Grijper sluiten
+
+         if (ServoSlope(myservo, 2300, 20)) {// Wacht tot servo gesloten is, kies dan volgende stap
+
+            if (MissieFase == 1) S.State = 500;  // Blikken terug brengen uit -B-
+
+            if (MissieFase == 2) S.State += 10;  // Blikken terug brengen uit -C-
          }
-
-         if (ServoSlope(myservo, 2300, 20)) S.State = 401;
       }
       break;
 
-      case 401 : {  // Terugweg selecteren
-         if (S.NewState) {
-            printf("case 401: Naar Terugweg Selecteren \n");
-         }
+      case 330 : {  // Vanuit C naar midden parcour A<>B rijden
+         if (S.NewState) Driver.XY(1500, 0 , -200, 0 );
 
-         if (Missie == 1) S.State = 500;  // Blikken terug brengen uit -B-
-
-         if (Missie == 2) S.State = 402;  // Blikken terug brengen uit -C-
+         if (Driver.IsDone()) S.State += 10;
       }
       break;
 
-      case 402 : {  // Blikken terug brengen uit -C-
-         if (S.NewState)
-            //printf("case 402: Blikken Terug brengen uit -C- \n");
+      case 340 : {  // Draaien voor achterwaards terug naar -A- vak
+         if (S.NewState) Driver.RotateHeading(0);
 
-            Driver.XY(1500, 0 , -200, 0 );   // Naar midden parcour A<>B rijden
-
-         if (Driver.IsDone()) S.State =403;
+         if (Driver.IsDone()) S.State = 500;
       }
       break;
 
-      case 403 : {  // Pos.1500.0 > 180 gr draaien voor terug naar -A- vak
-         if (S.NewState) Driver.Rotate(-90);
+      // --------------------------------
+      // Rij terug naar A en zet blik weg
+      // --------------------------------
 
-         if (Driver.IsDone()) S.State =500;
-      }
-      break;
-
-      // ----------------------------
-      // Drive back to A and drop can
-      // ----------------------------
-
-      case 500 : {   // Drive to can-drop position (from A-B area)
+      case 500 : {   // Rij naar blik-afzet positie (vanuit gebied A-B)
          if (S.NewState) {
 
             int X = 0, Y = 0;
-            switch (BlikNummer) {                   // (BlikNummer)
-               case 0 : X = -50; Y = 440; break;     // 470 Blikken in -A- vorm
-               case 1 : X = -50; Y = 10; break;      // 50 70
-               case 2 : X = 100; Y = 360; break;     // 400 90-400
-               case 3 : X = 100; Y = 210; break;     // 250 90-270
-               case 4 : X = 300; Y = 210; break;     // 250 230-270
-               case 5 : X = 100; Y = 60; break;     // 100 90-140
+            switch (BlikNummer) {                  // (BlikNummer)
+               case 0 : X = -50; Y = 440; break;   // 470 Blikken in -A- vorm
+               case 1 : X = -50; Y =  10; break;   // 50 70
+               case 2 : X = 100; Y = 360; break;   // 400 90-400
+               case 3 : X = 100; Y = 210; break;   // 250 90-270
+               case 4 : X = 300; Y = 210; break;   // 250 230-270
+               case 5 : X = 100; Y =  60; break;   // 100 90-140
             }
             Driver.XY(X, Y, -200, 0);       // X, Y, Speed, EndSpeed - alles in mm(/sec)
          }
@@ -271,10 +247,7 @@ bool MissionBlikken(TState &S) //  **
       break;
 
       case 540 : {   // Rijden naar 0.0 voor volgende sessie
-         if (S.NewState) {
-            printf("case 9:Naar 0.0 pos. \n");
-            Driver.XY(150, 0 , 150, 0 );  //terug naar startpunt + 150
-         }
+         if (S.NewState) Driver.XY(150, 0 , 150, 0 );  //terug naar startpunt + 150
 
          if (Driver.IsDone()) S.State += 10;
       }
@@ -283,7 +256,7 @@ bool MissionBlikken(TState &S) //  **
       case 550 : {   // Pos.0.0 > 90 gr draaien naar rijrichting
          if (S.NewState) {
             BlikNummer ++;
-            printf("Case 10 Missie %d, BlikNummer: %d\n", Missie,  BlikNummer);
+            printf("Case 10 Missie %d, BlikNummer: %d\n", MissieFase,  BlikNummer);
             Driver.RotateHeading(0);      // Draaien naar rijrichting
          }
 
@@ -300,7 +273,7 @@ bool MissionBlikken(TState &S) //  **
 
       case 560 : {  // Einde blikzoeken
          if (S.NewState) {
-            printf("Case 12 Missie: %d, Blik NR: %d\n", Missie, BlikNummer);
+            printf("Case 12 Missie: %d, Blik NR: %d\n", MissieFase, BlikNummer);
             Driver.XY(150, 0 , -100, 0 ); //terug naar startpunt + 100
          }
 
