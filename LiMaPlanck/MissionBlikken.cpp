@@ -5,14 +5,6 @@
 #include "Libs/MyRobot.h"
 #include "Project.h"
 
-static bool OldSensorSetupCan(int Nr, int StartAngle, int StepAngle)
-{
-   int NewStartAngle = 180 - (StartAngle + StepAngle);
-   printf("OldSensorSetupCan %d [%d -> %d] %d\n",
-      Nr, StartAngle, NewStartAngle, StepAngle);
-   return Lpp.SensorSetupCan(Nr, NewStartAngle, StepAngle);
-}
-
 //-----------------------------------------------------------------------------
 // MissionBlikken -
 //-----------------------------------------------------------------------------
@@ -27,116 +19,70 @@ bool MissionBlikken(TState &S) //  **
 
    switch (S.State) {
 
-      case 0 : {  // LIDAR-STARTEN = "Mission AV1 Blikken Ophalen
+      case 0 : {     // LIDAR-STARTEN = "Mission AV1 Blikken Ophalen
          if (S.NewState) {
             Position.Reset();
-            //Lpp.Start();
-            OldSensorSetupCan(2, 120, 120);  // Sensor 2, vanaf 120 graden, segment van 120 graden  **blikken**
+            //OldSensorSetupCan(2, 120, 120);  // Sensor 2, vanaf 120 graden, segment van 120 graden  **blikken**
+            Lpp.SensorSetupCan(2, -60, 120);  // Sensor 2, vanaf 120 graden, segment van 120 graden  **blikken**
 
             MissieFase = 1;                     // is zoeken in vak -A <> B-
             printf("Case 0-Naar-Wachttijd AV-OpStart : %d\n", S.State);
          }
 
-         if (S.StateTime() > 1000) {      // Wacht op start lidar
-            printf("Na-Wachttijd naar case1 AV-VectorOpStart : %d\n", S.State);
-            if (ServoSlope(myservo, 550, 20)) S.State = 1;//++; //grijper open
-         }
+         ServoSlope(myservo, 550, 20); //grijper open
+
+         if (S.StateTime() > 1000) S.State += 10;
       }
       break;
 
- //  ==STARTVECTOR==
+      //  ==STARTVECTOR==
+      case 10 : {    // MissionStartVector1 uitvoeren
+         if (S.NewState) MissionSubS.Reset();    // geef aan dat we (opnieuw) starten
 
-      case 1 : {  // MissionStartVector1 uitvoeren
-         if (S.NewState) {
-            printf("case 1 Starten van MissionSubs \n");
-            MissionSubS.Reset();    // geef aan dat we opnieuw starten
-         }
-
-         if (MissionStartVector1(MissionSubS)) {
-            printf("na StartVector = case 1 naar case 2 \n");
-            S.State++; // Naar de volgende state als de missie klaar is.
-         }
+         if (MissionStartVector1(MissionSubS)) S.State = 100;
       }
       break;
 
- //  ==EINDE-STARTVECTOR==
-      case 2 : {
+      case 100 : {   // Voorbereiden (her)start blikzoeken
          if (S.NewState) {
             if (MissieFase == 1) {             // Blikken zoeken in vak A<>B
-               S.State = 20;
+               S.State = 200;
             } else {
-               S.State = 100;                 // Blikken zoeken in vak -C-
+               S.State += 10;                 // Blikken zoeken in vak -C-
             }
          }
       }
       break;
 
-      case 100 : {
-         if (S.NewState) Driver.XY(1500, 0 , 200, 0 );   // Naar midden parcour -C- rijden
+      case 110 : {   // Naar midden parcour -C- rijden
+         if (S.NewState) Driver.XY(1500, 0 , 200, 0 );
 
-         if (Driver.IsDone()) S.State = 101;
+         if (Driver.IsDone()) S.State += 10;
       }
       break;
 
-      case 101 : {  // Pos.1500.0 > 90 gr draaien naar -C- vak
+      case 120 : {   // Pos.1500.0 > 90 gr draaien naar -C- vak
          if (S.NewState) Driver.RotateHeading(90);
 
          if (Driver.IsDone()) {
-            S.State = 20;
+            S.State = 200;
          }
       }
       break;
 
-      case 105 : {  // Achteruit Rijden naar 1500.0 voor zoeken in vak -C- Of EINDE opdracht
-         if (S.NewState) {
-            //printf("case 105:Naar 1500.0 pos. \n");
-
-            Driver.XY(1500, 0 , -200, 0 );   // Naar midden parcour A<>B rijden
-         }
-
-         if (Driver.IsDone()) S.State =106;
-      }
-      break;
-
-      case 106 : {  // Selecteren naar vak -C- Of naar EINDE opdracht
-
-         if (MissieFase == 2) {
-             S.State = 101;       //Blikken zoeken in vak -C-
-         }
-
-         if (MissieFase == 3) {
-            S.State = 107;        // Einde Opdracht Blikzoeken
-         }
-      }
-      break;
-
-      case 107 : {  // = EINDE OPDRACHT BLIKKEN Achteruit Rijden naar 0.0
-         if (S.NewState) {
-            //printf("case 107:Naar 0.0 pos. Einde opdracht \n");
-
-            Driver.XY(0, -150 , -200, 0 );   // Naar midden parcour A<>B rijden
-         }
-
-         if (Driver.IsDone()) return S.Done(__FUNCTION__);   // Klaar!!!
-      }
-      break;
-
-      case 20 : { // Blikken zoeken
-         if (S.NewState) {
-            printf("case 20: Naar blikken zoeken \n");
-            Driver.SpeedLR(140, 140);   // default rechtuit
-         }
+      case 200 : {   // Blikken zoeken
+         if (S.NewState) Driver.SpeedLR(140, 140);   // default rechtuit
 
          if (Position.XPos >= 2800) {    // 300 3100 Einde vak -B-
             Driver.SpeedLR(0, 0);           // Motoren Stoppen
             MissieFase = 2;                     // Gaan zoeken in vak -C-
-            S.State = 105;
+            S.State = 300;
          }
 
          if (Position.YPos >= 1600) {    // Einde vak -C-
             Driver.SpeedLR(0, 0);            // Motoren Stoppen
             MissieFase = 3;                      // Klaar in vak -C-
-            S.State = 105;
+            S.State = 300;
          }
 
          printf("Lidar S2 Distance %d, Degrees: %d\n",
@@ -144,12 +90,12 @@ bool MissionBlikken(TState &S) //  **
 
          if (Lpp.Sensor[2].Distance < 600) {
             Driver.SpeedLR(0, 0);            // Motoren Stoppen
-            S.State = 300;
+            S.State += 10;
          }
       }
       break;
 
-      case 300 : { // BLIK GEZIEN-Draai naar blik .... graden
+      case 210 : {   // BLIK GEZIEN-Draai naar blik .... graden
          if (S.NewState) {
             int BlikHoekCorrectie = Lpp.Sensor[2].Degrees32 / 32;
             if (BlikHoekCorrectie > 0) {
@@ -168,7 +114,7 @@ bool MissionBlikken(TState &S) //  **
       }
       break;
 
-      case 310 : {  // Naar blik rijden
+      case 220 : {   // Naar blik rijden
          if (S.NewState) Driver.SpeedLR(80, 80);
 
          if (Lpp.Sensor[2].Distance < 130) {
@@ -179,7 +125,7 @@ bool MissionBlikken(TState &S) //  **
       }
       break;
 
-      case 320 : {  // Grijper sluiten
+      case 230 : {   // Grijper sluiten
 
          if (ServoSlope(myservo, 2300, 20)) {// Wacht tot servo gesloten is, kies dan volgende stap
 
@@ -190,17 +136,36 @@ bool MissionBlikken(TState &S) //  **
       }
       break;
 
-      case 330 : {  // Vanuit C naar midden parcour A<>B rijden
+      case 240 : {   // Vanuit C naar midden parcour A<>B rijden
          if (S.NewState) Driver.XY(1500, 0 , -200, 0 );
 
          if (Driver.IsDone()) S.State += 10;
       }
       break;
 
-      case 340 : {  // Draaien voor achterwaards terug naar -A- vak
+      case 250 : {   // Draaien voor achterwaards terug naar -A- vak
          if (S.NewState) Driver.RotateHeading(0);
 
          if (Driver.IsDone()) S.State = 500;
+      }
+      break;
+
+      case 300 : {   // Achteruit rijden naar 1500.0 voor zoeken in vak -C- Of EINDE opdracht
+         if (S.NewState) Driver.XY(1500, 0 , -200, 0 );   // Naar midden parcour A<>B rijden
+
+         if (Driver.IsDone()) {
+
+            if (MissieFase == 2) S.State = 120;       //Blikken zoeken in vak -C-
+
+            if (MissieFase == 3) S.State += 10;        // Einde Opdracht Blikzoeken
+         }
+      }
+      break;
+
+      case 310 : {   // = EINDE OPDRACHT BLIKKEN Achteruit Rijden naar 0.0
+         if (S.NewState) Driver.XY(0, -150 , -200, 0 );   // Naar midden parcour A<>B rijden
+
+         if (Driver.IsDone()) return S.Done(__FUNCTION__);   // Klaar!!!
       }
       break;
 
@@ -265,7 +230,7 @@ bool MissionBlikken(TState &S) //  **
                S.State += 10;
             }
             else {
-               S.State = 2;
+               S.State = 100;
             }
          }
       }
@@ -285,4 +250,3 @@ bool MissionBlikken(TState &S) //  **
    }
    return false;  // mission nog niet gereed
 }
-
