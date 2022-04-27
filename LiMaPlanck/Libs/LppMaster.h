@@ -131,13 +131,13 @@ struct TLppSensorData
 {
    lpp_int Distance;    // mm
    lpp_int Degrees32;   // degrees * 32
-};
+} __attribute__((packed));
 
 //-----------------------------------------------------------------------------
 struct TLppArrayData
 {
    lpp_int Distance;    // mm
-};
+} __attribute__((packed));
 
 //-----------------------------------------------------------------------------
 struct TLppStatusData
@@ -160,7 +160,7 @@ struct TLppStatusData
    char  CanEdge;       // 17 - min edge size (delta between two samples, in mm) for CAN start/end
    char  CanMin;        // 18 - min angle of can (units tbd)
    char  CanMax;        // 19 - max angle of can (units tbd)
-};
+} __attribute__((packed));
 
 //-----------------------------------------------------------------------------
 struct TLppSetupData
@@ -169,7 +169,7 @@ struct TLppSetupData
    int StartAngle;
    int StepAngle;
    int StepCount;
-};
+} __attribute__((packed));
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -213,7 +213,7 @@ class TLpp {
 
       bool IsRunning();
 
-      void Dump();
+      void Dump(bool IncludeCfg=false);
       void PrintStatus();
       void PrintArray();
       void PrintSensors();
@@ -388,7 +388,7 @@ bool TLpp::ReadStatus()
       TxBuffer[0] = R_ID;
       bool r = I2cSendReceive(LPP_I2C_ADDRESS, 1, sizeof(Status), (lpp_tx_buffer *)TxBuffer, (lpp_rx_buffer *)&Status);
 
-      // swap bytes of short.
+      // swap bytes of shorts.
       unsigned int t;
       t = Status.SampleRate;
       Status.SampleRate  = ((t & 0xFF) << 8) |  ((t >> 8) & 0xFF);
@@ -474,8 +474,13 @@ void TLpp::PrintSensors()
 // TLpp::Dump -
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void TLpp::Dump()
+void TLpp::Dump(bool IncludeCfg)
    {
+      if(IncludeCfg) {
+         for (int i=0; i<SensorCount; i++) {
+            ReadPrintSensorCfg(i);
+         }
+      }
       PrintStatus();
       PrintArray();
       PrintSensors();
@@ -526,7 +531,7 @@ TLppSetupData TLpp::ReadPrintSensorCfg(int Nr, bool Silent)
 
       if (!Silent) {
          printf("Sensor %d, Mode: %d, Count: %d, Start: %d, Step: %d\n",
-            Nr, R.Mode, R.StepCount, R.StartAngle, R.StepAngle);
+            Nr-1, R.Mode, R.StepCount, R.StartAngle, R.StepAngle);
       }
       return R;
    }

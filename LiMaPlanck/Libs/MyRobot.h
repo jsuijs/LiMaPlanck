@@ -129,7 +129,8 @@ class TState
       TState();
       void Reset();
 
-      void Update(const char *InName, bool Verbose=true);
+      void Update(const char *FName, bool Verbose=true);
+      bool Done(const char *FName);
       bool InvalidState(const char *FName);
       int StateTime();
 

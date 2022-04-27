@@ -76,7 +76,7 @@ void ProgrammaTakt()
       break;
 
       case 8 : { // Programma: MissieBlikken
-//         if (MissieBlikken(MissonS)) Program.State = 0;
+         if (MissionBlikken(MissonS)) Program.State = 0;
       }
       break;
 
