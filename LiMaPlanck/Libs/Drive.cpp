@@ -245,29 +245,6 @@ void TDrive::XY(int X, int Y, int Speed, int EndSpeed)
    }
 
 //-----------------------------------------------------------------------------
-// RotateHeading - draai naar absolute heading (graden).
-//-----------------------------------------------------------------------------
-// Draai de stilstaande robot naar opgegeven richting.
-// - 'Heading' is de absolute hoek, in graden.
-//
-// Gebruikte constantes: ROTATE_P_GAIN, ROTATE_D_GAIN, ROTATE_CLIP
-//
-// Updatable:  No
-// Indefinite: No
-//-----------------------------------------------------------------------------
-void TDrive::RotateHeading(int Heading, int RotateClip)
-   {
-      if (Flags.IsSet(1)) printf("Drive.RotateHeading\n");
-
-      NewMovement = true;
-      IsDoneFlag = false;
-
-      DriveMode = M_ROTATE;
-      Param1 = NormHoek(Heading - Position.Hoek, 360); // Aantal te draaien graden (relatief).
-      Param2 = RotateClip; // Draaisnelheid (degrees * 16 / tick)
-   }
-
-//-----------------------------------------------------------------------------
 // Rotate - draai graden (relatief).
 //-----------------------------------------------------------------------------
 // Draai de stilstaande robot naar opgegeven richting.
@@ -281,7 +258,7 @@ void TDrive::RotateHeading(int Heading, int RotateClip)
 //-----------------------------------------------------------------------------
 void TDrive::Rotate(int Degrees, int RotateClip)
    {
-      if (Flags.IsSet(1)) printf("Drive.Rotate\n");
+      if (Flags.IsSet(1)) printf("Drive.Rotate Degrees: %d, Clip: %d\n", Degrees, RotateClip);
 
       NewMovement = true;
       IsDoneFlag = false;
@@ -289,6 +266,54 @@ void TDrive::Rotate(int Degrees, int RotateClip)
       DriveMode = M_ROTATE;
       Param1 = Degrees;    // Aantal te draaien graden (relatief).
       Param2 = RotateClip; // Draaisnelheid (degrees * 16 / tick)
+   }
+
+//-----------------------------------------------------------------------------
+// RotateHeading - draai naar absolute heading (graden).
+//-----------------------------------------------------------------------------
+// Draai de stilstaande robot naar opgegeven richting.
+// - 'Heading' is de absolute hoek, in graden.
+//
+// Gebruikte constantes: ROTATE_P_GAIN, ROTATE_D_GAIN, ROTATE_CLIP
+//
+// Updatable:  No
+// Indefinite: No
+//-----------------------------------------------------------------------------
+void TDrive::RotateHeading(int Heading, int RotateClip)
+   {
+      if (Flags.IsSet(1)) printf("Drive.RotateHeading Heading: %d, Clip: %d\n", Heading, RotateClip);
+
+      NewMovement = true;
+      IsDoneFlag = false;
+
+      DriveMode = M_ROTATE;
+      Param1 = NormHoek(Heading - Position.Hoek, 360); // Aantal te draaien graden (relatief).
+      Param2 = RotateClip; // Draaisnelheid (degrees * 16 / tick)
+   }
+
+//-----------------------------------------------------------------------------
+// RotatePoint - draai naar punt (X,Y).
+//-----------------------------------------------------------------------------
+// Draai de stilstaande robot naar opgegeven punt.
+//
+// Gebruikte constantes: ROTATE_P_GAIN, ROTATE_D_GAIN, ROTATE_CLIP
+//
+// Updatable:  No
+// Indefinite: No
+//-----------------------------------------------------------------------------
+void TDrive::RotatePoint(int TargetX, int TargetY, int RotateClip)
+   {
+      if (Flags.IsSet(1)) printf("Drive.RotatePoint X:%d, Y: %d, Clip: %d\n", TargetX, TargetY, RotateClip);
+
+      // Reken Heading uit van huidige positie naar opgegeven punt.
+      long TargetHeading;
+      int  TargetDistance;
+
+      Cartesian2Polar(TargetHeading, TargetDistance, TargetX - Position.XPos, TargetY - Position.YPos);
+      if (Flags.IsSet(6)) printf ("RotatePoint TargetVector %d mm, %d graden (%d %d %d %d))\n", TargetDistance, (int)(TargetHeading/256),
+            TargetX, Position.XPos, TargetY, Position.YPos);
+
+      RotateHeading(TargetHeading / 256, RotateClip);
    }
 
 //-----------------------------------------------------------------------------
@@ -308,48 +333,50 @@ void TDrive::Stop()
    }
 
 //-----------------------------------------------------------------------------
-// ArcHeading - Rij boog naar heading (graden).
-//-----------------------------------------------------------------------------
-// Rij een boog tot de opgegeven richting.
-// - 'Heading' is de absolute hoek, in graden.
-// - Radius is straal van de draaicircel in mm
-//
-// Updatable:  No
-// Indefinite: No
-//-----------------------------------------------------------------------------
-void TDrive::ArcHeading(int Heading, int Radius, int Speed, int EndSpeed)
-   {
-      if (Flags.IsSet(1)) printf("Drive.Arc\n");
-
-      NewMovement = true;
-      IsDoneFlag = false;
-
-      DriveMode = M_ARC;
-      Param1 = NormHoek(Heading - Position.Hoek, 360);   // DeltaDegrees
-      Param2 = Radius;
-      Param3 = Speed;
-      Param4 = EndSpeed;
-   }
-
-//-----------------------------------------------------------------------------
 // Arc - Rij boog van Degrees (graden).
 //-----------------------------------------------------------------------------
 // Rij een boog tot de opgegeven richting.
 // - 'Degrees' is de relatieve hoek, in graden.
-// - Radius is straal van de draaicircel in mm
+// - Radius is straal van de draaicirkel in mm
 //
 // Updatable:  No
 // Indefinite: No
 //-----------------------------------------------------------------------------
 void TDrive::Arc(int Degrees, int Radius, int Speed, int EndSpeed)
    {
-      if (Flags.IsSet(1)) printf("Drive.ArcRel\n");
+      if (Flags.IsSet(1)) printf("Drive.Arc Degrees: %d, Radius: %d, Speed: %d, EndSpeed: %d\n",
+            Degrees, Radius, Speed, EndSpeed);
 
       NewMovement = true;
       IsDoneFlag = false;
 
       DriveMode = M_ARC;
       Param1 = Degrees;
+      Param2 = Radius;
+      Param3 = Speed;
+      Param4 = EndSpeed;
+   }
+
+//-----------------------------------------------------------------------------
+// ArcHeading - Rij boog naar heading (graden).
+//-----------------------------------------------------------------------------
+// Rij een boog tot de opgegeven richting.
+// - 'Heading' is de absolute hoek, in graden.
+// - Radius is straal van de draaicirkel in mm
+//
+// Updatable:  No
+// Indefinite: No
+//-----------------------------------------------------------------------------
+void TDrive::ArcHeading(int Heading, int Radius, int Speed, int EndSpeed)
+   {
+      if (Flags.IsSet(1)) printf("Drive.ArcHeading Heading: %d, Radius: %d, Speed: %d, EndSpeed: %d\n",
+            Heading, Radius, Speed, EndSpeed);
+
+      NewMovement = true;
+      IsDoneFlag = false;
+
+      DriveMode = M_ARC;
+      Param1 = NormHoek(Heading - Position.Hoek, 360);   // DeltaDegrees
       Param2 = Radius;
       Param3 = Speed;
       Param4 = EndSpeed;
@@ -534,7 +561,7 @@ bool TDrive::XYTakt(bool FirstCall, int TargetX, int TargetY, int Speed, int End
       }
 
       // doel bepalen (steeds opnieuw).
-      // hoek & afstand bepalen, resultaat in graden*256 (360/circel) en mm
+      // hoek & afstand bepalen, resultaat in graden*256 (360/cirkel) en mm
       Cartesian2Polar(TargetHeading, TargetDistance, TargetX - Position.XPos, TargetY - Position.YPos);
       if (Flags.IsSet(6)) printf ("XYTakt TargetVector %d mm, %d graden (%d %d %d %d))\n", TargetDistance, (int)(TargetHeading/256),
             TargetX, Position.XPos, TargetY, Position.YPos);
