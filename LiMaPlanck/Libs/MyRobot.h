@@ -50,22 +50,21 @@ class TPosition
       int  YPos;
       int  Hoek;  // in graden
 
-      long HoekHires() { return VarRobotDegrees_q8; }
+      long HoekHires() { return fVarRobotDegrees * 256; }
 
    private:
       // de robot positie.
-      long int VarRobotXPos_q10;    // in 1/1024 mm (ca 1 um)
-      long int VarRobotYPos_q10;    // in 1/1024 mm (ca 1 um)
-      long int VarRobotDegrees_q8;  // in 360*256 /circel (graden*256)
+      float fVarRobotXPos;       // in mm
+      float fVarRobotYPos;       // in mm
+      float fVarRobotDegrees;    // in 360 /circel
 
-      long int OdoL_ticks;          // afstand in odo_ticks  - LET OP - alleen voor hoek; var maakt sprong van '360 graden' ticks.
-      long int OdoR_ticks;          // afstand in odo_ticks  - LET OP - alleen voor hoek;
+      float fOdoL;               // afstand in mm
+      float fOdoR;               // afstand in mm
+      float fOdoT;               // afstand in mm (gemiddelde van L+R, absolute waarde!)
 
-      long int OdoL_q10;            // afstand in mm * 1024 (ongeveer um)
-      long int OdoR_q10;            // afstand in mm * 1024 (ongeveer um)
-      long int OdoT_q10;            // afstand in mm * 1024 (ongeveer um) (gemiddelde van L+R, absolute waarde!)
+      long int OdoL_ticks;       // afstand in odo_ticks  - LET OP - alleen voor hoek; var maakt sprong van '360 graden' ticks.
+      long int OdoR_ticks;       // afstand in odo_ticks  - LET OP - alleen voor hoek;
 
-      // private methods
       void Update();
 };
 extern TPosition Position;

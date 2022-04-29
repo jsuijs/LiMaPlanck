@@ -22,9 +22,9 @@ TPosition::TPosition()
 //-----------------------------------------------------------------------------
 void TPosition::OdoGet(int &OdoL_out, int &OdoR_out, int &OdoT_out)
    {
-      OdoL_out = OdoL_q10 / 1024;
-      OdoR_out = OdoR_q10 / 1024;
-      OdoT_out = OdoT_q10 / 1024;
+      OdoL_out = fOdoL;
+      OdoR_out = fOdoR;
+      OdoT_out = fOdoT;
    }
 
 //------------------------------------------------------------------------
@@ -43,16 +43,16 @@ void TPosition::Reset()
 void TPosition::Set(float X, float Y, float Degrees)
    {
       printf("ResetRobotPosition\n");
-      VarRobotXPos_q10     = X / 1024;
-      VarRobotYPos_q10     = Y / 1024;
-      VarRobotDegrees_q8   = Degrees / 256;
+      fVarRobotXPos     = X;
+      fVarRobotYPos     = Y;
+      fVarRobotDegrees  = Degrees;
 
       // wis odo hulp vars:
-      OdoL_ticks = 0;
-      OdoR_ticks = 0;
-      OdoT_q10   = 0;
-      OdoL_q10   = 0;
-      OdoR_q10   = 0;
+      OdoL_ticks  = 0;
+      OdoR_ticks  = 0;
+      fOdoT       = 0;
+      fOdoL       = 0;
+      fOdoR       = 0;
 
       Update();   // update variabelen
    }
@@ -72,8 +72,7 @@ void TPosition::Print()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void TPosition::Takt()
-   {	float RadHoek;
-      static long OdoTickLR_Correction = 0;
+   {	static long OdoTickLR_Correction = 0;
 
       // Haal encoder gegevens op
       ReadStmEncodersDelta(ActSpeedL, ActSpeedR);
@@ -106,25 +105,23 @@ void TPosition::Takt()
 
       if ((ActSpeedL !=0) || (ActSpeedR != 0)) { // als we verplaatst zijn
 
-         // reken afgelegde weg om naar micrometers (odo interne eenheid)
-         long DeltaL_q10, DeltaR_q10, DeltaT_q10;
-         DeltaL_q10 = ((ActSpeedL * ODO_TICK_TO_METRIC) + 2) / 4 ;   // +2 voor afronding, /4 omdat ODO_TICK_TO_METRIC *4096 is, en DeltaL in mm*1024
-         DeltaR_q10 = ((ActSpeedR * ODO_TICK_TO_METRIC) + 2) / 4 ;
-         DeltaT_q10 = (DeltaL_q10 + DeltaR_q10) / 2; 						// /2 (ivm sum L+R)
+         // reken afgelegde weg om naar mm
+         float fDeltaL = ActSpeedL * (ODO_TICK_TO_METRIC / 4096.0);  // ODO_TICK_TO_METRIC is mm*4096
+         float fDeltaR = ActSpeedR * (ODO_TICK_TO_METRIC / 4096.0);
+         float fDeltaT = (fDeltaL + fDeltaR) / 2; 						   // /2 (ivm sum L+R)
 
-         if (DeltaT_q10 > 0) { 	// Absolute waarde / totaal afgelegde weg (o.a. voor compas)
-            OdoT_q10 += DeltaT_q10;
+         if (fDeltaT > 0) { 	// Absolute waarde / totaal afgelegde weg (o.a. voor compas)
+            fOdoT += fDeltaT;
          } else {
-            OdoT_q10 -= DeltaT_q10;
+            fOdoT -= fDeltaT;
          }
-         OdoL_q10 += DeltaL_q10;
-         OdoR_q10 += DeltaR_q10;
+         fOdoL += fDeltaL;
+         fOdoR += fDeltaR;
 
-         // werk de absolute robot-positie bij (0 graden = rijrichting x, positieve hoek = draai naar rechts)
-         RadHoek = GRAD2RAD(VarRobotDegrees_q8) / 256;
          // update X/Y positie
-         VarRobotXPos_q10 += DeltaT_q10 * cos(RadHoek);
-         VarRobotYPos_q10 += DeltaT_q10 * sin(RadHoek);
+         float RadHeading = GRAD2RAD(fVarRobotDegrees);
+         fVarRobotXPos += fDeltaT * cos(RadHeading);
+         fVarRobotYPos += fDeltaT * sin(RadHeading);
 
          Update();
 //       printf("SpeedL: %d, SpeedR: %d, Lticks: %ld, Rticks: %ld, DeltaL: %ld, DeltaR: %ld, XPos: %d YPos: %d Hoek: %d\n",
@@ -146,18 +143,17 @@ void TPosition::Update()
    {
       //--------------------
       // Bereken nieuwe hoek
-      VarRobotDegrees_q8 = ((OdoR_ticks - OdoL_ticks) * ODO_HEADING) / 256;   // heading in graden*256
+      fVarRobotDegrees = (OdoR_ticks - OdoL_ticks) * (ODO_HEADING / 65536.0);   // ODO_HEADING is _Q16
 
       // Normaliseer hoek
-      VarRobotDegrees_q8 %= NORM_Q8;  // +/- 360*256 graden
-      while (VarRobotDegrees_q8 >  (NORM_Q8/2))  VarRobotDegrees_q8 -= NORM_Q8;  // > 180 graden (als norm=360)
-      while (VarRobotDegrees_q8 <= (NORM_Q8/-2)) VarRobotDegrees_q8 += NORM_Q8;  // =< -180 graden (als norm=360) (<=, niet < omdat anders zowel 180 als -180 geldig zouden zijn)
+      while (fVarRobotDegrees >  (180))  fVarRobotDegrees -= 360;  // > 180 graden
+      while (fVarRobotDegrees <= (-180)) fVarRobotDegrees += 360;  // =< -180 graden (<=, niet < omdat anders zowel 180 als -180 geldig zouden zijn)
 
       //--------------------
       // update public var's
-      XPos  = VarRobotXPos_q10   / 1024;  // RobotXPos in mm
-      YPos  = VarRobotYPos_q10   / 1024;  // RobotYPos in mm
-      Hoek  = VarRobotDegrees_q8 / 256;   // RobotHoekPos in graden
+      XPos  = fVarRobotXPos;     // RobotXPos in mm
+      YPos  = fVarRobotYPos;     // RobotYPos in mm
+      Hoek  = fVarRobotDegrees;  // RobotHoekPos in graden
 
       if (Flags.IsSet(20)) {
          // Note: float in format string doesn't work on
@@ -165,7 +161,7 @@ void TPosition::Update()
          // newline, so three print-statements with CSerial
          // are required to print the position message:
          CSerial.printf("%cPOSITION %d %d ", FRAME_START, XPos, YPos);
-         CSerial.print(VarRobotDegrees_q8 / 14667.7);
+         CSerial.print(GRAD2RAD(fVarRobotDegrees));
          CSerial.printf("%c\n", FRAME_END);
       }
    }
