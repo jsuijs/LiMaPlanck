@@ -83,11 +83,11 @@ void Slope(int &SlopeInOut, int Setpoint, int Step)
 }
 
 //----------------------------------------------------------------------------
-// NormHoek - Normeer een hoek rond nulpunt (+/- halve circel).
+// NormHoek - Normeer een hoek rond nulpunt (+/- halve cirkel).
 //----------------------------------------------------------------------------
 // Param
 //    hoek = input,
-//    Norm = volle circel
+//    Norm = volle cirkel
 //
 // Return: normalized hoek
 //

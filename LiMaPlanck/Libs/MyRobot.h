@@ -56,14 +56,11 @@ class TPosition
       // de robot positie.
       float fVarRobotXPos;       // in mm
       float fVarRobotYPos;       // in mm
-      float fVarRobotDegrees;    // in 360 /circel
+      float fVarRobotDegrees;    // in 360 /cirkel
 
       float fOdoL;               // afstand in mm
       float fOdoR;               // afstand in mm
       float fOdoT;               // afstand in mm (gemiddelde van L+R, absolute waarde!)
-
-      long int OdoL_ticks;       // afstand in odo_ticks  - LET OP - alleen voor hoek; var maakt sprong van '360 graden' ticks.
-      long int OdoR_ticks;       // afstand in odo_ticks  - LET OP - alleen voor hoek;
 
       void Update();
 };

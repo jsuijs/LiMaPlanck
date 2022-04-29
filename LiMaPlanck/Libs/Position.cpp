@@ -48,8 +48,6 @@ void TPosition::Set(float X, float Y, float Degrees)
       fVarRobotDegrees  = Degrees;
 
       // wis odo hulp vars:
-      OdoL_ticks  = 0;
-      OdoR_ticks  = 0;
       fOdoT       = 0;
       fOdoL       = 0;
       fOdoR       = 0;
@@ -72,38 +70,14 @@ void TPosition::Print()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void TPosition::Takt()
-   {	static long OdoTickLR_Correction = 0;
-
+   {
       // Haal encoder gegevens op
       ReadStmEncodersDelta(ActSpeedL, ActSpeedR);
 
-      // Corrigeer voor verschil in wiel-grootte
-      OdoTickLR_Correction += ActSpeedR * (long)ODO_TICK_L_R;
-      ActSpeedR = OdoTickLR_Correction / 4096;
-      OdoTickLR_Correction -= ActSpeedR * 4096L;
-
-      // Hou ticks bij, om richting te bepalen.
-      OdoL_ticks += ActSpeedL;
-      OdoR_ticks += ActSpeedR;
-
-      // corrigeer OdoL_ticks zodat de delta niet te hoog oploopt.
-      // (Als de delta te groot wordt, kan een wrap-around optreden bij berekening van VarRobotHoek)
-      // (gekozen voor +/- 360 graden (en niet +/- 180) zodat er hysteresis tussen de correctie-punten zit)
-      long d = OdoR_ticks - OdoL_ticks;
-      if (d > TICKS_360_GRADEN) {
-         OdoL_ticks += TICKS_360_GRADEN;
-         printf("OdoL_ticks jump up %ld\n", OdoL_ticks);
-      }
-
-      if (d < -TICKS_360_GRADEN) {
-         OdoL_ticks -= TICKS_360_GRADEN;
-         printf("OdoL_ticks jump down %ld\n", OdoL_ticks);
-      }
-
-      //   printf("ActSpeedL: %d, ActSpeedR: %d, OdoL_ticks: %ld, OdoR_ticks: %ld\n",
-      //      ActSpeedL, ActSpeedR, OdoL_ticks, OdoR_ticks);
-
       if ((ActSpeedL !=0) || (ActSpeedR != 0)) { // als we verplaatst zijn
+
+         // Corrigeer voor verschil in wiel-grootte & reken om naar graden
+         fVarRobotDegrees += (ActSpeedR * ODO_TICK_L_R / 4096.0 - ActSpeedL) * (ODO_HEADING / 65536.0);   // ODO_HEADING is _Q16
 
          // reken afgelegde weg om naar mm
          float fDeltaL = ActSpeedL * (ODO_TICK_TO_METRIC / 4096.0);  // ODO_TICK_TO_METRIC is mm*4096
@@ -142,9 +116,6 @@ void TPosition::Takt()
 void TPosition::Update()
    {
       //--------------------
-      // Bereken nieuwe hoek
-      fVarRobotDegrees = (OdoR_ticks - OdoL_ticks) * (ODO_HEADING / 65536.0);   // ODO_HEADING is _Q16
-
       // Normaliseer hoek
       while (fVarRobotDegrees >  (180))  fVarRobotDegrees -= 360;  // > 180 graden
       while (fVarRobotDegrees <= (-180)) fVarRobotDegrees += 360;  // =< -180 graden (<=, niet < omdat anders zowel 180 als -180 geldig zouden zijn)
