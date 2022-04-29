@@ -76,21 +76,16 @@ void TPosition::Takt()
 
       if ((ActSpeedL !=0) || (ActSpeedR != 0)) { // als we verplaatst zijn
 
-         // Corrigeer voor verschil in wiel-grootte & reken om naar graden
+         // Update heading: (incl. correctie voor verschil in wiel-grootte)
          fVarRobotDegrees += (ActSpeedR * F_ODO_TICK_L_R - ActSpeedL) * F_ODO_HEADING;
 
-         // reken afgelegde weg om naar mm
+         // bereken afgelegde weg in mm
+         float fDeltaT = (ActSpeedL + ActSpeedR) * F_ODO_TICK_TO_METRIC / 2;
          fOdoL += ActSpeedL * F_ODO_TICK_TO_METRIC;
          fOdoR += ActSpeedR * F_ODO_TICK_TO_METRIC;
-         float fDeltaT = (ActSpeedL + ActSpeedR) * F_ODO_TICK_TO_METRIC / 2;
+         fOdoT += ABS(fDeltaT); // Absolute waarde : totaal afgelegde weg
 
-         if (fDeltaT > 0) { 	// Absolute waarde / totaal afgelegde weg (o.a. voor compas)
-            fOdoT += fDeltaT;
-         } else {
-            fOdoT -= fDeltaT;
-         }
-
-         // update X/Y positie
+         // update X/Y
          float RadHeading = GRAD2RAD(fVarRobotDegrees);
          fVarRobotXPos += fDeltaT * cos(RadHeading);
          fVarRobotYPos += fDeltaT * sin(RadHeading);
