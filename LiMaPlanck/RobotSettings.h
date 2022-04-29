@@ -148,4 +148,15 @@ const float ROTATE_D_GAIN     =  0.05;
 const int SERVO_OPEN    =  500;
 #endif // ROBOT_ALOYS
 
+// For backward compatibility
+#ifndef F_ODO_TICK_L_R
+   #define F_ODO_TICK_L_R (ODO_TICK_L_R / 4096.0)
+#endif
+#ifndef F_ODO_HEADING
+   #define F_ODO_HEADING (ODO_HEADING / 65536.0)
+#endif
+#ifndef F_ODO_TICK_TO_METRIC
+   #define F_ODO_TICK_TO_METRIC (ODO_TICK_TO_METRIC / 4096.0)
+#endif
+
 #endif

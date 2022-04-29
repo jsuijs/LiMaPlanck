@@ -42,7 +42,7 @@ void TPosition::Reset()
 //------------------------------------------------------------------------
 void TPosition::Set(float X, float Y, float Degrees)
    {
-      printf("ResetRobotPosition\n");
+      printf("SetRobotPosition to %d %d %d\n", (int) X, (int) Y, (int) Degrees);
       fVarRobotXPos     = X;
       fVarRobotYPos     = Y;
       fVarRobotDegrees  = Degrees;
@@ -77,20 +77,18 @@ void TPosition::Takt()
       if ((ActSpeedL !=0) || (ActSpeedR != 0)) { // als we verplaatst zijn
 
          // Corrigeer voor verschil in wiel-grootte & reken om naar graden
-         fVarRobotDegrees += (ActSpeedR * ODO_TICK_L_R / 4096.0 - ActSpeedL) * (ODO_HEADING / 65536.0);   // ODO_HEADING is _Q16
+         fVarRobotDegrees += (ActSpeedR * F_ODO_TICK_L_R - ActSpeedL) * F_ODO_HEADING;
 
          // reken afgelegde weg om naar mm
-         float fDeltaL = ActSpeedL * (ODO_TICK_TO_METRIC / 4096.0);  // ODO_TICK_TO_METRIC is mm*4096
-         float fDeltaR = ActSpeedR * (ODO_TICK_TO_METRIC / 4096.0);
-         float fDeltaT = (fDeltaL + fDeltaR) / 2; 						   // /2 (ivm sum L+R)
+         fOdoL += ActSpeedL * F_ODO_TICK_TO_METRIC;
+         fOdoR += ActSpeedR * F_ODO_TICK_TO_METRIC;
+         float fDeltaT = (ActSpeedL + ActSpeedR) * F_ODO_TICK_TO_METRIC / 2;
 
          if (fDeltaT > 0) { 	// Absolute waarde / totaal afgelegde weg (o.a. voor compas)
             fOdoT += fDeltaT;
          } else {
             fOdoT -= fDeltaT;
          }
-         fOdoL += fDeltaL;
-         fOdoR += fDeltaR;
 
          // update X/Y positie
          float RadHeading = GRAD2RAD(fVarRobotDegrees);

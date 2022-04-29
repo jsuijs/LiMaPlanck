@@ -22,12 +22,6 @@ static int VolgLinksAW()          // Wandvolgen AchterWaards
         return constrain(Afstand, -20, 20);
 }
 
-//-----------------------------------------------------------------------------
-static void MapSensorSetup(int Sensor, int Start, int Width)
-{
-   Lpp.SensorSetup(Sensor, (Start * lidar_sign) + lidar_Offset - Width, Width);
-}
-
 #define T_NUL     0
 #define T_EEN     1
 #define T_DRIE    3
@@ -37,7 +31,6 @@ static void MapSensorSetup(int Sensor, int Start, int Width)
 //-----------------------------------------------------------------------------
 //    ***** STARTVECTOR UITVOEREN   9-11-2021 (av) ******
 //-----------------------------------------------------------------------------
-//lppstart
 bool MissionStartVector1(TState &S)
 {
    static int AWScannen;      // X * Heen en weer rijden om Achterwand te scannen
