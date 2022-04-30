@@ -15,6 +15,7 @@ HardwareSerial    Serial2 (PA3, PA2);  // rx, tx
 TwoWire           Wire2(PB11, PB10);   // sda, scl
 TFlags            Flags(32);
 TMissionControl   MissionControl;
+TState            SubS; // Sub-mission statemachine
 
 Servo myservo;  // create servo object to control a servo
 
@@ -236,7 +237,7 @@ void Execute(int Param[])
       MissionControl.Start(MissionWheelSizeCalibrate);
    }
 
-   if (Command.Match("Stop",           0)) PfKeySet(-1);
+   if (Command.Match("Stop",           0)) PfKey(-1);
 
    if (Command.Match("LppStart",       0)) Lpp.Start();
    if (Command.Match("LppStop",        0)) Lpp.Stop();
@@ -249,7 +250,7 @@ void Execute(int Param[])
    if (Command.Match("PassageSetup",   3)) Passage.Setup(Param[0], Param[1], Param[2]);
    if (Command.Match("PassageFind",    2)) printf("PassageFind %d degrees\n", Passage.Find(Param[0], Param[1]));
 
-   if (Command.Match("PfKey",          1)) PfKeySet(Param[0]);
+   if (Command.Match("PfKey",          1)) PfKey(Param[0]);
    if (Command.Match("Position",       0)) Position.Print();
    if (Command.Match("PositionReset",  0)) Position.Reset();
 

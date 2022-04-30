@@ -61,7 +61,7 @@ void ProgrammaTakt();
 // RcDispatch.cpp
 void RcDispatch(int &RcData);
 int  PfKeyGet();
-void PfKeySet(int InKey);
+void PfKey(int InKey);
 
 
 #include "Libs/Drive.h"          // contains code...

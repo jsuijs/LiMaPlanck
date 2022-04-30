@@ -5,26 +5,15 @@
 #include "Libs/MyRobot.h"
 #include "Project.h"
 
-// prototypes
-
-bool __attribute__ ((weak)) MissionAloys1(TState &S) { S = S; return true; }
-TState SubS;            // Sub-mission statemachine
 
 //-----------------------------------------------------------------------------
-// ProgrammaTakt - program-selection & call the program (mission)
+// PfKey - execute function key (one shot)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void ProgrammaTakt()
+void PfKey(int ch)
 {
-   int ch = PfKeyGet();
-   if (ch) printf("Key: %d\n", ch);
-
-   // One shot call to PfKey commands
+   printf("Key: %d\n", ch);
    switch(ch) {
-
-      case 0 : {  // Default - no key
-      }
-      break;
 
       case -1 : { // Stop
          MissionControl.Reset(); // stop mission
@@ -43,7 +32,7 @@ void ProgrammaTakt()
       break;
 
       case 4 : { // Programma:
-        MissionControl.Start(MissionAloys1);
+        //MissionControl.Start(MissionAloys1);
       }
       break;
 
@@ -103,14 +92,20 @@ void ProgrammaTakt()
       }
       break;
    } // einde van switch
+}
 
+//-----------------------------------------------------------------------------
+// ProgrammaTakt - program-selection & call the program (mission)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void ProgrammaTakt()
+{
    // Execute mission
    if (MissionControl.Takt()) {
       // Mission done.
-      Driver.Pwm(0, 0); // only once, so CLI-commands can be used
+      Driver.Pwm(0, 0); // Stop motors (and only once, so CLI-commands can be used)
    }
 }
-
 
 ////-----------------------------------------------------------------------------
 //// MissionTemplate -

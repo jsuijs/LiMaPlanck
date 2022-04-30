@@ -3,31 +3,8 @@
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-static int _PfKey = 0;  // see PfKeyGet()
-
 //-----------------------------------------------------------------------------
-// PfKeySet -
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void PfKeySet(int InKey)
-{
-   printf("PfKeySet %d\n", InKey);
-   _PfKey = InKey;
-}
-
-//-----------------------------------------------------------------------------
-// PfKeyGet -
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-int PfKeyGet()
-{
-   int r = _PfKey;
-   _PfKey = 0;  // one shot
-   return r;   // PfKey value, 0 = no key, -1 = stop (special code)
-}
-
-//-----------------------------------------------------------------------------
-// RcDispatch - Verwerk RC5 code
+// RcDispatch - Map RC5 codes
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void RcDispatch(int &RcData)
@@ -45,31 +22,31 @@ void RcDispatch(int &RcData)
       case 0x3761    : Position.Reset();   break; // menu -> reset position
 
       // PF-keys
-      case RC_STOP   : PfKeySet(-1);       break; // STOP (special, but passed to ProgrammaTakt)
+      case RC_STOP   : PfKey(-1);       break; // STOP (special, but passed to ProgrammaTakt)
 
-      case RC_F01    : PfKeySet( 1);       break;
-      case RC_F02    : PfKeySet( 2);       break;
-      case RC_F03    : PfKeySet( 3);       break;
-      case RC_F04    : PfKeySet( 4);       break;
-      case RC_F05    : PfKeySet( 5);       break;
-      case RC_F06    : PfKeySet( 6);       break;
-      case RC_F07    : PfKeySet( 7);       break;
-      case RC_F08    : PfKeySet( 8);       break;
-      case RC_F09    : PfKeySet( 9);       break;
-      case RC_F10    : PfKeySet(10);       break;
-      case RC_F11    : PfKeySet(11);       break;
-      case RC_F12    : PfKeySet(12);       break;
+      case RC_F01    : PfKey( 1);       break;
+      case RC_F02    : PfKey( 2);       break;
+      case RC_F03    : PfKey( 3);       break;
+      case RC_F04    : PfKey( 4);       break;
+      case RC_F05    : PfKey( 5);       break;
+      case RC_F06    : PfKey( 6);       break;
+      case RC_F07    : PfKey( 7);       break;
+      case RC_F08    : PfKey( 8);       break;
+      case RC_F09    : PfKey( 9);       break;
+      case RC_F10    : PfKey(10);       break;
+      case RC_F11    : PfKey(11);       break;
+      case RC_F12    : PfKey(12);       break;
 #ifdef RC_F13
-      case RC_F13    : PfKeySet(13);       break;
+      case RC_F13    : PfKey(13);       break;
 #endif
 #ifdef RC_F14
-      case RC_F14    : PfKeySet(14);       break;
+      case RC_F14    : PfKey(14);       break;
 #endif
 #ifdef RC_F15
-      case RC_F15    : PfKeySet(15);       break;
+      case RC_F15    : PfKey(15);       break;
 #endif
 #ifdef RC_F16
-      case RC_F16    : PfKeySet(16);       break;
+      case RC_F16    : PfKey(16);       break;
 #endif
    }
 }
