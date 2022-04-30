@@ -9,13 +9,14 @@
 #include "Project.h"
 
 // global instances
-TPosition      Position;
-TDrive         Driver;
-TCommand       Command(Execute);
-TLpp           Lpp;
-HardwareSerial Serial2 (PA3, PA2);  // rx, tx
-TwoWire        Wire2(PB11, PB10);   // sda, scl
-TFlags         Flags(32);
+TPosition         Position;
+TDrive            Driver;
+TCommand          Command(Execute);
+TLpp              Lpp;
+HardwareSerial    Serial2 (PA3, PA2);  // rx, tx
+TwoWire           Wire2(PB11, PB10);   // sda, scl
+TFlags            Flags(32);
+TMissionControl   MissionControl;
 
 Servo myservo;  // create servo object to control a servo
 
@@ -233,6 +234,12 @@ void Execute(int Param[])
    if (Command.Match("DriveArc",       4)) Driver.Arc(Param[0], Param[1], Param[2], Param[3]);
    if (Command.Match("DriveStop",      0)) Driver.Stop();
 
+   if (Command.Match("WSCal",          2)) {
+      MissionControl.S.Param1 = Param[0];          // distance to drive
+      MissionControl.S.Param2 = Param[1];          // set CW
+      MissionControl.Start(MissionWheelSizeCalibrate);
+   }
+
    if (Command.Match("Stop",           0)) PfKeySet(-1);
 
    if (Command.Match("LppStart",       0)) Lpp.Start();
@@ -253,8 +260,6 @@ void Execute(int Param[])
    if (Command.Match("Flag",           1)) printf("Flag %d is %d\n", Param[0], Flags.IsSet(Param[0]));
    if (Command.Match("Flag",           2)) Flags.Set(Param[0], Param[1]);
    if (Command.Match("FlagDump",       0)) Flags.Dump();
-
-   if (Command.Match("DefaultDistance",1)) DefaultDistance = Param[0];
 
    if (Command.Match("Servo",          1)) myservo.write(Param[0]);
 

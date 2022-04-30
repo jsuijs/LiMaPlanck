@@ -10,7 +10,6 @@
 bool __attribute__ ((weak)) MissionAloys1(TState &S) { S = S; return true; }
 static TState MissonS;  // Mission statemachine
 TState SubS;            // Sub-mission statemachine
-int DefaultDistance = 2000;
 
 //-----------------------------------------------------------------------------
 // ProgrammaTakt - program-selection & call the program (mission)
@@ -32,6 +31,16 @@ void ProgrammaTakt()
          }
       }
    }
+
+
+   if (MissionControl.IsActive()) {
+      // MissionControl has priority over other programs.
+      if (MissionControl.Takt()) {
+         Program.State = 0;
+      }
+      return;
+   }
+
 
    Program.Update("Program", Flags.IsSet(10));
    if (Program.NewState) {
@@ -107,15 +116,17 @@ void ProgrammaTakt()
       }
       break;
 
-      case 102 : { // Programma: MissionOdoTest CW
-         MissonS.Param1 = -1;               // set CW
-         if (MissionOdoTest(MissonS)) Program.State = 0;
+      case 102 : { // Programma: MissionWheelSizeCalibrate CW
+         MissonS.Param1 = 2000;              // distance to drive
+         MissonS.Param2 = -1;                // set CW
+         if (MissionWheelSizeCalibrate(MissonS)) Program.State = 0;
       }
       break;
 
-      case 103 : { // Programma: MissionOdoTest CCW
-         MissonS.Param1 = 1;                // set CCW
-         if (MissionOdoTest(MissonS)) Program.State = 0;
+      case 103 : { // Programma: WheelSizeCalibrate CCW
+         MissonS.Param1 = 2000;              // distance to drive
+         MissonS.Param2 = 1;                 // set CCW
+         if (MissionWheelSizeCalibrate(MissonS)) Program.State = 0;
       }
       break;
 
@@ -126,6 +137,7 @@ void ProgrammaTakt()
       break;
    } // einde van switch
 }
+
 
 ////-----------------------------------------------------------------------------
 //// MissionTemplate -

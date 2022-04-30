@@ -8,6 +8,7 @@
 #include "Project.h"
 
 #include "Libs/MyRobot.cpp"
+#include "Libs/MissionControl.cpp"
 #include "Libs/Drive.cpp"
 #include "Libs/MotorController.cpp"
 #include "Libs/Position.cpp"

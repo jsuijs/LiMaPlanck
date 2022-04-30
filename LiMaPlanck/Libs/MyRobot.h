@@ -134,11 +134,13 @@ class TState
       bool NewState;
 
       int  Param1;   // user param
+      int  Param2;   // user param
 
    private:
       int PrevState;
       int StateStartTime;
 };
+#include "Libs/MissionControl.h"
 
 //-----------------------------------------------------------------------------
 class TBuzzer

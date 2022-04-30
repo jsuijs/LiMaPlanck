@@ -68,15 +68,15 @@ bool MissionGripperTest(TState & S) // Eerste Servo Test
 //*************************************
 
 //-----------------------------------------------------------------------------
-// MissionOdoTest - Heenrijde, draaien en terugrijden.
+// MissionWheelSizeCalibrate - Heenrijden, draaien en terugrijden.
 //-----------------------------------------------------------------------------
 // Ten behoeve van calibratie odometrie
 //
-// input: S.Param1 = 1 (CCW) of -1 (CW)
-// DefaultDistance: Te rijden afstand.
-//
+// input:
+//    S.Param1 = te rijden afstand
+//    S.Param2 = 1 (CCW) of -1 (CW)
 //-----------------------------------------------------------------------------
-bool MissionOdoTest(TState &S)
+bool MissionWheelSizeCalibrate(TState &S)
 {
   S.Update(__FUNCTION__, Flags.IsSet(11));
 
@@ -85,7 +85,7 @@ bool MissionOdoTest(TState &S)
     case 0 : {  // naar 3000mm testrit
         if (S.NewState) {
           Position.Reset();
-          Driver.XY(DefaultDistance, 0 , 200, 0 );
+          Driver.XY(S.Param1, 0 , 200, 0 );
         }
 
         if (Driver.IsDone()) S.State += 10;
@@ -94,7 +94,7 @@ bool MissionOdoTest(TState &S)
 
     case 10 : { // Draai naar -180 of +180, afhankelijk van MissionHandler.ParamGet(0)
         if (S.NewState) {
-          Driver.Rotate(180 * S.Param1); // 180 graden links of rechts
+          Driver.Rotate(180 * S.Param2); // 180 graden links of rechts
         }
         if (Driver.IsDone()) S.State += 10; // Naar de volgende state als de beweging klaar is
       }

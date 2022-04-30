@@ -12,7 +12,7 @@ extern Servo myservo;
 void LppSensorDefaultSetup();
 
 bool MissionGripperTest(TState & S);
-bool MissionOdoTest(TState &S);
+bool MissionWheelSizeCalibrate(TState &S);
 bool MissionRandomRijden(TState &S);
 bool MissionSuperSlalom(TState &S);
 
@@ -25,7 +25,6 @@ bool MissionStartVector1(TState &S);
 bool MissionBlikken(TState &S);
 
 extern TState SubS;  // Sub-mission statemachine
-extern int DefaultDistance;
 void ReadLijnsensor();
 
 // conversie van oude nummers (in letters) naar nieuw
