@@ -22,7 +22,7 @@ void ProgrammaTakt()
    // One shot call to PfKey commands
    switch(ch) {
 
-      case 0 : {  // default - no key
+      case 0 : {  // Default - no key
       }
       break;
 
@@ -59,7 +59,7 @@ void ProgrammaTakt()
 
 //      case 9 : { // Programma: Heen en Weer
 //         MissionControl.S.Param1 = 200;  // speed
-//         if (MissieHeenEnWeer(MissonS)) Program.State = 0;
+//         MissionControl.Start(MissieHeenEnWeer);
 //      }
 //      break;
 
@@ -105,13 +105,9 @@ void ProgrammaTakt()
    } // einde van switch
 
    // Execute mission
-   if (MissionControl.IsActive()) {
-      if (MissionControl.Takt()) {
-         // Mission done.
-         Driver.Pwm(0, 0); // only once, so CLI-commands can be used
-         //Program.State = 0;
-      }
-      return;
+   if (MissionControl.Takt()) {
+      // Mission done.
+      Driver.Pwm(0, 0); // only once, so CLI-commands can be used
    }
 }
 
