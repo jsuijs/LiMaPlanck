@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // Flags.h  - Flags class for debug
 //-----------------------------------------------------------------------------
-// Note: #define MAIN enables acutual code, in adition to prototypes
+// Note: #define FRAMEWORK_CODE enables acutual code, in adition to prototypes
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ class TFlags
 };
 extern TFlags Flags;
 
-#ifdef MAIN
+#ifdef FRAMEWORK_CODE
 
 //-----------------------------------------------------------------------------
 // TFlags::TFlags - constructor

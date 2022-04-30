@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Drive.cpp
+// Drive.h
 //-----------------------------------------------------------------------------
 //
 // Per 'bewegingstype' heeft in deze class 2 methodes (functies). Neem
@@ -33,6 +33,60 @@
 // dan nooit 'true' terug. In dit geval bepaal je op een andere manier wanneer
 // je een volgende beweging start.
 //-----------------------------------------------------------------------------
+
+class TDrive
+{
+   enum TDiveMode { UNDEFINED, M_PWM, M_SPEED_LR, M_SPEED_ROTATION, M_SPEED_HEADING, M_XY, M_ROTATE, M_ARC, M_STOP };
+
+   public:
+      TDrive();
+      void init();
+      void Takt();
+      bool IsDone();
+
+      // bewegingen
+      void Pwm(int PwmL, int PwmR);
+      void SpeedLR(int SpeedL, int SpeedR);
+      void SpeedRotation(int Speed, int Rotation_q8);
+      void SpeedHeading(int Speed, int Heading);
+
+      void Rotate(int Degrees, int RotateClip = ROTATE_CLIP_Q8);
+      void RotateHeading(int Heading, int RotateClip = ROTATE_CLIP_Q8);
+      void RotatePoint(int X, int Y, int RotateClip = ROTATE_CLIP_Q8);
+
+      void Arc(int Degrees, int Radius, int Speed, int EndSpeed);
+      void ArcHeading(int Heading, int Radius, int Speed, int EndSpeed);
+
+      void XY(int X, int Y, int Speed, int EndSpeed);
+
+      void Stop();
+
+   private:
+      TDiveMode DriveMode;    // actief type aansturing
+      int Param1;             // Paramers van actieve aansturing type
+      int Param2;
+      int Param3;
+      int Param4;
+
+      bool IsDoneFlag;        // Movement is gereed
+      bool NewMovement;
+
+      int SollSpeedL, SollSpeedR; // Snelheid (in mm/sec) die we nastreven, verandering begrensd door MaxSlope
+
+      int MaxSlope;
+
+      void SpeedLRTakt(bool FirstCall, int SpeedL, int SpeedR, int MaxSlopeP);
+      bool SpeedRotationTakt(bool FirstCall, int InSpeed, int InRotation_q8);
+      bool SpeedHeadingTakt(bool FirstCall, int InSpeed, int InHeading);
+      bool XYTakt(bool FirstCall, int TargetX, int TargetY, int Speed, int EndSpeed);
+      bool RotateRelTakt(bool FirstCall, int DeltaDegrees, int RotateClip_q8);
+      bool ArcRelTakt(bool FirstCall, int DeltaDegrees, int Radius, int Speed, int EndSpeed);
+      bool StopTakt(bool FirstCall);
+};
+
+extern TDrive Driver;
+
+#ifdef FRAMEWORK_CODE
 
 //-----------------------------------------------------------------------------
 // TDrive - constructor
@@ -710,3 +764,5 @@ bool TDrive::StopTakt(bool FirstCall)
       return true;   // done (we staan stil, of toch bijna, de beide setpoints zijn samen 0.
 
    }
+
+#endif

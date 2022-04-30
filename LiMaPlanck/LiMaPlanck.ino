@@ -1,8 +1,6 @@
 //-----------------------------------------------------------------------------
 // LiMaPlanck.ino
 //-----------------------------------------------------------------------------
-
-#define MAIN
 #include "RobotSettings.h"          // project-instellingen
 #include "Libs/MyRobot.h"           // super-include
 #include "Libs/Motors_TB6612.cpp"   // Kies je motor-sturing
@@ -27,8 +25,6 @@ const int LEDRING_CLOCKWISE   = false; // change to set -90 and 90 degrees at th
 
 //---------------------------------------------------------------------------------------
 // RC5 stuff start
-#include "Libs/RC5.h"
-
 int Rc5Data;  // Set on receive, feel free to set to zero when done.
 int IR_PIN = PB4;
 //int RC5_INTERRUPT = 0;

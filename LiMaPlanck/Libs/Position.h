@@ -1,9 +1,51 @@
 //-----------------------------------------------------------------------------
-// Position.cpp
+// Position.h - Keep track of robot position & STM32 encoder routines...
 //-----------------------------------------------------------------------------
+// Note: #define FRAMEWORK_CODE enables acutual code, in adition to prototypes
 //-----------------------------------------------------------------------------
 #include "math.h"
 #include "stdio.h"
+
+class TPosition
+{
+   public:
+      TPosition();
+      void init() { Reset(); }
+      void Takt();
+      void Reset();
+      void Set(float X, float Y, float Degrees);
+
+      void OdoGet(int &OdoL_out, int &OdoR_out, int &OdoT_out) ;
+      void Print();
+
+      int  ActSpeedL, ActSpeedR;    // in odo_ticks per MAIN_TAKT_INTERVAL
+      int  XPos;  // in mm
+      int  YPos;
+      int  Hoek;  // in graden
+
+      long HoekHires() { return fVarRobotDegrees * 256; }
+
+   private:
+      // de robot positie.
+      float fVarRobotXPos;       // in mm
+      float fVarRobotYPos;       // in mm
+      float fVarRobotDegrees;    // in 360 /cirkel
+
+      float fOdoL;               // afstand in mm
+      float fOdoR;               // afstand in mm
+      float fOdoT;               // afstand in mm (gemiddelde van L+R, absolute waarde!)
+
+      void Update();
+};
+
+extern TPosition Position;
+
+//-----------------------------------------------------------------------------
+// STM32 Encoders
+void InitStmEncoders();
+void ReadStmEncodersDelta(int &Left, int &Right);
+
+#ifdef FRAMEWORK_CODE
 
 //-----------------------------------------------------------------------------
 // TPosition::TPosition - constructor
@@ -220,3 +262,5 @@ void ReadStmEncodersDelta(int &Left, int &Right)
    Left  = (short int)(RawEncoderLeft  - PrevEncoderLeft);
    Right = (short int)(RawEncoderRight - PrevEncoderRight);
 }
+
+#endif

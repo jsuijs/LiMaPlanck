@@ -2,7 +2,7 @@
 // Apa102.h  - Control a string of APA102 RGB LEDs
 //-----------------------------------------------------------------------------
 // Derived from RobotLib
-// Note: #define MAIN enables acutual code, in adition to prototypes
+// Note: #define FRAMEWORK_CODE enables acutual code, in adition to prototypes
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -87,7 +87,7 @@ private:
 
 #endif //__COLORLED_H
 
-#ifdef MAIN
+#ifdef FRAMEWORK_CODE
 //-----------------------------------------------------------------------------
 // From Robotlib: ColorLed.cpp
 

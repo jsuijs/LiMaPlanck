@@ -32,7 +32,7 @@ class RC5
 
 
 
-#ifdef MAIN
+#ifdef FRAMEWORK_CODE
 /*
  *  RC5 Arduino Library
  *  Guy Carpenter, Clearwater Software - 2013

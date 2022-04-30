@@ -25,7 +25,7 @@ class TPassageFinder {
 extern TPassageFinder Passage;
 
 // --- C++ ---
-#ifdef MAIN
+#ifdef FRAMEWORK_CODE
 
 //-----------------------------------------------------------------------------
 // TPassageFinder::Setup - Configure Lpp Array for passage detection

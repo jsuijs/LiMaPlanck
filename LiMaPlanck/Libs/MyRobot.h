@@ -24,148 +24,19 @@ T ABSOLUTE(const T& v) { return v < 0 ? -v : v; }
 #define FRAME_START        0xC1  // indicates start of packet
 
 #include "Libs/Flags.h"          // contains code...
-#include "Libs/LppMaster.h"      // contains code...
+#include "Libs/State.h"          // contains code...
+#include "Libs/MissionControl.h" // contains code...
+#include "Libs/Position.h"       // contains code...
+
 #include "Libs/Commands.h"       // contains code...
+#include "Libs/Buzzer.h"         // contains code...
+#include "Libs/RC5.h"            // contains code...
+
+#include "Libs/LppMaster.h"      // contains code...
 #include "Libs/PassageFinder.h"  // contains code...
 #include "Libs/Apa102.h"         // contains code...
 
-//-----------------------------------------------------------------------------
-// Position.cpp
-
-//-----------------------------------------------------------------------------
-class TPosition
-{
-   public:
-      TPosition();
-      void init() { Reset(); }
-      void Takt();
-      void Reset();
-      void Set(float X, float Y, float Degrees);
-
-      void OdoGet(int &OdoL_out, int &OdoR_out, int &OdoT_out) ;
-      void Print();
-
-      int  ActSpeedL, ActSpeedR;    // in odo_ticks per MAIN_TAKT_INTERVAL
-      int  XPos;  // in mm
-      int  YPos;
-      int  Hoek;  // in graden
-
-      long HoekHires() { return fVarRobotDegrees * 256; }
-
-   private:
-      // de robot positie.
-      float fVarRobotXPos;       // in mm
-      float fVarRobotYPos;       // in mm
-      float fVarRobotDegrees;    // in 360 /cirkel
-
-      float fOdoL;               // afstand in mm
-      float fOdoR;               // afstand in mm
-      float fOdoT;               // afstand in mm (gemiddelde van L+R, absolute waarde!)
-
-      void Update();
-};
-extern TPosition Position;
-
-//-----------------------------------------------------------------------------
-class TDrive
-{
-   enum TDiveMode { UNDEFINED, M_PWM, M_SPEED_LR, M_SPEED_ROTATION, M_SPEED_HEADING, M_XY, M_ROTATE, M_ARC, M_STOP };
-
-   public:
-      TDrive();
-      void init();
-      void Takt();
-      bool IsDone();
-
-      // bewegingen
-      void Pwm(int PwmL, int PwmR);
-      void SpeedLR(int SpeedL, int SpeedR);
-      void SpeedRotation(int Speed, int Rotation_q8);
-      void SpeedHeading(int Speed, int Heading);
-
-      void Rotate(int Degrees, int RotateClip = ROTATE_CLIP_Q8);
-      void RotateHeading(int Heading, int RotateClip = ROTATE_CLIP_Q8);
-      void RotatePoint(int X, int Y, int RotateClip = ROTATE_CLIP_Q8);
-
-      void Arc(int Degrees, int Radius, int Speed, int EndSpeed);
-      void ArcHeading(int Heading, int Radius, int Speed, int EndSpeed);
-
-      void XY(int X, int Y, int Speed, int EndSpeed);
-
-      void Stop();
-
-   private:
-      TDiveMode DriveMode;    // actief type aansturing
-      int Param1;             // Paramers van actieve aansturing type
-      int Param2;
-      int Param3;
-      int Param4;
-
-      bool IsDoneFlag;        // Movement is gereed
-      bool NewMovement;
-
-      int SollSpeedL, SollSpeedR; // Snelheid (in mm/sec) die we nastreven, verandering begrensd door MaxSlope
-
-      int MaxSlope;
-
-      void SpeedLRTakt(bool FirstCall, int SpeedL, int SpeedR, int MaxSlopeP);
-      bool SpeedRotationTakt(bool FirstCall, int InSpeed, int InRotation_q8);
-      bool SpeedHeadingTakt(bool FirstCall, int InSpeed, int InHeading);
-      bool XYTakt(bool FirstCall, int TargetX, int TargetY, int Speed, int EndSpeed);
-      bool RotateRelTakt(bool FirstCall, int DeltaDegrees, int RotateClip_q8);
-      bool ArcRelTakt(bool FirstCall, int DeltaDegrees, int Radius, int Speed, int EndSpeed);
-      bool StopTakt(bool FirstCall);
-};
-extern TDrive Driver;
-
-//-----------------------------------------------------------------------------
-class TState
-{
-   public:
-      TState();
-      void Reset();
-
-      void Update(const char *FName, bool Verbose=true);
-      bool Done(const char *FName);
-      bool InvalidState(const char *FName);
-      int StateTime();
-
-      int  State;
-      bool NewState;
-
-      int  Param1;   // user param
-      int  Param2;   // user param
-
-   private:
-      int PrevState;
-      int StateStartTime;
-};
-#include "Libs/MissionControl.h"
-
-//-----------------------------------------------------------------------------
-class TBuzzer
-{
-   public:
-      TBuzzer(int Pin);
-      void Takt();
-
-      void Beep(int duration, int number_of_beeps = 1);
-      void BeepWait(int duration, int number_of_beeps = 1);
-      void Wait();
-
-   private :
-      int BuzzerPin;
-      volatile int BeepState, BeepDuration;
-      int BeepCountDown, Toggle;
-};
-extern TBuzzer Buzzer;
-
 bool ServoSlope(Servo &S, int Setpoint, int Step);
-
-//-----------------------------------------------------------------------------
-// Encoders
-void InitStmEncoders();
-void ReadStmEncodersDelta(int &Left, int &Right);
 
 //-----------------------------------------------------------------------------
 // Motors.cpp
@@ -191,5 +62,8 @@ void ProgrammaTakt();
 void RcDispatch(int &RcData);
 int  PfKeyGet();
 void PfKeySet(int InKey);
+
+
+#include "Libs/Drive.h"          // contains code...
 
 #endif
