@@ -8,7 +8,6 @@
 // prototypes
 
 bool __attribute__ ((weak)) MissionAloys1(TState &S) { S = S; return true; }
-static TState MissonS;  // Mission statemachine
 TState SubS;            // Sub-mission statemachine
 
 //-----------------------------------------------------------------------------
@@ -16,93 +15,62 @@ TState SubS;            // Sub-mission statemachine
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void ProgrammaTakt()
-{  static TState Program;
-
+{
    int ch = PfKeyGet();
-   if (ch) {
-      // knop ingedrukt
+   if (ch) printf("Key: %d\n", ch);
 
-      printf("Key: %d\n", ch);
-      if (ch == -1) {
-         Program.Reset();           // reset, stop lopend programma / programma 'stilstaan'.
-      } else {
-         if (Program.State == 0) {  // andere pfkeys werken alleen als we stil staan
-            Program.State = ch;
-         }
-      }
-   }
+   // One shot call to PfKey commands
+   switch(ch) {
 
-
-   if (MissionControl.IsActive()) {
-      // MissionControl has priority over other programs.
-      if (MissionControl.Takt()) {
-         Program.State = 0;
-      }
-      return;
-   }
-
-
-   Program.Update("Program", Flags.IsSet(10));
-   if (Program.NewState) {
-      LppSensorDefaultSetup();      // re-load Lidar default configuration
-      MissonS.Reset();              // reset mission statemachine
-   }
-
-   // Call active program 1 trough 12
-   switch(Program.State) {
-
-      case 0 : { // Program: stand-still
-         if (Program.NewState) {
-            Driver.Pwm(0, 0); // only on entry, so CLI-commands can be used in this state.
-            //Lpp.Stop();
-         }
+      case 0 : {  // default - no key
       }
       break;
 
-      case 1 : { // Programma: rijden1
-//         if (MissionRijden1(Program)) Program.State = 0;
+      case -1 : { // Stop
+         MissionControl.Reset(); // stop mission
+         Driver.Pwm(0, 0);       // stop motors
       }
       break;
 
       case 2 : {  // Programma: Grijper open/toe
-        if (MissionGripperTest(MissonS)) Program.State = 0;  //**Grijper open/toe
+        MissionControl.Start(MissionGripperTest);
       }
       break;
 
       case 3 : {  // Programma:
-         if (MissionDuckling(MissonS)) Program.State = 0;
+         MissionControl.Start(MissionDuckling);
       }
       break;
 
       case 4 : { // Programma:
-        if (MissionAloys1(MissonS)) Program.State = 0;
+        MissionControl.Start(MissionAloys1);
       }
       break;
 
       case 7 : { // Programma:
-         if (MissionSuperSlalom(MissonS)) Program.State = 0;
+         MissionControl.Start(MissionSuperSlalom);
       }
       break;
 
       case 8 : { // Programma: MissieBlikken
-         if (MissionBlikken(MissonS)) Program.State = 0;
+         MissionControl.Start(MissionBlikken);
       }
       break;
 
 //      case 9 : { // Programma: Heen en Weer
-//         MissonS.Param1 = 200;  // speed
+//         MissionControl.S.Param1 = 200;  // speed
 //         if (MissieHeenEnWeer(MissonS)) Program.State = 0;
 //      }
 //      break;
 
       case 10 : { // Programma: ttijd
-         MissonS.Param1 = 300;  // speed
-//         if (MissieTTijd(MissonS)) Program.State = 0;
+         MissionControl.S.Param1 = 300;  // speed
+//         MissionControl.Start(MissieTTijd);
       }
       break;
 
       case 11 : { // Programma:
-        if (MissionRandomRijden(MissonS)) Program.State = 0;
+        MissionControl.Start(MissionRandomRijden);
       }
       break;
 
@@ -112,30 +80,39 @@ void ProgrammaTakt()
       break;
 
       case 101 : { // Programma: MissionStartVector1
-         if (MissionStartVector1(MissonS)) Program.State = 0;
+         MissionControl.Start(MissionStartVector1);
       }
       break;
 
       case 102 : { // Programma: MissionWheelSizeCalibrate CW
-         MissonS.Param1 = 2000;              // distance to drive
-         MissonS.Param2 = -1;                // set CW
-         if (MissionWheelSizeCalibrate(MissonS)) Program.State = 0;
+         MissionControl.S.Param1 = 2000;              // distance to drive
+         MissionControl.S.Param2 = -1;                // set CW
+         MissionControl.Start(MissionWheelSizeCalibrate);
       }
       break;
 
       case 103 : { // Programma: WheelSizeCalibrate CCW
-         MissonS.Param1 = 2000;              // distance to drive
-         MissonS.Param2 = 1;                 // set CCW
-         if (MissionWheelSizeCalibrate(MissonS)) Program.State = 0;
+         MissionControl.S.Param1 = 2000;              // distance to drive
+         MissionControl.S.Param2 = 1;                 // set CCW
+         MissionControl.Start(MissionWheelSizeCalibrate);
       }
       break;
 
       default : {
-         printf("ProgrammaTakt: ongeldig programma %d\n", Program.State);
-         Program.Reset();
+         printf("ProgrammaTakt: onbekende PfKey %d\n", ch);
       }
       break;
    } // einde van switch
+
+   // Execute mission
+   if (MissionControl.IsActive()) {
+      if (MissionControl.Takt()) {
+         // Mission done.
+         Driver.Pwm(0, 0); // only once, so CLI-commands can be used
+         //Program.State = 0;
+      }
+      return;
+   }
 }
 
 
