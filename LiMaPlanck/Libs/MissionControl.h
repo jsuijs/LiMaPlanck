@@ -3,7 +3,6 @@
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-
 //-----------------------------------------------------------------------------
 class TMissionControl
 {
@@ -22,9 +21,9 @@ class TMissionControl
 };
 
 extern TMissionControl MissionControl;
+extern TState SubS;  // Sub-mission statemachine
 
 #ifdef FRAMEWORK_CODE
-
 
 //-----------------------------------------------------------------------------
 // TMissionControl - Constructor

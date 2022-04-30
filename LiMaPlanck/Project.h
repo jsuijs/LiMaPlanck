@@ -24,7 +24,6 @@ bool MissionTTijdOpening1(TState &S);      // T-Tijd met opening zoeken in vak -
 bool MissionStartVector1(TState &S);
 bool MissionBlikken(TState &S);
 
-extern TState SubS;  // Sub-mission statemachine
 void ReadLijnsensor();
 
 // conversie van oude nummers (in letters) naar nieuw
