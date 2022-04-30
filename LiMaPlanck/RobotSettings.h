@@ -37,14 +37,6 @@ const int TB6612_DIRR_B2   = PA9;   // pin 26  jumper pin 31 PB12
 const int MAIN_TAKT_INTERVAL  = 20;    // miliseconds
 const int MAX_SLOPE           = 10;    // in mm/sec/MAIN_TAKT_INTERVAL
 
-// Encoder parameters (Position.h)
-const int ODO_TICK_TO_METRIC  =  508;  // Distance per tick (left wheel). 4096 means 1 tick => 1 mm
-const int ODO_TICK_L_R        = 4096;  // Wheel-size correction. (Right wheel vs left one, 4096 = equal size)
-
-const int ODO_HEADING         = 2592;  // Odo-ticks to heading, larger => more degrees per tick
-                                       // ODO_HEADING = (ODO_TICK_TO_METRIC * 917) / WIELBASIS (in mm)
-                                       // If the robots rotates too much, increase this number
-
 // Motor PID (MPID) parameters
 const int MPID_I_MAX          = 100;   // integrator limit
 const int MPID_OFFSET         =  10;   // motor offset
@@ -67,9 +59,16 @@ const float ROTATE_D_GAIN     =  0.05;
 
 //=============js===============================
 #ifdef ROBOT_JOEP
-   //
+
+   // Encoder parameters (Position.h)
+   const float ODO_TICK_TO_METRIC   =  508;     // Distance per tick (left wheel). 4096 means 1 tick => 1 mm
+   const float ODO_TICK_L_R         = 4096.8;   // Wheel-size correction. (Right wheel vs left one, 4096 = equal size)
+   const float ODO_HEADING          = 2594;     // Odo-ticks to heading, larger => more degrees per tick
+                                                // ODO_HEADING = (ODO_TICK_TO_METRIC * 917) / WIELBASIS (in mm)
+                                                // If the robots rotates too much, increase this number
+//#define F_ODO_HEADING 0.632693277
+
    // Define RC5-codes of (amongst others) function-keys
-   //
    const int RC_STOP       = 0x3775; // STOP robot - stop button (Function-key -1)
 
    const int RC_F01        = 0x3770; // mark
@@ -95,9 +94,15 @@ const float ROTATE_D_GAIN     =  0.05;
 
 //=============kk===============================
 #ifdef ROBOT_KAREL
-   //
+
+// Encoder parameters (Position.h)
+   const float ODO_TICK_TO_METRIC   =  508;     // Distance per tick (left wheel). 4096 means 1 tick => 1 mm
+   const float ODO_TICK_L_R         = 4096.8;   // Wheel-size correction. (Right wheel vs left one, 4096 = equal size)
+   const float ODO_HEADING          = 2594;     // Odo-ticks to heading, larger => more degrees per tick
+                                                // ODO_HEADING = (ODO_TICK_TO_METRIC * 917) / WIELBASIS (in mm)
+                                                // If the robots rotates too much, increase this number
+
    // Define RC5-codes of (amongst others) function-keys
-   //
    const int RC_STOP       = 0x3775; // STOP robot - stop button (Function-key -1)
 
    const int RC_F01        = 0x3770; // mark
@@ -122,9 +127,16 @@ const float ROTATE_D_GAIN     =  0.05;
 
 //=============av===============================
 #ifdef ROBOT_ALOYS
-   //
+
+   // Encoder parameters (Position.h)        // Testen met Joep = Bergenop Zoom 11-09-2021
+   const float ODO_TICK_TO_METRIC  =  508;   //496; av508 Distance per tick (left wheel). 4096 means 1 tick => 1 mm
+   const float ODO_TICK_L_R        = 4109;   //96; boz av4109  // Wheel-size correction. (Right wheel vs left one, 4096 = equal size)
+
+   const float ODO_HEADING         = 2592;   //av2592; boz 2574 // Odo-ticks to heading, larger => more degrees per tick
+                                             // ODO_HEADING = (ODO_TICK_TO_METRIC * 917) / WIELBASIS (in mm)
+                                             // If the robots rotates too much, increase this number
+
    // Define RC5-codes of (amongst others) function-keys
-   //
    const int RC_STOP       = 0x300c; // 0/1-STOP robot
 
    const int RC_F01        = 0x3001; // Knop 1
