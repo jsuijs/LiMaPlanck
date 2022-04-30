@@ -61,11 +61,11 @@ const float ROTATE_D_GAIN     =  0.05;
 #ifdef ROBOT_JOEP
 
    // Encoder parameters (Position.h)
-   const float ODO_TICK_TO_METRIC   =  508;     // Distance per tick (left wheel). 4096 means 1 tick => 1 mm
-   const float ODO_TICK_L_R         = 4096.8;   // Wheel-size correction. (Right wheel vs left one, 4096 = equal size)
-   const float ODO_HEADING          = 2594;     // Odo-ticks to heading, larger => more degrees per tick
-                                                // ODO_HEADING = (ODO_TICK_TO_METRIC * 917) / WIELBASIS (in mm)
-                                                // If the robots rotates too much, increase this number
+   const float F_ODO_TICK_TO_METRIC =  508/ 4096.0;   // Distance per tick (left wheel). 4096 means 1 tick => 1 mm
+   const float F_ODO_TICK_L_R       = 4096.8/ 4096.0; // Wheel-size correction. (Right wheel vs left one, 4096 = equal size)
+   const float F_ODO_HEADING        = 2594/ 65536.0;  // Odo-ticks to heading, larger => more degrees per tick
+                                                      // ODO_HEADING = (ODO_TICK_TO_METRIC * 917) / WIELBASIS (in mm)
+                                                      // If the robots rotates too much, increase this number
 //#define F_ODO_HEADING 0.632693277
 
    // Define RC5-codes of (amongst others) function-keys
@@ -92,15 +92,15 @@ const float ROTATE_D_GAIN     =  0.05;
 #endif // ROBOT_JOEP
 
 
-//=============kk===============================
+//=============kd===============================
 #ifdef ROBOT_KAREL
 
-// Encoder parameters (Position.h)
-   const float ODO_TICK_TO_METRIC   =  508;     // Distance per tick (left wheel). 4096 means 1 tick => 1 mm
-   const float ODO_TICK_L_R         = 4096.8;   // Wheel-size correction. (Right wheel vs left one, 4096 = equal size)
-   const float ODO_HEADING          = 2594;     // Odo-ticks to heading, larger => more degrees per tick
-                                                // ODO_HEADING = (ODO_TICK_TO_METRIC * 917) / WIELBASIS (in mm)
-                                                // If the robots rotates too much, increase this number
+   // Encoder parameters (Position.h)
+   const float F_ODO_TICK_TO_METRIC =  508/ 4096.0;   // Distance per tick (left wheel). 4096 means 1 tick => 1 mm
+   const float F_ODO_TICK_L_R       = 4096.8/4096.0;  // Wheel-size correction. (Right wheel vs left one, 4096 = equal size)
+   const float F_ODO_HEADING        = 2594/ 65536.0;  // Odo-ticks to heading, larger => more degrees per tick
+                                                      // ODO_HEADING = (ODO_TICK_TO_METRIC * 917) / WIELBASIS (in mm)
+                                                      // If the robots rotates too much, increase this number
 
    // Define RC5-codes of (amongst others) function-keys
    const int RC_STOP       = 0x3775; // STOP robot - stop button (Function-key -1)
@@ -129,12 +129,12 @@ const float ROTATE_D_GAIN     =  0.05;
 #ifdef ROBOT_ALOYS
 
    // Encoder parameters (Position.h)        // Testen met Joep = Bergenop Zoom 11-09-2021
-   const float ODO_TICK_TO_METRIC  =  508;   //496; av508 Distance per tick (left wheel). 4096 means 1 tick => 1 mm
-   const float ODO_TICK_L_R        = 4109;   //96; boz av4109  // Wheel-size correction. (Right wheel vs left one, 4096 = equal size)
+   const float F_ODO_TICK_TO_METRIC =  508/ 4096.0;   //496; av508 Distance per tick (left wheel). 4096 means 1 tick => 1 mm
+   const float F_ODO_TICK_L_R       = 4109/ 4096.0;   //96; boz av4109  // Wheel-size correction. (Right wheel vs left one, 4096 = equal size)
 
-   const float ODO_HEADING         = 2592;   //av2592; boz 2574 // Odo-ticks to heading, larger => more degrees per tick
-                                             // ODO_HEADING = (ODO_TICK_TO_METRIC * 917) / WIELBASIS (in mm)
-                                             // If the robots rotates too much, increase this number
+   const float F_ODO_HEADING        = 2592/ 65536.0;  //av2592; boz 2574 // Odo-ticks to heading, larger => more degrees per tick
+                                                      // ODO_HEADING = (ODO_TICK_TO_METRIC * 917) / WIELBASIS (in mm)
+                                                      // If the robots rotates too much, increase this number
 
    // Define RC5-codes of (amongst others) function-keys
    const int RC_STOP       = 0x300c; // 0/1-STOP robot
@@ -160,15 +160,15 @@ const float ROTATE_D_GAIN     =  0.05;
 const int SERVO_OPEN    =  500;
 #endif // ROBOT_ALOYS
 
-// For backward compatibility
-#ifndef F_ODO_TICK_L_R
-   #define F_ODO_TICK_L_R (ODO_TICK_L_R / 4096.0)
-#endif
-#ifndef F_ODO_HEADING
-   #define F_ODO_HEADING (ODO_HEADING / 65536.0)
-#endif
-#ifndef F_ODO_TICK_TO_METRIC
-   #define F_ODO_TICK_TO_METRIC (ODO_TICK_TO_METRIC / 4096.0)
-#endif
+//// For backward compatibility
+//#ifndef F_ODO_TICK_L_R
+//   #define F_ODO_TICK_L_R (ODO_TICK_L_R / 4096.0)
+//#endif
+//#ifndef F_ODO_HEADING
+//   #define F_ODO_HEADING (ODO_HEADING / 65536.0)
+//#endif
+//#ifndef F_ODO_TICK_TO_METRIC
+//   #define F_ODO_TICK_TO_METRIC (ODO_TICK_TO_METRIC / 4096.0)
+//#endif
 
 #endif

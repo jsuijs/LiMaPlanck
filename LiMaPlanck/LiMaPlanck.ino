@@ -79,7 +79,13 @@ void setup() {
 
       //Lpp.ArraySetup(70, 20, 11);   // Setup array with 11 segments of 20 degrees
 
-      LppSensorDefaultSetup();      // Separate function, so we can reload later.
+      Lpp.SensorSetup(0,  165, 30);    // Achterwaarts 180 +/- 15
+      Lpp.SensorSetup(1, -110, 40);    // Rechts, -90 +/- 20
+      Lpp.SensorSetup(2,  -70, 40);    // Rechts-voor -50 +/- 20
+      Lpp.SensorSetup(3,  -30, 60);    // Voor, 0 +/- 30
+      Lpp.SensorSetup(4,   30, 40);    // Links-voor, 50 +/- 20
+      Lpp.SensorSetup(5,   70, 40);    // Links   90 +/- 20
+      Lpp.SensorSetupCan(6, -45, 90);  // Blikdetectie voor, 0 +/- 45
 
       // Lees en print status (ter informatie)
       Lpp.ReadStatus();
@@ -103,7 +109,7 @@ void setup() {
 //   Flags.Set(12, true);    // PassageFinder
 
    Buzzer.Beep(30, 2);
-   printf("Opstarten gereed.\n");
+   printf("Opstarten gereed %d.\n", WIEL_BASIS);
 
    myservo.attach(PB5);    // attaches the servo on pin 17 to the servo object
    myservo.write(550);     // default: gripper open
@@ -134,7 +140,7 @@ void loop() {
       ReadLpp();
       ShowLppSensor(6);
       Position.Takt();  // Lees & verwerk encoder data
-      ProgrammaTakt();  // Voer (stapje van) geselecteerde programma uit
+      MissionTakt();    // Voer (stapje van) geselecteerde programma uit
       Driver.Takt();    // stuur motoren aan
 
       LedTakt();
@@ -157,22 +163,6 @@ void loop() {
    }
 
    Command.Takt(CSerial);  // Console command interpreter
-}
-
-//---------------------------------------------------------------------------------------
-// LppSensorDefaultSetup -
-//---------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------
-void LppSensorDefaultSetup()
-{
-   Lpp.SensorSetup(0,  165, 30);    // Achterwaarts 180 +/- 15
-   Lpp.SensorSetup(1, -110, 40);    // Rechts, -90 +/- 20
-   Lpp.SensorSetup(2,  -70, 40);    // Rechts-voor -50 +/- 20
-   Lpp.SensorSetup(3,  -30, 60);    // Voor, 0 +/- 30
-   Lpp.SensorSetup(4,   30, 40);    // Links-voor, 50 +/- 20
-   Lpp.SensorSetup(5,   70, 40);    // Links   90 +/- 20
-   Lpp.SensorSetupCan(6, -45, 90);  // Blikdetectie voor, 0 +/- 45
-//   Lpp.SensorSetup(7, 180-250, 40);  // Vrije sensor, stel in als benodigd bij de missie
 }
 
 //---------------------------------------------------------------------------------------
@@ -204,8 +194,6 @@ void BlinkTakt()
    Count ++;
 }
 
-
-
 //-----------------------------------------------------------------------------
 // Execute - execute commando
 //-----------------------------------------------------------------------------
@@ -214,6 +202,14 @@ void BlinkTakt()
 void Execute(int Param[])
 {
    if (Command.Match("?",              0)) Command.Help("ArduinoPlanck command parser.");
+
+   if (Command.Match("Flag",           1)) printf("Flag %d is %d\n", Param[0], Flags.IsSet(Param[0]));
+   if (Command.Match("Flag",           2)) Flags.Set(Param[0], Param[1]);
+   if (Command.Match("FlagDump",       0)) Flags.Dump();
+
+   if (Command.Match("PfKey",          1)) PfKey(Param[0]);
+   if (Command.Match("Position",       0)) Position.Print();
+   if (Command.Match("PositionReset",  0)) Position.Reset();
 
    // Drive commands
    if (Command.Match("DrivePwm",       2)) Driver.Pwm(Param[0], Param[1]);
@@ -250,14 +246,6 @@ void Execute(int Param[])
    if (Command.Match("PassageSetup",   3)) Passage.Setup(Param[0], Param[1], Param[2]);
    if (Command.Match("PassageFind",    2)) printf("PassageFind %d degrees\n", Passage.Find(Param[0], Param[1]));
 
-   if (Command.Match("PfKey",          1)) PfKey(Param[0]);
-   if (Command.Match("Position",       0)) Position.Print();
-   if (Command.Match("PositionReset",  0)) Position.Reset();
-
-   if (Command.Match("Flag",           1)) printf("Flag %d is %d\n", Param[0], Flags.IsSet(Param[0]));
-   if (Command.Match("Flag",           2)) Flags.Set(Param[0], Param[1]);
-   if (Command.Match("FlagDump",       0)) Flags.Dump();
-
    if (Command.Match("Servo",          1)) myservo.write(Param[0]);
 
    if (Command.Match("LedsClear",      0)) { Leds.Clear();                                      Leds.Commit(); }
@@ -265,8 +253,6 @@ void Execute(int Param[])
    if (Command.Match("LedsBright",     1)) { Leds.Brightness = Param[0];                        Leds.Commit(); }
    if (Command.Match("LedsRgb",        4)) { Leds.RGB(Param[0], Param[1], Param[2], Param[3]);  Leds.Commit(); }
 
-   if (Command.Match("LedsRingH",      2)) { Leds.HSV(Degrees2RingIndex(Param[0]), Param[1]);                      Leds.Commit(); }
-
-   if (Command.Match("ShowLppSensor",  1)) { ShowLppSensor(Param[0]); }
-
+   if (Command.Match("LedsRingH",      2)) { Leds.HSV(Degrees2RingIndex(Param[0]), Param[1]);   Leds.Commit(); }
+   if (Command.Match("ShowLppSensor",  1)) ShowLppSensor(Param[0]);  // Show LppSensor range & value on LEDs
 }

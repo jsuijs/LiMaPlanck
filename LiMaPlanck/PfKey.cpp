@@ -1,10 +1,9 @@
 //-----------------------------------------------------------------------------
-// ProgrammTakt.cpp
+// PfKey.cpp
 //-----------------------------------------------------------------------------
 #include "RobotSettings.h"
 #include "Libs/MyRobot.h"
 #include "Project.h"
-
 
 //-----------------------------------------------------------------------------
 // PfKey - execute function key (one shot)
@@ -73,59 +72,9 @@ void PfKey(int ch)
       }
       break;
 
-      case 102 : { // Programma: MissionWheelSizeCalibrate CW
-         MissionControl.S.Param1 = 2000;              // distance to drive
-         MissionControl.S.Param2 = -1;                // set CW
-         MissionControl.Start(MissionWheelSizeCalibrate);
-      }
-      break;
-
-      case 103 : { // Programma: WheelSizeCalibrate CCW
-         MissionControl.S.Param1 = 2000;              // distance to drive
-         MissionControl.S.Param2 = 1;                 // set CCW
-         MissionControl.Start(MissionWheelSizeCalibrate);
-      }
-      break;
-
       default : {
          printf("ProgrammaTakt: onbekende PfKey %d\n", ch);
       }
       break;
    } // einde van switch
 }
-
-//-----------------------------------------------------------------------------
-// ProgrammaTakt - program-selection & call the program (mission)
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void ProgrammaTakt()
-{
-   // Execute mission
-   if (MissionControl.Takt()) {
-      // Mission done.
-      Driver.Pwm(0, 0); // Stop motors (and only once, so CLI-commands can be used)
-   }
-}
-
-////-----------------------------------------------------------------------------
-//// MissionTemplate -
-////-----------------------------------------------------------------------------
-////-----------------------------------------------------------------------------
-//bool MissionTemplate(TState &S)
-//{
-//   S.Update(__FUNCTION__, Flags.IsSet(11));
-//
-//   switch (S.State) {
-//      case 0 : {  //
-//         if (S.NewState) {
-//            Driver.XY(S.Param1, 0, S.Param1, 0);  // X, Y, Speed, EndSpeed - all in mm(/sec)
-//         }
-//
-//         if (Driver.IsDone()) S.State += 10; // To next state if driver is done
-//      }
-//      break;
-//
-//      default : return S.InvalidState(__FUNCTION__);   // Report invalid state & end mission
-//   }
-//   return false;  // mission nog niet gereed
-//}

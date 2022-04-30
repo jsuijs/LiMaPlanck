@@ -24,6 +24,18 @@ bool ServoSlope(Servo &S, int Setpoint, int Step)
    return (Current == Setpoint);
 }
 
+//-----------------------------------------------------------------------------
+// MissionTakt - drive the program (mission)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void MissionTakt()
+{
+   // Execute mission
+   if (MissionControl.Takt()) {
+      // Mission done.
+      Driver.Pwm(0, 0); // Stop motors (and only once, so CLI-commands can be used)
+   }
+}
 
 //-----------------------------------------------------------------------------
 // _write - link printf to CSerial

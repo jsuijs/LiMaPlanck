@@ -22,8 +22,8 @@ void MotorController(int SetpointL, int SetpointR)
    int PowerL, PowerR;
 
    // convert setpoints from mm/s to ticks/interval
-   volatile int SetpointL_Ticks = (SetpointL * 4L * MAIN_TAKT_INTERVAL) / ODO_TICK_TO_METRIC;
-   volatile int SetpointR_Ticks = (SetpointR * 4L * MAIN_TAKT_INTERVAL) / ODO_TICK_TO_METRIC;
+   int SetpointL_Ticks = (SetpointL * (long) MAIN_TAKT_INTERVAL) / (F_ODO_TICK_TO_METRIC * 1024);
+   int SetpointR_Ticks = (SetpointR * (long) MAIN_TAKT_INTERVAL) / (F_ODO_TICK_TO_METRIC * 1024);
 
   //printf("!! %d %d %d %d\n", SetpointL, SetpointL_Ticks, MAIN_TAKT_INTERVAL, ODO_TICK_TO_METRIC);
 

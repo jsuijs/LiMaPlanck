@@ -5,6 +5,31 @@
 #include "Libs/MyRobot.h"
 #include "Project.h"
 
+
+////-----------------------------------------------------------------------------
+//// MissionTemplate -
+////-----------------------------------------------------------------------------
+////-----------------------------------------------------------------------------
+//bool MissionTemplate(TState &S)
+//{
+//   S.Update(__FUNCTION__, Flags.IsSet(11));
+//
+//   switch (S.State) {
+//      case 0 : {  //
+//         if (S.NewState) {
+//            Driver.XY(S.Param1, 0, S.Param1, 0);  // X, Y, Speed, EndSpeed - all in mm(/sec)
+//         }
+//
+//         if (Driver.IsDone()) S.State += 10; // To next state if driver is done
+//      }
+//      break;
+//
+//      default : return S.InvalidState(__FUNCTION__);   // Report invalid state & end mission
+//   }
+//   return false;  // mission nog niet gereed
+//}
+
+
 //-----------------------------------------------------------------------------
 // ***** MissionGripperTest - state machine *****************************
 //-----------------------------------------------------------------------------
