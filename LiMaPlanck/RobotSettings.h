@@ -61,12 +61,11 @@ const float ROTATE_D_GAIN     =  0.05;
 #ifdef ROBOT_JOEP
 
    // Encoder parameters (Position.h)
-   const float F_ODO_TICK_TO_METRIC =  508/ 4096.0;   // Distance per tick (left wheel). 4096 means 1 tick => 1 mm
-   const float F_ODO_TICK_L_R       = 4096.8/ 4096.0; // Wheel-size correction. (Right wheel vs left one, 4096 = equal size)
-   const float F_ODO_HEADING        = 2594/ 65536.0;  // Odo-ticks to heading, larger => more degrees per tick
-                                                      // ODO_HEADING = (ODO_TICK_TO_METRIC * 917) / WIELBASIS (in mm)
-                                                      // If the robots rotates too much, increase this number
-//#define F_ODO_HEADING 0.632693277
+   const float F_ODO_TICK_TO_METRIC = 0.124023;    // Distance per tick in mm (left wheel).
+   const float F_ODO_TICK_L_R       = 1.000195;    // Wheel-size correction. (Right wheel vs left one, 4096 = equal size)
+   const float F_ODO_HEADING        = 0.039581;    // Odo-ticks to heading, larger => more degrees per tick
+                                                   // ODO_HEADING = (ODO_TICK_TO_METRIC * 57.2957795) / WIELBASIS (in mm)
+                                                   // If the robots rotates too much, increase this number
 
    // Define RC5-codes of (amongst others) function-keys
    const int RC_STOP       = 0x3775; // STOP robot - stop button (Function-key -1)
@@ -151,7 +150,7 @@ const float ROTATE_D_GAIN     =  0.05;
    const int RC_F10        = 0x300a; // DrKn << >>
    const int RC_F11        = 0x300d; // Mute = knop 13!!
    const int RC_F12        = 0x300b; // Knop CH+P/C
-	 const int RC_F14        = 0x3018; // Knop Knop -A-
+	const int RC_F14        = 0x3018; // Knop Knop -A-
 
    const int LPP_OFFSET    = -4;
    const int LPP_REVERSE   = 1;
@@ -159,16 +158,5 @@ const float ROTATE_D_GAIN     =  0.05;
    const int SERVO_CLOSE   = 2300;
 const int SERVO_OPEN    =  500;
 #endif // ROBOT_ALOYS
-
-//// For backward compatibility
-//#ifndef F_ODO_TICK_L_R
-//   #define F_ODO_TICK_L_R (ODO_TICK_L_R / 4096.0)
-//#endif
-//#ifndef F_ODO_HEADING
-//   #define F_ODO_HEADING (ODO_HEADING / 65536.0)
-//#endif
-//#ifndef F_ODO_TICK_TO_METRIC
-//   #define F_ODO_TICK_TO_METRIC (ODO_TICK_TO_METRIC / 4096.0)
-//#endif
 
 #endif

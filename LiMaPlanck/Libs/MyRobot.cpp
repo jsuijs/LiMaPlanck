@@ -30,10 +30,12 @@ bool ServoSlope(Servo &S, int Setpoint, int Step)
 //-----------------------------------------------------------------------------
 void MissionTakt()
 {
-   // Execute mission
-   if (MissionControl.Takt()) {
-      // Mission done.
-      Driver.Pwm(0, 0); // Stop motors (and only once, so CLI-commands can be used)
+   if (!MissionControl.IsDone()) {
+      // Execute mission
+      if (MissionControl.Takt()) {
+         // Mission done.
+         Driver.Pwm(0, 0); // Stop motors (and only once, so CLI-commands can be used)
+      }
    }
 }
 

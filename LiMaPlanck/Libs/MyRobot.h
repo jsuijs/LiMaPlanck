@@ -8,14 +8,14 @@
 #include <Arduino.h>
 #include <Servo.h>
 
-#define TICKS_360_GRADEN   (360 / F_ODO_HEADING)
-#define GRAD2RAD(x)        ((float)(x) / 57.2957795)
-#define MAIN_TAKT_RATE     (1000 / MAIN_TAKT_INTERVAL)   // Hz
-#define WIEL_BASIS         ((F_ODO_TICK_TO_METRIC * 917) / (F_ODO_HEADING * 16))
-#define RAD2GRAD(x)        ((float)(x) * 57.2957795)   // uitkomst is float, deze kan evt zonder verlies geschaald worden naar hogere resulotie
-#define ACT_SPEED_MM_SEC(ActSpeed) ((ActSpeed * (F_ODO_TICK_TO_METRIC*4096))) / (4 * MAIN_TAKT_INTERVAL);
-#define ABS(x)             ( (x>=0) ? x : -x )
+const int MAIN_TAKT_RATE   = 1000 / MAIN_TAKT_INTERVAL;   // Hz
+const int WIEL_BASIS       = F_ODO_TICK_TO_METRIC * 57.2957795 / F_ODO_HEADING;
 
+#define ACT_SPEED_MM_SEC(ActSpeed) ((ActSpeed * (F_ODO_TICK_TO_METRIC*1024)) / MAIN_TAKT_INTERVAL);
+
+#define GRAD2RAD(x)        ((float)(x) / 57.2957795)
+#define RAD2GRAD(x)        ((float)(x) * 57.2957795)   // uitkomst is float, deze kan evt zonder verlies geschaald worden naar hogere resulotie
+#define ABS(x)             ( (x>=0) ? x : -x )
 
 template <typename T> inline
 T ABSOLUTE(const T& v) { return v < 0 ? -v : v; }

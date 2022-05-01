@@ -11,7 +11,7 @@ class TMissionControl
       void Start(bool (*InMission)(TState &S));
 
       void Reset();
-      bool IsActive() { return CurrentMission != NULL; }
+      bool IsDone() { return CurrentMission == NULL; }
       bool Takt();
 
       TState S;  // Mission statemachine
@@ -40,11 +40,11 @@ TMissionControl::TMissionControl()
 //-----------------------------------------------------------------------------
 void TMissionControl::Reset()
    {
-      if (IsActive()) {
+      if (IsDone()) {
+         printf("MissionControl.Reset: No mission active.\n");
+      } else {
          printf("MissionControl.Reset: Abort mission.\n");
          CurrentMission = NULL;
-      } else {
-         printf("MissionControl.Reset: No mission active.\n");
       }
    }
 
@@ -54,7 +54,7 @@ void TMissionControl::Reset()
 //-----------------------------------------------------------------------------
 void TMissionControl::Start(bool (*InMission)(TState &S))
    {
-      if (IsActive()) {
+      if (!IsDone()) {
          printf("MissionControl.Start ERROR: a mission is already running.\n");
          return;
       }
@@ -70,7 +70,7 @@ void TMissionControl::Start(bool (*InMission)(TState &S))
 //-----------------------------------------------------------------------------
 bool TMissionControl::Takt()
    {
-      if (!IsActive()) return true;
+      if (IsDone()) return true;
 
       bool r = CurrentMission(S);
       if (r) {

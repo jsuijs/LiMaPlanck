@@ -118,7 +118,7 @@ void TDrive::Takt()
 
       if (NewMovement) {
          // gewijzigde drive mode => diverse init's
-         if (Flags.IsSet(1)) printf("Drive - new movement\n");
+         if (Flags.IsSet(1)) printf("Drive - new movement %d\n", DriveMode);
          FirstCall = true;
 
          SollSpeedL = ACT_SPEED_MM_SEC(Position.ActSpeedL);
