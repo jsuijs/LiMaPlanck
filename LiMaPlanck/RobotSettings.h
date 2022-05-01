@@ -62,7 +62,7 @@ const float ROTATE_D_GAIN     =  0.05;
 
    // Encoder parameters (Position.h)
    const float F_ODO_TICK_TO_METRIC = 0.124023;    // Distance per tick in mm (left wheel).
-   const float F_ODO_TICK_L_R       = 1.000195;    // Wheel-size correction. (Right wheel vs left one, 4096 = equal size)
+   const float F_ODO_TICK_L_R       = 1.000914278; // Wheel-size correction. (Right wheel vs left one, 1.0 = equal size)
    const float F_ODO_HEADING        = 0.039581;    // Odo-ticks to heading, larger => more degrees per tick
                                                    // ODO_HEADING = (ODO_TICK_TO_METRIC * 57.2957795) / WIELBASIS (in mm)
                                                    // If the robots rotates too much, increase this number
