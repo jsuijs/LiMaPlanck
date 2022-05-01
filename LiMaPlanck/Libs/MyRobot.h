@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// MyRobot.h - include voor diverse .cpp files.
+// MyRobot.h - definitions and (optional) quite a bit of code
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 #ifndef MYROBOT_H
@@ -11,11 +11,11 @@
 const int MAIN_TAKT_RATE   = 1000 / MAIN_TAKT_INTERVAL;   // Hz
 const int WIEL_BASIS       = F_ODO_TICK_TO_METRIC * 57.2957795 / F_ODO_HEADING;
 
-#define ACT_SPEED_MM_SEC(ActSpeed) ((ActSpeed * (F_ODO_TICK_TO_METRIC*1024)) / MAIN_TAKT_INTERVAL);
+#define ACT_SPEED_MM_SEC(ActSpeed) (ActSpeed * (F_ODO_TICK_TO_METRIC * 1000 / MAIN_TAKT_INTERVAL));
 
 #define GRAD2RAD(x)        ((float)(x) / 57.2957795)
-#define RAD2GRAD(x)        ((float)(x) * 57.2957795)   // uitkomst is float, deze kan evt zonder verlies geschaald worden naar hogere resulotie
-#define ABS(x)             ( (x>=0) ? x : -x )
+#define RAD2GRAD(x)        ((float)(x) * 57.2957795)
+#define ABS(x)             ((x>=0) ? x : -x)
 
 template <typename T> inline
 T ABSOLUTE(const T& v) { return v < 0 ? -v : v; }
@@ -35,7 +35,6 @@ T ABSOLUTE(const T& v) { return v < 0 ? -v : v; }
 #include "Libs/LppMaster.h"      // contains code...
 #include "Libs/PassageFinder.h"  // contains code...
 #include "Libs/Apa102.h"         // contains code...
-
 
 //-----------------------------------------------------------------------------
 // Motors.cpp
@@ -62,7 +61,6 @@ bool ServoSlope(Servo &S, int Setpoint, int Step);
 void RcDispatch(int &RcData);
 int  PfKeyGet();
 void PfKey(int InKey);
-
 
 #include "Libs/Drive.h"          // contains code...
 

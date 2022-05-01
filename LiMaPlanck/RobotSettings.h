@@ -156,7 +156,7 @@ const float ROTATE_D_GAIN     =  0.05;
    const int LPP_REVERSE   = 1;
 
    const int SERVO_CLOSE   = 2300;
-const int SERVO_OPEN    =  500;
+   const int SERVO_OPEN    =  500;
 #endif // ROBOT_ALOYS
 
 #endif

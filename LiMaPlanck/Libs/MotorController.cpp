@@ -6,12 +6,11 @@
 class TMc   // local MotorControl class.
 {
    public:
-      void Compute(int Setpoint, int ActSpeed)
+      void Compute(int Setpoint, int ActSpeed, bool Debug=false)
       {
-         int Setpoint_Ticks = (Setpoint * (long) MAIN_TAKT_INTERVAL) / (F_ODO_TICK_TO_METRIC * 1024);
+         int Setpoint_Ticks = Setpoint * (MAIN_TAKT_INTERVAL / (F_ODO_TICK_TO_METRIC * 1000));
 
-         if (Setpoint_Ticks == 0) {
-            // Stop
+         if (Setpoint_Ticks == 0) { // Stop / Stopped
             IError = 0;
             Power  = 0;
             return;
@@ -31,6 +30,9 @@ class TMc   // local MotorControl class.
                   PError            * MPID_P_GAIN  +     // P
                   IError            * MPID_I_GAIN  +     // I
                   DError            * MPID_D_GAIN  ;     // D
+         if (Debug) {
+            printf("Sp: %d, SpT: %d, Act: %d, I: %d\n", Setpoint, Setpoint_Ticks, ActSpeed, IError);
+         }
       }
       int Power;                                         // output variable
 
