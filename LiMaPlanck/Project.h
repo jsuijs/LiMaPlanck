@@ -21,7 +21,7 @@ bool MissionTTijdOpening1(TState &S);      // T-Tijd met opening zoeken in vak -
 bool MissionStartVector1(TState &S);
 bool MissionBlikken(TState &S);
 
-void ReadLijnsensor();
+bool MissionAutoWSCal(TState &S);
 
 // Nieuwe namen voor sensoren
 const int S_ACHTER      = 0;

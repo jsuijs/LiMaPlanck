@@ -10,9 +10,7 @@
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 bool MissionBlikken(TState &S) //  **
-{
-   static TState MissionSubS;  // State of sub-mission   ++  StartVector
-   static int BlikNummer;      // 6-Blikken ophalen
+{  static int BlikNummer;      // 6-Blikken ophalen
    static int MissieFase;          // Rit nr 1=B en 2=C
 
    S.Update(__FUNCTION__, Flags.IsSet(11));  //   ++  StartVector
@@ -37,9 +35,9 @@ bool MissionBlikken(TState &S) //  **
 
       //  ==STARTVECTOR==
       case 10 : {    // MissionStartVector1 uitvoeren
-         if (S.NewState) MissionSubS.Reset();    // geef aan dat we (opnieuw) starten
+         if (S.NewState) SubS.Reset();    // geef aan dat we (opnieuw) starten
 
-         if (MissionStartVector1(MissionSubS)) S.State = 100;
+         if (MissionStartVector1(SubS)) S.State = 100;
       }
       break;
 

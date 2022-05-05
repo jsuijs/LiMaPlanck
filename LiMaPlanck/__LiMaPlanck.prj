@@ -48,3 +48,5 @@ Create Tagfile=0
 9=..+AFw-README.md
 10=MissionBlikken.cpp
 11=PfKey.cpp
+12=ArduinoSettings.bat
+13=MissionAutoWSCal.cpp

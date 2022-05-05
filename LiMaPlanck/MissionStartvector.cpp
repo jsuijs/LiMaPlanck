@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// MIssionStartvector.cpp
+// MissionStartvector.cpp
 //-----------------------------------------------------------------------------
 #include "RobotSettings.h"
 #include "Libs/MyRobot.h"
