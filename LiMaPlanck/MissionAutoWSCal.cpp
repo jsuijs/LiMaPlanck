@@ -183,7 +183,7 @@ bool MissionAutoWSCal(TState &S)
                   StartDistanceRight, Measure.RightDistance(), Position.YPos);
 
             // Check if we're done or need another run.
-            RunCounter --;
+            RunCounter ++;
             if (RunCounter < 20) {
                S.State = 10;
             } else {
