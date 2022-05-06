@@ -63,7 +63,13 @@ void TState::Update(const char *FName, bool Verbose)
       if (Now == StateStartTime) printf("Waarschuwing: S.Update wordt waarschijnlijk dubbel aangeroepen! (%s)\n", FName);
       NewState = false;
       if (PrevState != State) {
-         if (Verbose) printf("%s state %d -> %d\n", FName, PrevState, State);
+         if (Verbose) {
+            printf("%s state %d -> %d\n", FName, PrevState, State);
+            if (PrevState == -1) {
+               // first call after reset
+               printf("%s state Param0: %d, Param1: %d, Param2: %d\n", FName, Param0, Param1, Param2);
+            }
+         }
 
          PrevState      = State;
          NewState       = true;
