@@ -228,8 +228,8 @@ void Execute(int Param[])
    if (Command.Match("DriveStop",      0)) Driver.Stop();
 
    if (Command.Match("WSCal",          2)) {
-      MissionControl.S.Param1 = Param[0];          // distance to drive
-      MissionControl.S.Param2 = Param[1];          // set CW
+      MissionControl.S.Param0 = Param[0];          // distance to drive (e.g. 2000)
+      MissionControl.S.Param1 = Param[1];          // set CW (1 or -1)
       MissionControl.Start(MissionWheelSizeCalibrate);
    }
 
@@ -256,6 +256,11 @@ void Execute(int Param[])
    if (Command.Match("LedsRingH",      2)) { Leds.HSV(Degrees2RingIndex(Param[0]), Param[1]);   Leds.Commit(); }
    if (Command.Match("ShowLppSensor",  1)) ShowLppSensor(Param[0]);  // Show LppSensor range & value on LEDs
 
-   if (Command.Match("awscal",         0)) MissionControl.Start(MissionAutoWSCal);
+   if (Command.Match("awscal",         3)) {
+      MissionControl.S.Param0 = Param[0];          // # of runs (e.g. 10)
+      MissionControl.S.Param1 = Param[1];          // distance to drive (e.g. 2000)
+      MissionControl.S.Param2 = Param[2];          // set CW (1 or -1)
+      MissionControl.Start(MissionAutoWSCal);
+   }
 
 }

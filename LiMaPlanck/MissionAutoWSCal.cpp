@@ -158,9 +158,9 @@ bool MissionAutoWSCal(TState &S)
 
       case 60 : {       // Do the test
          if (S.NewState) {
-            SubS.Param1 = 2000; // distance to drive
-            SubS.Param2 = 1;    // set CW
-            SubS.Reset();       // Start mission at the beginning
+            SubS.Param0 = S.Param1; // distance to drive
+            SubS.Param1 = S.Param2; // set CW
+            SubS.Reset();           // Start mission at the beginning
          }
 
          if (MissionWheelSizeCalibrate(SubS)) S.State += 10;
@@ -179,12 +179,13 @@ bool MissionAutoWSCal(TState &S)
 
          if (Measure.Takt()) {
             // measurement ready
-            printf("WSCal-result Pre: %d, Post: %d, Y: %d\n",
-                  StartDistanceRight, Measure.RightDistance(), Position.YPos);
+            printf("WSCal-result Pre: %d, Post: %d, Y: %d, Error: %d\n",
+                  StartDistanceRight, Measure.RightDistance(), Position.YPos,
+                  Measure.RightDistance() - StartDistanceRight - Position.YPos);
 
             // Check if we're done or need another run.
             RunCounter ++;
-            if (RunCounter < 20) {
+            if (RunCounter < S.Param0) {
                S.State = 10;
             } else {
                return true;

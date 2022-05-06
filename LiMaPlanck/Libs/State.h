@@ -18,6 +18,7 @@ class TState
       int  State;
       bool NewState;
 
+      int  Param0;   // user param
       int  Param1;   // user param
       int  Param2;   // user param
 

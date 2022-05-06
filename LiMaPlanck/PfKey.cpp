@@ -30,11 +30,6 @@ void PfKey(int ch)
       }
       break;
 
-      case 4 : { // Programma:
-        //MissionControl.Start(MissionAloys1);
-      }
-      break;
-
       case 7 : { // Programma:
          MissionControl.Start(MissionSuperSlalom);
       }
@@ -42,18 +37,6 @@ void PfKey(int ch)
 
       case 8 : { // Programma: MissieBlikken
          MissionControl.Start(MissionBlikken);
-      }
-      break;
-
-//      case 9 : { // Programma: Heen en Weer
-//         MissionControl.S.Param1 = 200;  // speed
-//         MissionControl.Start(MissieHeenEnWeer);
-//      }
-//      break;
-
-      case 10 : { // Programma: ttijd
-         MissionControl.S.Param1 = 300;  // speed
-//         MissionControl.Start(MissieTTijd);
       }
       break;
 

@@ -108,7 +108,7 @@ bool MissionWheelSizeCalibrate(TState &S)
     case 0 : {  // naar 3000mm testrit
         if (S.NewState) {
           Position.Reset();
-          Driver.XY(S.Param1, 0 , 200, 0 );
+          Driver.XY(S.Param0, 0 , 200, 0 );
         }
 
         if (Driver.IsDone()) S.State += 10;
