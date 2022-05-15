@@ -118,8 +118,9 @@ void TPosition::Takt()
 
       if ((ActSpeedL !=0) || (ActSpeedR != 0)) { // als we verplaatst zijn
 
-         // Update heading: (incl. correctie voor verschil in wiel-grootte)
-         fVarRobotDegrees += (ActSpeedR * F_ODO_TICK_L_R - ActSpeedL) * F_ODO_HEADING;
+         // Update heading (eerste helft, incl. correctie voor verschil in wiel-grootte)
+         float HalfHeadingDelta = (ActSpeedR * F_ODO_TICK_L_R - ActSpeedL) * F_ODO_HEADING / 2;
+         fVarRobotDegrees += HalfHeadingDelta;
 
          // bereken afgelegde weg in mm
          float fDeltaT = (ActSpeedL + ActSpeedR) * F_ODO_TICK_TO_METRIC / 2;
@@ -131,6 +132,9 @@ void TPosition::Takt()
          float RadHeading = GRAD2RAD(fVarRobotDegrees);
          fVarRobotXPos += fDeltaT * cos(RadHeading);
          fVarRobotYPos += fDeltaT * sin(RadHeading);
+
+         // resterende heading update
+         fVarRobotDegrees += HalfHeadingDelta;
 
          Update();
 //       printf("SpeedL: %d, SpeedR: %d, Lticks: %ld, Rticks: %ld, DeltaL: %ld, DeltaR: %ld, XPos: %d YPos: %d Hoek: %d\n",
