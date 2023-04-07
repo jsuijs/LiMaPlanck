@@ -17,16 +17,12 @@
  *    The parameters specified here are those for for which we can't set up
  *    reliable defaults, so we need to have the user set them.
  ***************************************************************************/
-PID::PID(double* Input, double* Output, double* Setpoint,
-        double Kp, double Ki, double Kd, int POn, int ControllerDirection)
+PID::PID(double Kp, double Ki, double Kd, int POn, int ControllerDirection)
 {
-    myOutput = Output;
-    myInput = Input;
-    mySetpoint = Setpoint;
     inAuto = false;
 
-    PID::SetOutputLimits(0, 255);				//default output limit corresponds to
-												//the arduino pwm limits
+    PID::SetOutputLimits(0, 255);			//default output limit corresponds to
+												      //the arduino pwm limits
 
     SampleTime = 100;							//default Controller Sample Time is 0.1 seconds
 
@@ -41,13 +37,11 @@ PID::PID(double* Input, double* Output, double* Setpoint,
  *    to use Proportional on Error without explicitly saying so
  ***************************************************************************/
 
-PID::PID(double* Input, double* Output, double* Setpoint,
-        double Kp, double Ki, double Kd, int ControllerDirection)
-    :PID::PID(Input, Output, Setpoint, Kp, Ki, Kd, P_ON_E, ControllerDirection)
+PID::PID(double Kp, double Ki, double Kd, int ControllerDirection)
+    :PID::PID(Kp, Ki, Kd, P_ON_E, ControllerDirection)
 {
 
 }
-
 
 /* Compute() **********************************************************************
  *     This, as they say, is where the magic happens.  this function should be called
@@ -55,17 +49,22 @@ PID::PID(double* Input, double* Output, double* Setpoint,
  *   pid Output needs to be computed.  returns true when the output is computed,
  *   false when nothing has been done.
  **********************************************************************************/
-bool PID::Compute()
+bool PID::Compute(double Input, double Setpoint)
 {
    if(!inAuto) return false;
+
+   if (InitFlag) {
+      lastInput = Input;
+      InitFlag = false;
+   }
+
    unsigned long now = millis();
    unsigned long timeChange = (now - lastTime);
    if(timeChange>=SampleTime)
    {
       /*Compute all the working error variables*/
-      double input = *myInput;
-      double error = *mySetpoint - input;
-      double dInput = (input - lastInput);
+      double error = Setpoint - Input;
+      double dInput = (Input - lastInput);
       outputSum+= (ki * error);
 
       /*Add Proportional on Measurement, if P_ON_M is specified*/
@@ -84,14 +83,14 @@ bool PID::Compute()
 
 	    if(output > outMax) output = outMax;
       else if(output < outMin) output = outMin;
-	    *myOutput = output;
+	   Output = output;
 
       /*Remember some variables for next time*/
-      lastInput = input;
+      lastInput = Input;
       lastTime = now;
 	    return true;
    }
-   else return false;
+   return false;
 }
 
 /* SetTunings(...)*************************************************************
@@ -159,8 +158,8 @@ void PID::SetOutputLimits(double Min, double Max)
 
    if(inAuto)
    {
-	   if(*myOutput > outMax) *myOutput = outMax;
-	   else if(*myOutput < outMin) *myOutput = outMin;
+	   if(Output > outMax) Output = outMax;
+	   else if(Output < outMin) Output = outMin;
 
 	   if(outputSum > outMax) outputSum= outMax;
 	   else if(outputSum < outMin) outputSum= outMin;
@@ -188,10 +187,11 @@ void PID::SetMode(int Mode)
  ******************************************************************************/
 void PID::Initialize()
 {
-   outputSum = *myOutput;
-   lastInput = *myInput;
+   InitFlag = true;
+
+   outputSum = Output;
    if(outputSum > outMax) outputSum = outMax;
-   else if(outputSum < outMin) outputSum = outMin;
+   if(outputSum < outMin) outputSum = outMin;
 }
 
 /* SetControllerDirection(...)*************************************************
@@ -216,9 +216,9 @@ void PID::SetControllerDirection(int Direction)
  * functions query the internal state of the PID.  they're here for display
  * purposes.  this are the functions the PID Front-end uses for example
  ******************************************************************************/
-double PID::GetKp(){ return  dispKp; }
-double PID::GetKi(){ return  dispKi;}
-double PID::GetKd(){ return  dispKd;}
-int PID::GetMode(){ return  inAuto ? AUTOMATIC : MANUAL;}
-int PID::GetDirection(){ return controllerDirection;}
+double PID::GetKp()        { return  dispKp; }
+double PID::GetKi()        { return  dispKi; }
+double PID::GetKd()        { return  dispKd; }
+int    PID::GetMode()      { return  inAuto ? AUTOMATIC : MANUAL; }
+int    PID::GetDirection() { return controllerDirection; }
 
