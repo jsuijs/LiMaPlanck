@@ -19,7 +19,7 @@
  ***************************************************************************/
 PID::PID(double Kp, double Ki, double Kd, int POn, int ControllerDirection)
 {
-    inAuto = false;
+    inAuto = true;
 
     PID::SetOutputLimits(0, 255);			//default output limit corresponds to
 												      //the arduino pwm limits
@@ -88,7 +88,7 @@ bool PID::Compute(double Input, double Setpoint)
       /*Remember some variables for next time*/
       lastInput = Input;
       lastTime = now;
-	    return true;
+	   return true;
    }
    return false;
 }

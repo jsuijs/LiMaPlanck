@@ -30,6 +30,11 @@ void PfKey(int ch)
       }
       break;
 
+      case 4 : {  // Programma:
+         MissionControl.Start(MissionLijnVolgen);
+      }
+      break;
+
       case 7 : { // Programma:
          MissionControl.Start(MissionSuperSlalom);
       }

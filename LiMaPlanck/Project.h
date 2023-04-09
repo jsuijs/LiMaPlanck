@@ -30,5 +30,7 @@ const int S_VOOR        = 3;
 const int S_LINKS_VOOR  = 4;
 
 void LedTakt();
+extern PID LinePid;
+extern int LineSpeedSetpoint;
 
 #endif

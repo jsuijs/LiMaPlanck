@@ -111,8 +111,8 @@ void setup() {
    Buzzer.Beep(30, 2);
    printf("Opstarten gereed %d.\n", WIEL_BASIS);
 
-   myservo.attach(PB5);    // attaches the servo on pin 17 to the servo object
-   myservo.write(550);     // default: gripper open
+//   myservo.attach(PB5);    // attaches the servo on pin 17 to the servo object
+//   myservo.write(550);     // default: gripper open
 }
 
 //---------------------------------------------------------------------------------------
@@ -138,6 +138,7 @@ void loop() {
       NextMainTakt = ms + MAIN_TAKT_INTERVAL;  // zet tijd voor volgende interval
       // hier de periodieke acties voor deze interval
       ReadLpp();
+      ReadLineSensor();
       ShowLppSensor(6);
       Position.Takt();  // Lees & verwerk encoder data
       MissionTakt();    // Voer (stapje van) geselecteerde programma uit
@@ -237,8 +238,6 @@ void Execute(int Param[])
 
    if (Command.Match("I2cScan",        0)) I2cScan();
 
-   if (Command.Match("LineSensorRead", 0)) LineSensorRead();
-
    if (Command.Match("LppStart",       0)) Lpp.Start();
    if (Command.Match("LppStop",        0)) Lpp.Stop();
    if (Command.Match("LppSetupS",      3)) Lpp.SensorSetup(Param[0], Param[1], Param[2]);  // Sensor #, start & width
@@ -267,4 +266,27 @@ void Execute(int Param[])
       MissionControl.Start(MissionAutoWSCal);
    }
 
+   if (Command.Match("ReadLineSensor", 0)) ReadLineSensor();
+
+   if (Command.Match("LineSpeed",      1)) LineSpeedSetpoint = Param[0];
+
+   if (Command.Match("Linepid",     0)) {
+      printf("LinePID Kp: %f, Ki: %f, Kd: %f, Output: %f\n",
+            LinePid.GetKp(), LinePid.GetKi(), LinePid.GetKd(), LinePid.Output);
+   }
+
+   if (Command.Match("LinepidKp",     2)) {
+      double Value = Param[0] / (double) Param[1];
+      LinePid.SetTunings(Value, LinePid.GetKi(), LinePid.GetKd());
+   }
+
+   if (Command.Match("LinepidKi",     2)) {
+      double Value = Param[0] / (double) Param[1];
+      LinePid.SetTunings(LinePid.GetKp(), Value, LinePid.GetKd());
+   }
+
+   if (Command.Match("LinepidKd",     2)) {
+      double Value = Param[0] / (double) Param[1];
+      LinePid.SetTunings(LinePid.GetKp(), LinePid.GetKi(), Value);
+   }
 }
