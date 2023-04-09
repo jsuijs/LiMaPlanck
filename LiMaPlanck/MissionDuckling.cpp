@@ -93,11 +93,7 @@ bool MissionDuckling(TState &S)
       }
       break;
 
-
-      default : {
-         printf("Error: ongeldige state in MissieTemplate (%d)\n", S.State);
-         return true;  // error => mission end
-      }
+      default : return S.InvalidState(__FUNCTION__);   // Report invalid state & end mission
    }
    return false;  // mission nog niet gereed
 }

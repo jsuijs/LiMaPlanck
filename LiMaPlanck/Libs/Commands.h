@@ -14,7 +14,7 @@
 #define CMD_MAX_NR_PARAMETERS 9
 
 void HexDump(const void *Data, int Length);
-void HexDump( const void *Data, unsigned int Length, unsigned int Offset);
+void HexDump(const void *Data, unsigned int Length, unsigned int Offset);
 
 /*=====================================================================
  TCommand :

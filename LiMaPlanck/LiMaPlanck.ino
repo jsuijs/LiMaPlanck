@@ -235,6 +235,10 @@ void Execute(int Param[])
 
    if (Command.Match("Stop",           0)) PfKey(-1);
 
+   if (Command.Match("I2cScan",        0)) I2cScan();
+
+   if (Command.Match("LineSensorRead", 0)) LineSensorRead();
+
    if (Command.Match("LppStart",       0)) Lpp.Start();
    if (Command.Match("LppStop",        0)) Lpp.Stop();
    if (Command.Match("LppSetupS",      3)) Lpp.SensorSetup(Param[0], Param[1], Param[2]);  // Sensor #, start & width

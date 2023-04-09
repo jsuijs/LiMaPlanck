@@ -1,3 +1,6 @@
+#ifndef LPP_MASTER_H
+#define LPP_MASTER_H
+
 // <FROM LIDER PREPOCESS SKETCH>
       //--------------------
       // I2c registers START
@@ -116,9 +119,12 @@
    typedef       byte lpp_rx_buffer;
 
    bool I2cSendReceive(byte I2cSlaveAddress, byte TxCount, byte RxCount, const byte *TxBuffer, byte *RxBuffer);
-   void HexDump( const void *Data, unsigned int Length, unsigned int Offset=0);
+   void I2cScan();
    bool I2cWrite_Byte_Byte(int I2cSlaveAddress, int RegAddr, int Data);
    bool I2cWrite_Byte_Word(int I2cSlaveAddress, int RegAddr, int Data);
+   bool I2cRead_Byte_Word(int I2cSlaveAddress, int RegAddr, int &Data);
+
+   void HexDump( const void *Data, unsigned int Length, unsigned int Offset);
    int NormDegrees(int Degrees);
 #endif
 
@@ -594,6 +600,24 @@ bool TLpp::_ReadShorts(char StartIx, char NrOfShorts, lpp_int *Data)
       return r;
    }
 
+//----------------------------------------------------------------------------
+// NormDegrees - Norm angle in degrees, signed result (-179...180 degrees)
+//----------------------------------------------------------------------------
+// Param
+//    degrees = input,
+//
+// Return: normalized degrees
+//
+// See NormAngle() for float (RAD) version.
+//----------------------------------------------------------------------------
+int NormDegrees(int Degrees)
+{
+   Degrees %= 360;  // step 1: +/- 360 degrees
+   while (Degrees >   180) Degrees -= 360;   // > 180 degrees
+   while (Degrees <= -180) Degrees += 360;   // =< -180 degrees (<=, not < because then both 180 and -180 would be valid)
+   return Degrees;
+}
+
 //-----------------------------------------------------------------------------
 // I2cWrite_Byte_Byte - Send a Byte address, then write a Byte of data.
 //-----------------------------------------------------------------------------
@@ -621,23 +645,58 @@ bool I2cWrite_Byte_Word(int I2cSlaveAddress, int RegAddr, int Data)
    return I2cSendReceive(I2cSlaveAddress, 3, 0, (const unsigned char *)TxBuffer, NULL);
 }
 
-//----------------------------------------------------------------------------
-// NormDegrees - Norm angle in degrees, signed result (-179...180 degrees)
-//----------------------------------------------------------------------------
-// Param
-//    degrees = input,
-//
-// Return: normalized degrees
-//
-// See NormAngle() for float (RAD) version.
-//----------------------------------------------------------------------------
-int NormDegrees(int Degrees)
-{
-   Degrees %= 360;  // step 1: +/- 360 degrees
-   while (Degrees >   180) Degrees -= 360;   // > 180 degrees
-   while (Degrees <= -180) Degrees += 360;   // =< -180 degrees (<=, not < because then both 180 and -180 would be valid)
-   return Degrees;
+//-----------------------------------------------------------------------------
+// I2cRead_Byte_Word - Send a Word address, then read a Word of data.
+//-----------------------------------------------------------------------------
+// return: true on succes
+//-----------------------------------------------------------------------------
+bool I2cRead_Byte_Word(int I2cSlaveAddress, int RegAddr, int &Data)
+{  byte TrxBuffer[2];
+
+   TrxBuffer[0] = (RegAddr) & 0xFF;
+   bool r = I2cSendReceive(I2cSlaveAddress, 1, 2, TrxBuffer, TrxBuffer);
+   if (r) {
+      Data = (((int)TrxBuffer[0]) << 8) | TrxBuffer[1];
+   }
+   return r;
 }
+
+//-----------------------------------------------------------------------------
+// I2cIsDeviceConnected - return true if slave # is responding
+//-----------------------------------------------------------------------------
+// Read one char from slave to see if it is present.
+// (Used by I2cScan)
+//-----------------------------------------------------------------------------
+bool I2cIsDeviceConnected(int I2cSlaveAddress, int NrOfBytes)
+{  int r;
+   byte Data[NrOfBytes + 1];
+
+   //I2cDisableTOMsg = true;  // temporary disable timeout messages
+   r = I2cSendReceive(I2cSlaveAddress, 0, NrOfBytes, NULL, Data);
+   //I2cDisableTOMsg = false;  // re-enable timeout messages
+   return r;
+}
+
+//-----------------------------------------------------------------------------
+// I2cScan - scan bus for slaves
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void I2cScan()
+{
+   printf("I2c bus scan slaves:\n");
+   for (int i=1; i < 128; i+=1) {
+      int Nr = 1;
+      if (i == 0x12) Nr = 16; // Sunfounder line sensor modules crashes when less bytes are read
+      if(I2cIsDeviceConnected(i, Nr)) {
+         printf("%02x ", i);
+      } else {
+         printf(".");
+      }
+      if (! (i & 0x3f)) printf("\n");
+   }
+   printf("\nDone.\n");
+}
+
 
 #ifndef LppWire
    #define LppWire Wire
@@ -692,6 +751,16 @@ bool I2cSendReceive(byte I2cSlaveAddress, byte TxCount, byte RxCount, const byte
 #ifndef HEXDUMP_DEFINED
 #define HEXDUMP_DEFINED
 
+//-----------------------------------------------------------------------------
+// HexDump - Dump Data in hex format
+//-----------------------------------------------------------------------------
+// No offset, so address displayed at the start of each line starts at 0.
+//-----------------------------------------------------------------------------
+void HexDump(const void *Data, int Length)
+{
+   HexDump(Data, Length, 0);
+}
+
 /*=====================================================================
  HexDump :
  ---------------------------------------------------------------------*/
@@ -743,3 +812,4 @@ void HexDump( const void *Data, unsigned int Length, unsigned int Offset)
 }
 #endif // HEXDUMP_DEFINED
 #endif // MAIN
+#endif // LPP_MASTER_H

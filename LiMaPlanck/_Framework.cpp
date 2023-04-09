@@ -16,3 +16,4 @@
 #include "Libs/RcDispatch.cpp"
 
 #include "Libs/Utilities.cpp"
+#include "Libs/Adafruit_ADS1015.cpp"
